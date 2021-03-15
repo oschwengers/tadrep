@@ -79,17 +79,13 @@ def setup(args):
 
     # workflow configuration
     global min_contig_coverage, min_contig_identity, min_plasmid_coverage, min_plasmid_identity, gap_sequence_length
-    if(args.min_contig_coverage):
-        min_contig_coverage = int(args.min_contig_coverage) / 100
+    min_contig_coverage = args.min_contig_coverage / 100
     log.info('min-contig-coverage=%s', min_contig_coverage)
-    if(args.min_contig_identity):
-        min_contig_identity = int(args.min_contig_identity) / 100
+    min_contig_identity = args.min_contig_identity / 100
     log.info('min-contig-identity=%s', min_contig_identity)
-    if(args.min_plasmid_coverage):
-        min_plasmid_coverage = int(args.min_plasmid_coverage) / 100
+    min_plasmid_coverage = args.min_plasmid_coverage / 100
     log.info('min-plasmid-coverage=%s', min_plasmid_coverage)
-    if(args.min_plasmid_identity):
-        min_plasmid_identity = int(args.min_plasmid_identity) / 100
+    min_plasmid_identity = args.min_plasmid_identity / 100
     log.info('min-plasmid-identity=%s', min_plasmid_identity)
     gap_sequence_length = args.gap_sequence_length
     log.info('gap-sequence-length=%s', gap_sequence_length)
