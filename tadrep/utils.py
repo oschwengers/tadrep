@@ -27,6 +27,7 @@ def parse_arguments():
     arg_group_parameters.add_argument('--min-contig-identity', action='store', type=int, default=90, dest='min_contig_identity', help="Maximal contig identity (default = 90%)")
     arg_group_parameters.add_argument('--min-plasmid-coverage', action='store', type=int, default=80, dest='min_plasmid_coverage', help="Minimal plasmid coverage (default = 80%)")
     arg_group_parameters.add_argument('--min-plasmid-identity', action='store', type=int, default=90, dest='min_plasmid_identity', help="Minimal plasmid identity (default = 90%)")
+    arg_group_parameters.add_argument('--gap-sequence-length', action='store', type=int, default=10, dest='gap_sequence_length', help="Gap sequence N length (default = 10)")
 
     arg_group_general = parser.add_argument_group('General')
     arg_group_general.add_argument('--help', '-h', action='help', help='Show this help message and exit')
