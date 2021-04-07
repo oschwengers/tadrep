@@ -17,6 +17,7 @@ genome_path = None
 plasmids_path = None
 output_path = None
 tmp_path = None
+prefix = None
 
 # workflow configuration
 min_contig_coverage = 0.9
@@ -36,7 +37,7 @@ def setup(args):
     log.info('verbose=%s', verbose)
 
     # input / output path configurations
-    global tmp_path, genome_path, plasmids_path, output_path
+    global tmp_path, genome_path, plasmids_path, output_path, prefix
 
     if(args.tmp_dir):
         tmp_path = Path(args.tmp_dir)
@@ -74,8 +75,12 @@ def setup(args):
     except:
         log.error('provided plasmids file not valid! path=%s', args.plasmids)
         sys.exit(f'ERROR: plasmids file ({args.plasmids}) not valid!')
+
+    if(args.prefix):
+        prefix = args.prefix
     log.info('plasmids-path=%s', plasmids_path)
     log.info('output-path=%s', output_path)
+    log.info('prefix=%s', prefix)
 
     # workflow configuration
     global min_contig_coverage, min_contig_identity, min_plasmid_coverage, min_plasmid_identity, gap_sequence_length

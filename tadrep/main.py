@@ -25,8 +25,9 @@ def main():
         cfg.output_path = output_path
     except:
         sys.exit(f'ERROR: could not resolve or create output directory ({args.output})!')
+    log_prefix = args.prefix if args.prefix else "tadrep"
     logging.basicConfig(
-        filename=str(output_path.joinpath(f'{cfg.prefix}.log')),
+        filename=str(output_path.joinpath(f'{log_prefix}.log')),
         filemode='w',
         format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
         level=logging.DEBUG if args.verbose else logging.INFO
@@ -47,7 +48,7 @@ def main():
         print(f'TaDReP v{tadrep.__version__}')
         print('Options and arguments:')
         print(f'\tinput: {cfg.genome_path}')
-        print(f'\tplasmid(s): {cfg.plasmid_path}')
+        print(f'\tplasmid(s): {cfg.plasmids_path}')
         print(f'\toutput: {cfg.output_path}')
         print(f'\tprefix: {cfg.prefix}')
         print(f'\ttmp directory: {cfg.tmp_path}')
@@ -61,7 +62,7 @@ def main():
     ############################################################################
     print('parse genome sequences...')
     try:
-        contigs = fasta.import_contigs(cfg.genome_path)
+        contigs = fasta.import_sequences(cfg.genome_path)
         log.info('imported sequences=%i', len(contigs))
         print(f'\timported: {len(contigs)}')
     except:
@@ -75,11 +76,11 @@ def main():
     # Import plasmid sequences
     # - parse contigs in Fasta file
     ############################################################################
-    print('parse genome sequences...')
+    print('parse plasmids sequences...')
     try:
-        contigs = fasta.import_sequences(cfg.genome_path)
-        log.info('imported sequences=%i', len(contigs))
-        print(f'\timported: {len(contigs)}')
+        plasmids = fasta.import_sequences(cfg.plasmids_path)
+        log.info('imported sequences=%i', len(plasmids))
+        print(f'\timported: {len(plasmids)}')
     except:
         log.error('wrong genome file format!', exc_info=True)
         sys.exit('ERROR: wrong genome file format!')
@@ -94,10 +95,10 @@ def main():
     # - write optional output files in GFF3/GenBank/EMBL formats
     # - remove temp directory
     ############################################################################
-    print('write genome sequences...')
+    print('prepare output sequences...')
     prefix = f"<prefix>-<plasmid-id>"
     fna_path = cfg.output_path.joinpath(f'{prefix}.fna')
-    fasta.export_contigs(hits['contigs'], fna_path, description=True, wrap=True)
+    fasta.export_sequences(hits['contigs'], fna_path, description=True, wrap=True)
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))

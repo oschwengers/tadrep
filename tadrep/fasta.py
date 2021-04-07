@@ -14,7 +14,7 @@ FASTA_LINE_WRAPPING = 60
 
 def import_sequences(contigs_path):
     """Import sequences."""
-    contigs = []
+    contigs = {}
     with xopen(str(contigs_path), threads=0) as fh:
         for record in SeqIO.parse(fh, 'fasta'):
             seq = str(record.seq).upper()
@@ -28,7 +28,7 @@ def import_sequences(contigs_path):
                 'imported: id=%s, length=%i, description=%s',
                 contig['id'], contig['length'], contig['description']
             )
-            contigs.append(contig)
+            contigs[contig['id']] = contig
     return contigs
 
 
