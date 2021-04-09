@@ -54,24 +54,6 @@ def main():
         print(f'\ttmp directory: {cfg.tmp_path}')
         print(f'\t# threads: {cfg.threads}')
 
-
-    ############################################################################
-    # Import draft genome contigs
-    # - parse contigs in Fasta file
-    # - apply contig length filter
-    ############################################################################
-    print('parse genome sequences...')
-    try:
-        contigs = fasta.import_sequences(cfg.genome_path)
-        log.info('imported sequences=%i', len(contigs))
-        print(f'\timported: {len(contigs)}')
-    except:
-        log.error('wrong genome file format!', exc_info=True)
-        sys.exit('ERROR: wrong genome file format!')
-    
-    # contig length filter (<= default / parameter?)
-
-
     ############################################################################
     # Import plasmid sequences
     # - parse contigs in Fasta file
@@ -79,26 +61,39 @@ def main():
     print('parse plasmids sequences...')
     try:
         plasmids = fasta.import_sequences(cfg.plasmids_path)
-        log.info('imported sequences=%i', len(plasmids))
+        log.info('imported plasmids: sequences=%i, file=%s', len(plasmids), cfg.plasmids_path)
         print(f'\timported: {len(plasmids)}')
-    except:
-        log.error('wrong genome file format!', exc_info=True)
-        sys.exit('ERROR: wrong genome file format!')
-
-
-    
-    
+    except ValueError:
+        log.error('wrong plasmids file format!', exc_info=True)
+        sys.exit('ERROR: wrong plasmids file format!')
 
     ############################################################################
-    # Write output files
-    # - write comprehensive annotation results as JSON
-    # - write optional output files in GFF3/GenBank/EMBL formats
-    # - remove temp directory
+    # Import draft genome contigs
+    # - parse contigs in Fasta file
+    # - apply contig length filter
     ############################################################################
-    print('prepare output sequences...')
-    prefix = f"<prefix>-<plasmid-id>"
-    fna_path = cfg.output_path.joinpath(f'{prefix}.fna')
-    fasta.export_sequences(hits['contigs'], fna_path, description=True, wrap=True)
+    print('parse genome sequences...')
+    for genome in cfg.genome_path:
+        try:
+            contigs = fasta.import_sequences(genome)
+            log.info('imported genomes: sequences=%i, file=%s', len(contigs), genome)
+            print(f'\timported: {len(contigs)}, file: {genome.stem}')
+        except ValueError:
+            log.error('wrong genome file format!', exc_info=True)
+            sys.exit('ERROR: wrong genome file format!')
+
+        # contig length filter (<= default / parameter?)
+
+        ############################################################################
+        # Write output files
+        # - write comprehensive annotation results as JSON
+        # - write optional output files in GFF3/GenBank/EMBL formats
+        # - remove temp directory
+        ############################################################################
+        print('prepare output sequences...')
+        prefix = f"<prefix>-<plasmid-id>"
+        fna_path = cfg.output_path.joinpath(f'{prefix}.fna')
+        fasta.export_sequences(hits['contigs'], fna_path, description=True, wrap=True)
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))
