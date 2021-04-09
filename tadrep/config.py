@@ -13,7 +13,7 @@ threads = None
 verbose = None
 
 # input / output configuration
-genome_path = None
+genome_path = []
 plasmids_path = None
 output_path = None
 tmp_path = None
@@ -51,18 +51,23 @@ def setup(args):
         tmp_path = Path(tempfile.mkdtemp())
     log.info('tmp-path=%s', tmp_path)
 
-    try:
-        genome_path = Path(args.genome).resolve()
-        if(not os.access(str(genome_path), os.R_OK)):
-            log.error('genome file not readable! path=%s', genome_path)
-            sys.exit(f'ERROR: genome file ({genome_path}) not readable!')
-        if(genome_path.stat().st_size == 0):
-            log.error('empty genome file! path=%s', genome_path)
-            sys.exit(f'ERROR: genome file ({genome_path}) is empty!')
-    except:
-        log.error('provided genome file not valid! path=%s', args.genome)
-        sys.exit(f'ERROR: genome file ({args.genome}) not valid!')
-    log.info('genome-path=%s', genome_path)
+    for path in args.genome:
+        try:
+            resolved_path = Path(path).resolve()
+            if(not resolved_path.is_file()):
+                log.error('genome file %s does not exist!', resolved_path)
+                sys.exit(f'ERROR: genome file ({path}) does not exist!')
+            if(not os.access(str(resolved_path), os.R_OK)):
+                log.error('genome file not readable! path=%s', resolved_path)
+                sys.exit(f'ERROR: genome file ({path}) not readable!')
+            if(resolved_path.stat().st_size == 0):
+                log.error('empty genome file! path=%s', resolved_path)
+                sys.exit(f'ERROR: genome file ({path}) is empty!')
+            genome_path.append(resolved_path)
+        except (OSError, ValueError):
+            log.error('provided genome file not valid! path=%s', path)
+            sys.exit(f'ERROR: genome file ({path}) not valid!')
+        log.info('genome-path=%s', resolved_path)
 
     try:
         plasmids_path = Path(args.plasmids).resolve()

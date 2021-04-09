@@ -18,7 +18,7 @@ def parse_arguments():
     )
 
     arg_group_io = parser.add_argument_group('Input / Output')
-    arg_group_io.add_argument('--genome', '-g', action='store', default=None, help='Draft genome path (default = <tadrep_path>/db)')
+    arg_group_io.add_argument('--genome', '-g', action='store', default=None, nargs="+", help='Draft genome path (default = <tadrep_path>/db)')
     arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, help='Plasmids path (default = <tadrep_path>/db)')
     arg_group_io.add_argument('--output', '-o', action='store', default=os.getcwd(), help='Output directory (default = current working directory)')
     arg_group_io.add_argument('--tmp-dir', action='store', default=None, help='Temporary directory to store temporary files with blast hits')
