@@ -8,6 +8,7 @@ import tadrep.constants as tc
 import tadrep.config as cfg
 import tadrep.fasta as fasta
 import tadrep.utils as tu
+import tadrep.blast as tb
 
 
 def main():
@@ -82,7 +83,9 @@ def main():
             log.error('wrong genome file format!', exc_info=True)
             sys.exit('ERROR: wrong genome file format!')
 
-        # contig length filter (<= default / parameter?)
+
+        unfiltered_hits = tb.search_contigs(cfg.genome_path, cfg.plasmids_path)
+    
 
         ############################################################################
         # Write output files
