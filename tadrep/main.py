@@ -2,6 +2,7 @@ import logging
 import sys
 import shutil
 from pathlib import Path
+from Bio.Seq import Seq
 
 import tadrep
 import tadrep.constants as tc
@@ -9,6 +10,7 @@ import tadrep.config as cfg
 import tadrep.fasta as fasta
 import tadrep.utils as tu
 import tadrep.blast as tb
+import tadrep.plasmids as tp
 
 
 def main():
@@ -36,7 +38,6 @@ def main():
     log = logging.getLogger('MAIN')
     log.info('version %s', tadrep.__version__)
     log.info('command line: %s', ' '.join(sys.argv))
-
 
     ############################################################################
     # Checks and configurations
@@ -69,34 +70,81 @@ def main():
         sys.exit('ERROR: wrong plasmids file format!')
 
     ############################################################################
-    # Import draft genome contigs
-    # - parse contigs in Fasta file
-    # - apply contig length filter
+    # Prepare summary output file
+    # - create file
+    # - write header into file
     ############################################################################
-    print('parse genome sequences...')
-    for genome in cfg.genome_path:
-        try:
-            contigs = fasta.import_sequences(genome)
-            log.info('imported genomes: sequences=%i, file=%s', len(contigs), genome)
-            print(f'\timported: {len(contigs)}, file: {genome.stem}')
-        except ValueError:
-            log.error('wrong genome file format!', exc_info=True)
-            sys.exit('ERROR: wrong genome file format!')
-
-
-        unfiltered_hits = tb.search_contigs(cfg.genome_path, cfg.plasmids_path)
-    
+    cfg.summary_path = cfg.output_path.joinpath(f'{log_prefix}-summary.tsv')
+    with cfg.summary_path.open('w') as fh:
+        fh.write(f'# {len(cfg.genome_path)} draft genome(s), {len(plasmids)} plasmid(s)\n')
+        fh.write('file\tplasmid_id\tcontig_id\tcontig_start\tcontig_end\tcontig_length\tstrand\tplasmid_start\tplasmid_end\tlength\tcoverage\tidentity\tevalue\n')
 
         ############################################################################
-        # Write output files
-        # - write comprehensive annotation results as JSON
-        # - write optional output files in GFF3/GenBank/EMBL formats
-        # - remove temp directory
+        # Import draft genome contigs
+        # - parse contigs in Fasta file
+        # - apply contig length filter
         ############################################################################
-        print('prepare output sequences...')
-        prefix = f"<prefix>-<plasmid-id>"
-        fna_path = cfg.output_path.joinpath(f'{prefix}.fna')
-        fasta.export_sequences(hits['contigs'], fna_path, description=True, wrap=True)
+        print('parse genome sequences...')
+        for genome in cfg.genome_path:
+            try:
+                contigs = fasta.import_sequences(genome)
+                log.info('imported genomes: sequences=%i, file=%s', len(contigs), genome)
+                print(f'\timported: {len(contigs)}, file: {genome.stem}')
+            except ValueError:
+                log.error('wrong genome file format!', exc_info=True)
+                sys.exit('ERROR: wrong genome file format!')
+
+            unfiltered_hits = tb.search_contigs(genome, cfg.plasmids_path)
+            filtered_hits = tb.filter_contig_hits(unfiltered_hits)
+            detected_plasmids = tp.detect_plasmids(filtered_hits, plasmids)
+
+            ############################################################################
+            # Write output files
+            # - write comprehensive annotation results as JSON
+            # - write optional output files in GFF3/GenBank/EMBL formats
+            # - remove temp directory
+            ############################################################################
+            print('write genome sequences...\n')
+            genome_file = genome.stem
+            print(f'\n\nGenome file: {genome_file}, total contigs: {len(contigs)}, found plasmids: {len(detected_plasmids)}\n')
+            for plasmid in detected_plasmids:
+                prefix = f"{cfg.prefix}-{genome_file}-{plasmid['id']}" if cfg.prefix else f"{genome_file}-{plasmid['id']}"
+                matched_contigs_sorted_path = cfg.output_path.joinpath(f'{prefix}-contigs.fna')
+                assembled_pseudo_plasmid_path = cfg.output_path.joinpath(f'{prefix}-assembled.fna')
+
+                log.debug('prepare output: plasmid-id=%s, contigs-path=%s, assembly-path=%s', plasmid['id'], matched_contigs_sorted_path, assembled_pseudo_plasmid_path)
+                matched_contigs_sorted = tp.reconstruct_plasmid(plasmid, genome_file, contigs)
+
+                fasta.export_sequences(matched_contigs_sorted, matched_contigs_sorted_path, description=True, wrap=True)
+                fasta.export_sequences([plasmid], assembled_pseudo_plasmid_path, description=True, wrap=True)
+
+                reference_plasmid = plasmids[plasmid['id']]
+
+                if (cfg.verbose):
+                    print(f"\tplasmid: {plasmid['id']}\t({reference_plasmid['length']} bp)\tcontig hits = {len(plasmid['hits'])}\t coverage = {plasmid['coverage'] * 100:1.1f}%\tidentity = {plasmid['identity'] * 100:1.1f}%")
+                    print(f"\t{'contig_id':^17} hit_length contig_length contig_start contig_end strand plasmid_start plasmid_end coverage[%] identity[%]")
+                else:
+                    print(f"{cfg.prefix}\t{plasmid['id']}\t{reference_plasmid['length']}\t{len(plasmid['hits'])}\t{plasmid['coverage']:f}\t{plasmid['identity']:f}\t{','.join(contig['contig_id'] for contig in plasmid['hits'])}")
+
+                for hit in plasmid['hits']:
+                    fh.write(f'{genome}\t')
+                    fh.write(f"{plasmid['id']}\t")
+                    fh.write(f"{hit['contig_id']}\t")
+                    fh.write(f"{hit['contig_start']}\t")
+                    fh.write(f"{hit['contig_end']}\t")
+                    fh.write(f"{hit['contig_length']}\t")
+                    fh.write(f"{hit['strand']}\t")
+                    fh.write(f"{hit['plasmid_start']}\t")
+                    fh.write(f"{hit['plasmid_end']}\t")
+                    fh.write(f"{hit['length']}\t")
+                    fh.write(f"{hit['coverage']:.3f}\t")
+                    fh.write(f"{hit['perc_identity']:.3f}\t")
+                    fh.write(f"{hit['evalue']}\n")
+
+                    if (cfg.verbose):
+                        contig = contigs[hit['contig_id']]
+                        print(f"\t{hit['contig_id']:^17} {hit['length']:>10} {contig['length']:>13} {hit['contig_start']:>12} {hit['contig_end']:>10} {hit['strand']:^6} {hit['plasmid_start']:>13} {hit['plasmid_end']:>11} {(hit['length'] / contig['length'] * 100):>8.1f}    {hit['perc_identity'] * 100:>8.1f}")
+                print('\n')
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))

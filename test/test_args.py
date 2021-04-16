@@ -35,5 +35,5 @@ def test_plasmids(tmpdir):
     assert proc.returncode != 0
 
     # parameter OK
-    proc = run(["bin/tadrep", '--genome', 'test/*.fna', '--plasmids', 'test/plasmids.fna', '--output', tmpdir])
+    proc = run(["bin/tadrep", '--genome', 'test/data/draft.fna', '--plasmids', 'test/data/plasmids.fna', '--output', tmpdir])
     assert proc.returncode == 0

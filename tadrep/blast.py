@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 
 import tadrep.config as cfg
+import tadrep.plasmids as tp
 
 log = logging.getLogger('BLAST')
 
@@ -40,6 +41,7 @@ def search_contigs(genome_path, plasmid_path):
         raise Exception(f'blastn error! Error code: {process.returncode}')
 
     hits = []
+    log.debug('reading blast output: file=%s', blast_output_path)
     with blast_output_path.open('r') as fh:
         for line in fh:
             cols = line.strip().split('\t')
@@ -61,14 +63,28 @@ def search_contigs(genome_path, plasmid_path):
             }
             hits.append(hit)
 
-    log.debug("Total contigs matched: %s", len(hits))
+    log.info('search blast-hits: genome=%s, plasmids=%s, found=%s', genome_path.stem, plasmid_path.stem, len(hits))
 
     return hits
+
 
 ############################################################################
 # Process contig-hits into columns
 # Check strand direction
 # return hits
 ############################################################################
-def parse_contig_hits():
-    pass
+def filter_contig_hits(raw_hits):
+    filtered_hits = {}
+    for hit in raw_hits:
+        if(hit['strand'] == '-'):
+            hit['plasmid_start'], hit['plasmid_end'] = hit['plasmid_end'], hit['plasmid_start']
+
+        if(hit['coverage'] >= cfg.min_contig_coverage and hit['perc_identity'] >= cfg.min_contig_identity):
+            plasmid_hits = filtered_hits.get(hit['plasmid_id'], [])
+            plasmid_hits.append(hit)
+            if(len(plasmid_hits) == 1):
+                filtered_hits[hit['plasmid_id']] = plasmid_hits
+            log.debug('contig hit: contig-id=%s, plasmid-id=%s, alignment length=%s, identity%s', hit['contig_id'], hit['plasmid_id'], hit['length'], hit['perc_identity'])
+
+    log.info('filtered blast-hits: raw-hits=%s, filtered-hits=%s', len(raw_hits), len(filtered_hits))
+    return filtered_hits
