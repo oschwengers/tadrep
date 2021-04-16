@@ -8,7 +8,6 @@ from pathlib import Path
 log = logging.getLogger('CONFIG')
 
 # runtime configurations
-env = os.environ.copy()
 threads = None
 verbose = None
 
@@ -31,7 +30,7 @@ gap_sequence_length = 10
 def setup(args):
     """Test environment and build a runtime configuration."""
     # runtime configurations
-    global env, threads, verbose
+    global threads, verbose
     threads = args.threads
     log.info('threads=%i', threads)
     verbose = args.verbose
