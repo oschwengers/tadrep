@@ -19,7 +19,7 @@ def test_genome():
     assert proc.returncode != 0
 
 
-def test_plasmids(tmpdir):
+def test_plasmids():
     # test database arguments
 
     # not provided
@@ -30,10 +30,12 @@ def test_plasmids(tmpdir):
     proc = run(["bin/tadrep", '--plasmids'])
     assert proc.returncode != 0
 
-    # parameter wrong path
-    proc = run(["bin/tadrep", '--plasmids', 'test/'])
+    # non-existing
+    proc = run(["bin/tadrep", '--plasmids', 'foo.fasta'])
     assert proc.returncode != 0
 
-    # parameter OK
+
+def test_full(tmpdir):
+    # all parameter OK
     proc = run(["bin/tadrep", '--genome', 'test/data/draft.fna', '--plasmids', 'test/data/plasmids.fna', '--output', tmpdir])
     assert proc.returncode == 0
