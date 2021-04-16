@@ -20,11 +20,11 @@ summary_path = None
 prefix = None
 
 # workflow configuration
-min_contig_coverage = 0.9
-min_contig_identity = 0.9
-min_plasmid_coverage = 0.8
-min_plasmid_identity = 0.8
-gap_sequence_length = 10
+min_contig_coverage = None
+min_contig_identity = None
+min_plasmid_coverage = None
+min_plasmid_identity = None
+gap_sequence_length = None
 
 
 def setup(args):
