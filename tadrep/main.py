@@ -109,14 +109,14 @@ def main():
             print(f'\n\nGenome file: {genome_file}, total contigs: {len(contigs)}, found plasmids: {len(detected_plasmids)}\n')
             for plasmid in detected_plasmids:
                 prefix = f"{cfg.prefix}-{genome_file}-{plasmid['id']}" if cfg.prefix else f"{genome_file}-{plasmid['id']}"
-                matched_contigs_sorted_path = cfg.output_path.joinpath(f'{prefix}-contigs.fna')
-                assembled_pseudo_plasmid_path = cfg.output_path.joinpath(f'{prefix}-assembled.fna')
+                plasmid_contigs_path = cfg.output_path.joinpath(f'{prefix}-contigs.fna')
+                plasmid_pseudosequence_path = cfg.output_path.joinpath(f'{prefix}-pseudo.fna')
 
-                log.debug('prepare output: plasmid-id=%s, contigs-path=%s, assembly-path=%s', plasmid['id'], matched_contigs_sorted_path, assembled_pseudo_plasmid_path)
+                log.debug('prepare output: plasmid-id=%s, contigs-path=%s, assembly-path=%s', plasmid['id'], plasmid_contigs_path, plasmid_pseudosequence_path)
                 matched_contigs_sorted = tp.reconstruct_plasmid(plasmid, genome_file, contigs)
 
-                fasta.export_sequences(matched_contigs_sorted, matched_contigs_sorted_path, description=True, wrap=True)
-                fasta.export_sequences([plasmid], assembled_pseudo_plasmid_path, description=True, wrap=True)
+                fasta.export_sequences(matched_contigs_sorted, plasmid_contigs_path, description=True, wrap=True)
+                fasta.export_sequences([plasmid], plasmid_pseudosequence_path, description=True, wrap=True)
 
                 reference_plasmid = plasmids[plasmid['id']]
 
