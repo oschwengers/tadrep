@@ -1,9 +1,9 @@
-import subprocess as sp
 import logging
-from pathlib import Path
+import subprocess as sp
 
 import tadrep.config as cfg
 import tadrep.plasmids as tp
+
 
 log = logging.getLogger('BLAST')
 
@@ -64,7 +64,6 @@ def search_contigs(genome_path, plasmid_path):
             hits.append(hit)
 
     log.info('search blast-hits: genome=%s, plasmids=%s, found=%s', genome_path.stem, plasmid_path.stem, len(hits))
-
     return hits
 
 

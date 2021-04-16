@@ -1,17 +1,11 @@
-
 import logging
 
 from Bio import SeqIO
-from Bio.Seq import Seq
 from xopen import xopen
-
-import tadrep.constants as bc
-import tadrep.config as cfg
-import tadrep.plasmids as tp
-import tadrep.blast as tb
 
 
 log = logging.getLogger('FASTA')
+
 
 FASTA_LINE_WRAPPING = 60
 

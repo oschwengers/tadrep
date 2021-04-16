@@ -1,6 +1,8 @@
 import logging
 import tadrep.config as cfg
+
 from Bio.Seq import Seq
+
 
 log = logging.getLogger('PLASMIDS')
 
@@ -60,5 +62,4 @@ def calc_coverage_identity(plasmid, hits):
     sum_contig_identity = sum([contig['num_identity'] for contig in hits])
     sum_contig_alignment = sum([contig['length'] for contig in hits])
     plasmid_identity = sum_contig_identity / sum_contig_alignment
-
     return plasmid_coverage, plasmid_identity

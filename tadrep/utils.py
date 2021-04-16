@@ -4,8 +4,7 @@ import multiprocessing as mp
 import os
 
 import tadrep
-import tadrep.constants as bc
-import tadrep.config as cfg
+
 
 log = logging.getLogger('UTILS')
 

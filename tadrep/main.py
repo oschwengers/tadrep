@@ -2,15 +2,13 @@ import logging
 import sys
 import shutil
 from pathlib import Path
-from Bio.Seq import Seq
 
 import tadrep
-import tadrep.constants as tc
+import tadrep.blast as tb
 import tadrep.config as cfg
 import tadrep.fasta as fasta
-import tadrep.utils as tu
-import tadrep.blast as tb
 import tadrep.plasmids as tp
+import tadrep.utils as tu
 
 
 def main():
