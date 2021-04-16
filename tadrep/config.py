@@ -17,6 +17,7 @@ genome_path = []
 plasmids_path = None
 output_path = None
 tmp_path = None
+summary_path = None
 prefix = None
 
 # workflow configuration
@@ -37,7 +38,7 @@ def setup(args):
     log.info('verbose=%s', verbose)
 
     # input / output path configurations
-    global tmp_path, genome_path, plasmids_path, output_path, prefix
+    global tmp_path, genome_path, plasmids_path, output_path, prefix, summary_path
 
     if(args.tmp_dir):
         tmp_path = Path(args.tmp_dir)
