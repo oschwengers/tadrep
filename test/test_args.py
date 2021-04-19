@@ -1,5 +1,5 @@
-import os
-from pathlib import Path
+import pytest
+
 from subprocess import run
 
 
@@ -35,6 +35,7 @@ def test_plasmids():
     assert proc.returncode != 0
 
 
+@pytest.mark.slow
 def test_full(tmpdir):
     # all parameter OK
     proc = run(["bin/tadrep", '--genome', 'test/data/draft.fna', '--plasmids', 'test/data/plasmids.fna', '--output', tmpdir])
