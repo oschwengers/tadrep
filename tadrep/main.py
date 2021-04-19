@@ -103,15 +103,15 @@ def main():
             # - remove temp directory
             ############################################################################
             print('write genome sequences...\n')
-            genome_file = genome.stem
-            print(f'\n\nGenome file: {genome_file}, total contigs: {len(contigs)}, found plasmids: {len(detected_plasmids)}\n')
+            sample = genome.stem
+            print(f'\n\nGenome file: {sample}, total contigs: {len(contigs)}, found plasmids: {len(detected_plasmids)}\n')
             for plasmid in detected_plasmids:
-                prefix = f"{cfg.prefix}-{genome_file}-{plasmid['id']}" if cfg.prefix else f"{genome_file}-{plasmid['id']}"
+                prefix = f"{cfg.prefix}-{sample}-{plasmid['id']}" if cfg.prefix else f"{sample}-{plasmid['id']}"
                 plasmid_contigs_path = cfg.output_path.joinpath(f'{prefix}-contigs.fna')
                 plasmid_pseudosequence_path = cfg.output_path.joinpath(f'{prefix}-pseudo.fna')
 
                 log.debug('prepare output: plasmid-id=%s, contigs-path=%s, assembly-path=%s', plasmid['id'], plasmid_contigs_path, plasmid_pseudosequence_path)
-                matched_contigs_sorted = tp.reconstruct_plasmid(plasmid, genome_file, contigs)
+                matched_contigs_sorted = tp.reconstruct_plasmid(plasmid, sample, contigs)
 
                 fasta.export_sequences(matched_contigs_sorted, plasmid_contigs_path, description=True, wrap=True)
                 fasta.export_sequences([plasmid], plasmid_pseudosequence_path, description=True, wrap=True)
@@ -122,10 +122,10 @@ def main():
                     print(f"\tplasmid: {plasmid['id']}\t({reference_plasmid['length']} bp)\tcontig hits = {len(plasmid['hits'])}\t coverage = {plasmid['coverage'] * 100:1.1f}%\tidentity = {plasmid['identity'] * 100:1.1f}%")
                     print(f"\t{'contig_id':^17} hit_length contig_length contig_start contig_end strand plasmid_start plasmid_end coverage[%] identity[%]")
                 else:
-                    print(f"{cfg.prefix}\t{plasmid['id']}\t{reference_plasmid['length']}\t{len(plasmid['hits'])}\t{plasmid['coverage']:f}\t{plasmid['identity']:f}\t{','.join(contig['contig_id'] for contig in plasmid['hits'])}")
+                    print(f"{sample}\t{plasmid['id']}\t{reference_plasmid['length']}\t{len(plasmid['hits'])}\t{plasmid['coverage']:f}\t{plasmid['identity']:f}\t{','.join(contig['contig_id'] for contig in plasmid['hits'])}")
 
                 for hit in plasmid['hits']:
-                    fh.write(f'{genome_file}\t')
+                    fh.write(f'{sample}\t')
                     fh.write(f"{plasmid['id']}\t")
                     fh.write(f"{hit['contig_id']}\t")
                     fh.write(f"{hit['contig_start']}\t")
