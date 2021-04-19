@@ -3,35 +3,35 @@ import pytest
 from subprocess import run
 
 
-def test_genome():
+@pytest.mark.parametrize(
+    "cmd_line",
+    [
+        (["bin/tadrep"]),  # not provided
+        (["bin/tadrep", '--genome']),  # missing path
+        (["bin/tadrep", '--genome', '']),  # empty
+        (["bin/tadrep", '--genome', 'foo.fasta']),  # not existing
+        (["bin/tadrep", '--genome', 'foo.fasta', '']),  # not existing, empty
+        (["bin/tadrep", '--genome', '', 'foo.fasta']),  # empty, not existing
+    ]
+)
+def test_genome_failing(cmd_line):
     # test genome arguments
-
-    # not provided
-    proc = run(["bin/tadrep"])
-    assert proc.returncode != 0
-
-    # parameter missing path
-    proc = run(["bin/tadrep", '--genome'])
-    assert proc.returncode != 0
-
-    # non-existing
-    proc = run(["bin/tadrep", '--genome', 'foo.fasta'])
+    proc = run(cmd_line)
     assert proc.returncode != 0
 
 
-def test_plasmids():
-    # test database arguments
-
-    # not provided
-    proc = run(["bin/tadrep"])
-    assert proc.returncode != 0
-
-    # parameter missing path
-    proc = run(["bin/tadrep", '--plasmids'])
-    assert proc.returncode != 0
-
-    # non-existing
-    proc = run(["bin/tadrep", '--plasmids', 'foo.fasta'])
+@pytest.mark.parametrize(
+    "cmd_line",
+    [
+        (["bin/tadrep"]),  # not provided
+        (["bin/tadrep", '--plasmids']),  # missing path
+        (["bin/tadrep", '--plasmids', '']),  # empty
+        (["bin/tadrep", '--plasmids', 'foo.fasta']),  # not existing
+    ]
+)
+def test_plasmids_failing(cmd_line):
+    # test plasmid arguments
+    proc = run(cmd_line)
     assert proc.returncode != 0
 
 
