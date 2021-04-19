@@ -37,6 +37,7 @@ def main():
     log.info('version %s', tadrep.__version__)
     log.info('command line: %s', ' '.join(sys.argv))
 
+
     ############################################################################
     # Checks and configurations
     # - check parameters and setup global configuration
@@ -54,6 +55,7 @@ def main():
         print(f'\ttmp directory: {cfg.tmp_path}')
         print(f'\t# threads: {cfg.threads}')
 
+
     ############################################################################
     # Import plasmid sequences
     # - parse contigs in Fasta file
@@ -67,6 +69,7 @@ def main():
         log.error('wrong plasmids file format!', exc_info=True)
         sys.exit('ERROR: wrong plasmids file format!')
 
+
     ############################################################################
     # Prepare summary output file
     # - create file
@@ -77,13 +80,9 @@ def main():
         fh.write(f'# {len(cfg.genome_path)} draft genome(s), {len(plasmids)} plasmid(s)\n')
         fh.write('file\tplasmid_id\tcontig_id\tcontig_start\tcontig_end\tcontig_length\tstrand\tplasmid_start\tplasmid_end\tlength\tcoverage\tidentity\tevalue\n')
 
-        ############################################################################
-        # Import draft genome contigs
-        # - parse contigs in Fasta file
-        # - apply contig length filter
-        ############################################################################
         print('parse genome sequences...')
         for genome in cfg.genome_path:
+            # Import draft genome contigs
             try:
                 contigs = fasta.import_sequences(genome)
                 log.info('imported genomes: sequences=%i, file=%s', len(contigs), genome)
@@ -91,17 +90,12 @@ def main():
             except ValueError:
                 log.error('wrong genome file format!', exc_info=True)
                 sys.exit('ERROR: wrong genome file format!')
+            
+            hits = tb.search_contigs(genome, cfg.plasmids_path)  # align contigs
+            filtered_hits = tb.filter_contig_hits(hits)  # filter hits
+            detected_plasmids = tp.detect_plasmids(filtered_hits, plasmids)  # detect reference plasmids above cov/id thresholds
 
-            unfiltered_hits = tb.search_contigs(genome, cfg.plasmids_path)
-            filtered_hits = tb.filter_contig_hits(unfiltered_hits)
-            detected_plasmids = tp.detect_plasmids(filtered_hits, plasmids)
-
-            ############################################################################
             # Write output files
-            # - write comprehensive annotation results as JSON
-            # - write optional output files in GFF3/GenBank/EMBL formats
-            # - remove temp directory
-            ############################################################################
             print('write genome sequences...\n')
             sample = genome.stem
             print(f'\n\nGenome file: {sample}, total contigs: {len(contigs)}, found plasmids: {len(detected_plasmids)}\n')
@@ -111,9 +105,9 @@ def main():
                 plasmid_pseudosequence_path = cfg.output_path.joinpath(f'{prefix}-pseudo.fna')
 
                 log.debug('prepare output: plasmid-id=%s, contigs-path=%s, assembly-path=%s', plasmid['id'], plasmid_contigs_path, plasmid_pseudosequence_path)
-                matched_contigs_sorted = tp.reconstruct_plasmid(plasmid, sample, contigs)
+                plasmid_contigs_sorted = tp.reconstruct_plasmid(plasmid, sample, contigs)
 
-                fasta.export_sequences(matched_contigs_sorted, plasmid_contigs_path, description=True, wrap=True)
+                fasta.export_sequences(plasmid_contigs_sorted, plasmid_contigs_path, description=True, wrap=True)
                 fasta.export_sequences([plasmid], plasmid_pseudosequence_path, description=True, wrap=True)
 
                 reference_plasmid = plasmids[plasmid['id']]

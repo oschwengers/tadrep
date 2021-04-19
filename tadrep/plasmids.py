@@ -12,7 +12,8 @@ def detect_plasmids(filtered_contigs, plasmids):
 
     for plasmid_id, hits in filtered_contigs.items():
         plasmid = plasmids[plasmid_id]
-        plasmid_coverage, plasmid_identity = calc_coverage_identity(plasmid, hits)
+        plasmid_coverage = calc_coverage(plasmid, hits)
+        plasmid_identity = calc_identity(hits)
 
         if (plasmid_coverage >= cfg.min_plasmid_coverage):
             if (plasmid_identity >= cfg.min_plasmid_identity):
@@ -35,31 +36,33 @@ def reconstruct_plasmid(plasmid, genome, contigs):
     log.debug('reconstruct plasmid: genome=%s, id=%s, contigs=%s', genome, plasmid['id'], len(plasmid['hits']))
 
     plasmid['hits'] = [contig for contig in sorted(plasmid['hits'], key=lambda k: k['plasmid_start'])]
-    matched_contigs_sorted = [contigs[hit['contig_id']] for hit in plasmid['hits']]
-    log.debug('sorted contigs: total=%s', len(matched_contigs_sorted))
+    plasmid_contigs_sorted = [contigs[hit['contig_id']] for hit in plasmid['hits']]
+    log.debug('sorted contigs: total=%s', len(plasmid_contigs_sorted))
 
     sequences = []
     for count, contig in enumerate(plasmid['hits']):
         if(contig['strand'] == '+'):
-            sequences.append(matched_contigs_sorted[count]['sequence'])
+            contig_seq = plasmid_contigs_sorted[count]['sequence']
         else:
-            sequences.append(str(Seq(matched_contigs_sorted[count]['sequence']).reverse_complement()))
+            contig_seq = str(Seq(plasmid_contigs_sorted[count]['sequence']).reverse_complement())
+        sequences.append(contig_seq)
 
     gap_sequence = 'N' * cfg.gap_sequence_length
-    sequence = gap_sequence.join(sequences)
+    plasmid['sequence'] = gap_sequence.join(sequences)
 
-    plasmid['sequence'] = sequence
     plasmid['description'] = f"{genome}_{plasmid['id']} pseudo plasmid reference={plasmid['id']} contigs={len(plasmid['hits'])}, coverage={plasmid['coverage']:.3f}, identity={plasmid['identity']:.3f}"
     log.info('reconstruct plasmid: genome=%s, id=%s, length=%s, description=%s', genome, plasmid['id'], len(plasmid['sequence']), plasmid['description'])
-    return matched_contigs_sorted
+    return plasmid_contigs_sorted
 
 
-def calc_coverage_identity(plasmid, hits):
+def calc_coverage(plasmid, hits):
+    hits_length_sum = sum([hit['length'] for hit in hits])
+    plasmid_coverage = hits_length_sum / plasmid['length']
+    return plasmid_coverage
 
-    contig_length_sum = sum([contig['length'] for contig in hits])
-    plasmid_coverage = contig_length_sum / plasmid['length']
 
-    sum_contig_identity = sum([contig['num_identity'] for contig in hits])
-    sum_contig_alignment = sum([contig['length'] for contig in hits])
-    plasmid_identity = sum_contig_identity / sum_contig_alignment
-    return plasmid_coverage, plasmid_identity
+def calc_identity(hits):
+    sum_hit_identity = sum([hit['num_identity'] for hit in hits])
+    sum_hit_alignment = sum([hit['length'] for hit in hits])
+    plasmid_identity = sum_hit_identity / sum_hit_alignment
+    return plasmid_identity
