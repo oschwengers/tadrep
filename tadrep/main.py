@@ -125,7 +125,7 @@ def main():
                     print(f"{cfg.prefix}\t{plasmid['id']}\t{reference_plasmid['length']}\t{len(plasmid['hits'])}\t{plasmid['coverage']:f}\t{plasmid['identity']:f}\t{','.join(contig['contig_id'] for contig in plasmid['hits'])}")
 
                 for hit in plasmid['hits']:
-                    fh.write(f'{genome}\t')
+                    fh.write(f'{genome_file}\t')
                     fh.write(f"{plasmid['id']}\t")
                     fh.write(f"{hit['contig_id']}\t")
                     fh.write(f"{hit['contig_start']}\t")

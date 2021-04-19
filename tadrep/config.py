@@ -52,6 +52,9 @@ def setup(args):
         tmp_path = Path(tempfile.mkdtemp())
     log.info('tmp-path=%s', tmp_path)
 
+    if(not args.genome):
+        log.error('genome file not provided!')
+        sys.exit('ERROR: no genome file was provided!')
     for path in args.genome:
         try:
             resolved_path = Path(path).resolve()
