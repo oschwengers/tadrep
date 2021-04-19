@@ -13,7 +13,7 @@ log = logging.getLogger('BLAST')
 # Run Blastn search
 ############################################################################
 def search_contigs(genome_path, plasmid_path):
-    blast_output_path = cfg.output_path.joinpath('blastn.tsv')
+    blast_output_path = cfg.tmp_path.joinpath('blastn.tsv')
 
     cmd_blast = [
         'blastn',
