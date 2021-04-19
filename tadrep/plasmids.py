@@ -32,11 +32,11 @@ def detect_plasmids(filtered_contigs, plasmids):
 
 
 def reconstruct_plasmid(plasmid, genome, contigs):
-    log.debug('reconstruct plasmid: id=%s, contigs=%s', plasmid['id'], len(plasmid['hits']))
+    log.debug('reconstruct plasmid: genome=%s, id=%s, contigs=%s', genome, plasmid['id'], len(plasmid['hits']))
 
     plasmid['hits'] = [contig for contig in sorted(plasmid['hits'], key=lambda k: k['plasmid_start'])]
     matched_contigs_sorted = [contigs[hit['contig_id']] for hit in plasmid['hits']]
-    log.info('sorted contigs: total=%s', len(matched_contigs_sorted))
+    log.debug('sorted contigs: total=%s', len(matched_contigs_sorted))
 
     sequences = []
     for count, contig in enumerate(plasmid['hits']):
@@ -50,7 +50,7 @@ def reconstruct_plasmid(plasmid, genome, contigs):
 
     plasmid['sequence'] = sequence
     plasmid['description'] = f"{genome}_{plasmid['id']} pseudo plasmid reference={plasmid['id']} contigs={len(plasmid['hits'])}, coverage={plasmid['coverage']:.3f}, identity={plasmid['identity']:.3f}"
-    log.info('reconstruct plasmid: id=%s, length=%s, description=%s', plasmid['id'], len(plasmid['sequence']), plasmid['description'])
+    log.info('reconstruct plasmid: genome=%s, id=%s, length=%s, description=%s', genome, plasmid['id'], len(plasmid['sequence']), plasmid['description'])
     return matched_contigs_sorted
 
 
