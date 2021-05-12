@@ -2,8 +2,10 @@ import argparse
 import logging
 import multiprocessing as mp
 import os
+import subprocess as sp
 
 import tadrep
+import tadrep.config as cfg
 
 
 log = logging.getLogger('UTILS')
@@ -22,6 +24,7 @@ def parse_arguments():
     arg_group_io.add_argument('--output', '-o', action='store', default=os.getcwd(), help='Output directory (default = current working directory)')
     arg_group_io.add_argument('--tmp-dir', action='store', default=None, help='Temporary directory to store temporary files with blast hits')
     arg_group_io.add_argument('--prefix', action='store', default=None, help='Prefix for all output files')
+    arg_group_io.add_argument('--database', '-db', action='store', default=None, help='Path to directory which contains database files')
     
     arg_group_parameters = parser.add_argument_group('Annotation')
     arg_group_parameters.add_argument('--min-contig-coverage', action='store', type=int, default=40, dest='min_contig_coverage', help="Minimal contig coverage (default = 40%%)")
@@ -36,3 +39,19 @@ def parse_arguments():
     arg_group_general.add_argument('--threads', '-t', action='store', type=int, default=mp.cpu_count(), help='Number of threads to use (default = number of available CPUs)')
     arg_group_general.add_argument('--version', action='version', version='%(prog)s ' + tadrep.__version__)
     return parser.parse_args()
+
+
+def run_cmd(cmd_command, tmp_path):
+    process = sp.run(
+        cmd_command,
+        cwd=str(tmp_path),
+        stdout=sp.PIPE,
+        stderr=sp.PIPE,
+        universal_newlines=True
+    )
+
+    if(process.returncode != 0):
+        log.debug('blast command: %s', cmd_command)
+        log.debug('stdout=%s, stderr=%s', process.stdout, process.stderr)
+        log.warning('Blast command failed! Error-code: %s', process.returncode)
+        raise Exception(f'Blast command error! Error code: {process.returncode}')

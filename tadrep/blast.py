@@ -1,8 +1,7 @@
 import logging
-import subprocess as sp
 
 import tadrep.config as cfg
-import tadrep.plasmids as tp
+import tadrep.utils as tu
 
 
 log = logging.getLogger('BLAST')
@@ -12,13 +11,16 @@ log = logging.getLogger('BLAST')
 # Setup blastn search
 # Run Blastn search
 ############################################################################
-def search_contigs(genome_path, plasmid_path):
+def search_contigs(genome_path):
     blast_output_path = cfg.tmp_path.joinpath('blastn.tsv')
+
+    db_target = '-subject' if cfg.plasmids_path else '-db'
+    db_target_path = cfg.plasmids_path if cfg.plasmids_path else cfg.database_path.joinpath("db")
 
     cmd_blast = [
         'blastn',
         '-query', str(genome_path),
-        '-subject', str(plasmid_path),
+        db_target, str(db_target_path),
         '-culling_limit', '1',
         '-evalue', '1E-5',
         '-num_threads', str(cfg.threads),
@@ -27,24 +29,15 @@ def search_contigs(genome_path, plasmid_path):
     ]
     log.debug("cmd=%s", cmd_blast)
 
-    process = sp.run(
-        cmd_blast,
-        cwd=str(cfg.tmp_path),
-        stdout=sp.PIPE,
-        stderr=sp.PIPE,
-        universal_newlines=True
-    )
-
-    if(process.returncode != 0):
-        log.debug('stdout=%s, stderr=%s', process.stdout, process.stderr)
-        log.warning('blastn failed! Blastn-error-code: %s', process.returncode)
-        raise Exception(f'blastn error! Error code: {process.returncode}')
+    tu.run_cmd(cmd_blast, cfg.tmp_path)
 
     hits = []
     log.debug('reading blast output: file=%s', blast_output_path)
     with blast_output_path.open('r') as fh:
         for line in fh:
             cols = line.strip().split('\t')
+            if(cfg.database_path):
+                cols[4] = cols[4].split('|')[1]
             hit = {
                 'contig_id': cols[0],
                 'contig_start': int(cols[1]),
@@ -63,7 +56,7 @@ def search_contigs(genome_path, plasmid_path):
             }
             hits.append(hit)
 
-    log.info('search blast-hits: genome=%s, plasmids=%s, found=%s', genome_path.stem, plasmid_path.stem, len(hits))
+    log.info('search blast-hits: genome=%s, plasmids=%s, found=%s', genome_path.stem, db_target_path.stem, len(hits))
     return hits
 
 

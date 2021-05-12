@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 log = logging.getLogger('CONFIG')
+FILES = ['db.ndb', 'db.nhr', 'db.nin', 'db.nog', 'db.nos', 'db.not', 'db.nsq', 'db.ntf', 'db.nto', 'db.tsv']
 
 
 # runtime configurations
@@ -19,6 +20,7 @@ output_path = None
 tmp_path = None
 summary_path = None
 prefix = None
+database_path = None
 
 # workflow configuration
 min_contig_coverage = None
@@ -38,7 +40,7 @@ def setup(args):
     log.info('verbose=%s', verbose)
 
     # input / output path configurations
-    global tmp_path, genome_path, plasmids_path, output_path, prefix, summary_path
+    global tmp_path, genome_path, plasmids_path, output_path, prefix, summary_path, database_path
 
     if(args.tmp_dir):
         tmp_path = Path(args.tmp_dir)
@@ -73,17 +75,36 @@ def setup(args):
             sys.exit(f'ERROR: genome file ({path}) not valid!')
         log.info('genome-path=%s', resolved_path)
 
-    try:
-        plasmids_path = Path(args.plasmids).resolve()
-        if(not os.access(str(plasmids_path), os.R_OK)):
-            log.error('plasmids file not readable! path=%s', plasmids_path)
-            sys.exit(f'ERROR: plasmids file ({plasmids_path}) not readable!')
-        if(plasmids_path.stat().st_size == 0):
-            log.error('empty plasmids file! path=%s', plasmids_path)
-            sys.exit(f'ERROR: plasmids file ({plasmids_path}) is empty!')
-    except:
-        log.error('provided plasmids file not valid! path=%s', args.plasmids)
-        sys.exit(f'ERROR: plasmids file ({args.plasmids}) not valid!')
+    if(args.plasmids):
+        try:
+            plasmids_path = Path(args.plasmids).resolve()
+            if(not os.access(str(plasmids_path), os.R_OK)):
+                log.error('plasmids file not readable! path=%s', plasmids_path)
+                sys.exit(f'ERROR: plasmids file ({plasmids_path}) not readable!')
+            if(plasmids_path.stat().st_size == 0):
+                log.error('empty plasmids file! path=%s', plasmids_path)
+                sys.exit(f'ERROR: plasmids file ({plasmids_path}) is empty!')
+        except (OSError, ValueError):
+            log.error('provided plasmids file not valid! path=%s', args.plasmids)
+            sys.exit(f'ERROR: plasmids file ({args.plasmids}) not valid!')
+    elif(args.database):
+        try:
+            database_path = Path(args.database).resolve()
+            if(not database_path.exists()):
+                log.error('Database path does not exist! path=%s', database_path)
+                sys.exit(f'ERROR: database path ({database_path}) does not exists!')
+            for file in FILES:
+                file_path = database_path.joinpath(file)
+                if(not file_path.is_file()):
+                    log.error('Database file missing! file=%s', file_path)
+                    sys.exit(f'ERROR: Database file missing! File={file_path}')
+        except (OSError, ValueError):
+            log.error('provided database not valid! path=%s', args.database)
+            sys.exit(f'ERROR: provided database {args.database} not valid!')
+        log.info('database path=%s', database_path)
+    else:
+        log.error('no plasmid file or database was provided!')
+        sys.exit('ERROR: neither plasmid file nor database was provided!')
 
     if(args.prefix):
         prefix = args.prefix

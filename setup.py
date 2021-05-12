@@ -21,7 +21,7 @@ setup(
     author='Oliver Schwengers',
     author_email='oliver.schwengers@computational.bio.uni-giessen.de',
     url='',
-    packages=find_packages(include=['tadrep', 'tadrep.*']),
+    packages=find_packages(include=['tadrep', 'tadrep.*', 'database', 'database.*']),
     python_requires='>=3.6',
     include_package_data=False,
     zip_safe=False,
@@ -31,7 +31,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'tadrep=tadrep.main:main'
+            'tadrep=tadrep.main:main',
+            'tadrep_db=database.main:main'
         ]
     },
     classifiers=[

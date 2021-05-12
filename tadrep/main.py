@@ -50,6 +50,7 @@ def main():
         print('Options and arguments:')
         print(f'\tinput: {cfg.genome_path}')
         print(f'\tplasmid(s): {cfg.plasmids_path}')
+        print(f'\tdatabase path: {cfg.database_path}')
         print(f'\toutput: {cfg.output_path}')
         print(f'\tprefix: {cfg.prefix}')
         print(f'\ttmp directory: {cfg.tmp_path}')
@@ -61,15 +62,22 @@ def main():
     # - parse contigs in Fasta file
     ############################################################################
     print('parse plasmids sequences...')
-    try:
-        plasmids = fasta.import_sequences(cfg.plasmids_path)
-        log.info('imported plasmids: sequences=%i, file=%s', len(plasmids), cfg.plasmids_path)
-        print(f'\timported: {len(plasmids)}')
-    except ValueError:
-        log.error('wrong plasmids file format!', exc_info=True)
-        sys.exit('ERROR: wrong plasmids file format!')
-
-
+    if(cfg.plasmids_path):
+        try:
+            plasmids = fasta.import_sequences(cfg.plasmids_path)
+            log.info('imported plasmids: sequences=%i, file=%s', len(plasmids), cfg.plasmids_path)
+            print(f'\timported: {len(plasmids)}')
+        except ValueError:
+            log.error('wrong plasmids file format!', exc_info=True)
+            sys.exit('ERROR: wrong plasmids file format!')
+    else:
+        try:
+            plasmids = fasta.import_tsv(cfg.database_path)
+            log.info('imported plasmids: sequence=%i, file=%s', len(plasmids), cfg.database_path)
+            print(f'\timported: {len(plasmids)}')
+        except:
+            log.error('wrong database path!', exc_info=True)
+            sys.exit('ERROR: wrong database path!')
     ############################################################################
     # Prepare summary output file
     # - create file
@@ -84,15 +92,18 @@ def main():
         for genome in cfg.genome_path:
             # Import draft genome contigs
             try:
-                contigs = fasta.import_sequences(genome)
+                contigs = fasta.import_sequences(genome, sequence=True)
                 log.info('imported genomes: sequences=%i, file=%s', len(contigs), genome)
                 print(f'\timported: {len(contigs)}, file: {genome.stem}')
             except ValueError:
                 log.error('wrong genome file format!', exc_info=True)
                 sys.exit('ERROR: wrong genome file format!')
-            
-            hits = tb.search_contigs(genome, cfg.plasmids_path)  # align contigs
+
+            print('Blasting against reference...')
+            hits = tb.search_contigs(genome)  # align contigs
+            print('Filtering hits...')
             filtered_hits = tb.filter_contig_hits(hits)  # filter hits
+            print('Detecting plasmids...')
             detected_plasmids = tp.detect_plasmids(filtered_hits, plasmids)  # detect reference plasmids above cov/id thresholds
 
             # Write output files

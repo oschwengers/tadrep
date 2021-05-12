@@ -2,6 +2,7 @@ import logging
 
 from Bio import SeqIO
 from xopen import xopen
+from pathlib import Path
 
 
 log = logging.getLogger('FASTA')
@@ -10,7 +11,7 @@ log = logging.getLogger('FASTA')
 FASTA_LINE_WRAPPING = 60
 
 
-def import_sequences(contigs_path):
+def import_sequences(contigs_path, sequence=False):
     """Import sequences."""
     contigs = {}
     with xopen(str(contigs_path), threads=0) as fh:
@@ -19,7 +20,7 @@ def import_sequences(contigs_path):
             contig = {
                 'id': record.id,
                 'description': record.description,
-                'sequence': seq,
+                'sequence': seq if sequence else None,
                 'length': len(seq)
             }
             log.info(
@@ -52,3 +53,19 @@ def wrap_sequence(sequence):
     for i in range(0, len(sequence), FASTA_LINE_WRAPPING):
         lines.append(sequence[i:i + FASTA_LINE_WRAPPING])
     return '\n'.join(lines) + '\n'
+
+
+def import_tsv(tsv_path):
+    complete_path = Path(f'{tsv_path}/db.tsv')
+    plasmids = {}
+    with complete_path.open('r') as fh:
+        for line in fh:
+            cols = line.strip().split('\t')
+            plasmid = {
+                'id': cols[0],
+                'description': cols[1],
+                'length': int(cols[2])
+            }
+            plasmids[plasmid['id']] = plasmid
+            log.info('imported: id=%s, description=%s, length=%s', plasmid['id'], plasmid['description'], plasmid['length'])
+    return plasmids
