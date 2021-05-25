@@ -4,9 +4,10 @@ import sys
 import tempfile
 from pathlib import Path
 
+import tadrep.utils as tu
+
 
 log = logging.getLogger('CONFIG')
-FILES = ['db.ndb', 'db.nhr', 'db.nin', 'db.nog', 'db.nos', 'db.not', 'db.nsq', 'db.ntf', 'db.nto', 'db.tsv']
 
 
 # runtime configurations
@@ -57,50 +58,13 @@ def setup(args):
     if(not args.genome):
         log.error('genome file not provided!')
         sys.exit('ERROR: no genome file was provided!')
-    for path in args.genome:
-        try:
-            resolved_path = Path(path).resolve()
-            if(not resolved_path.is_file()):
-                log.error('genome file %s does not exist!', resolved_path)
-                sys.exit(f'ERROR: genome file ({path}) does not exist!')
-            if(not os.access(str(resolved_path), os.R_OK)):
-                log.error('genome file not readable! path=%s', resolved_path)
-                sys.exit(f'ERROR: genome file ({path}) not readable!')
-            if(resolved_path.stat().st_size == 0):
-                log.error('empty genome file! path=%s', resolved_path)
-                sys.exit(f'ERROR: genome file ({path}) is empty!')
-            genome_path.append(resolved_path)
-        except (OSError, ValueError):
-            log.error('provided genome file not valid! path=%s', path)
-            sys.exit(f'ERROR: genome file ({path}) not valid!')
-        log.info('genome-path=%s', resolved_path)
+
+    genome_path = [tu.check_file_permission(file, 'genome') for file in args.genome]
 
     if(args.plasmids):
-        try:
-            plasmids_path = Path(args.plasmids).resolve()
-            if(not os.access(str(plasmids_path), os.R_OK)):
-                log.error('plasmids file not readable! path=%s', plasmids_path)
-                sys.exit(f'ERROR: plasmids file ({plasmids_path}) not readable!')
-            if(plasmids_path.stat().st_size == 0):
-                log.error('empty plasmids file! path=%s', plasmids_path)
-                sys.exit(f'ERROR: plasmids file ({plasmids_path}) is empty!')
-        except (OSError, ValueError):
-            log.error('provided plasmids file not valid! path=%s', args.plasmids)
-            sys.exit(f'ERROR: plasmids file ({args.plasmids}) not valid!')
+        plasmids_path = tu.check_file_permission(args.plasmids, 'plasmids')
     elif(args.database):
-        try:
-            database_path = Path(args.database).resolve()
-            if(not database_path.exists()):
-                log.error('Database path does not exist! path=%s', database_path)
-                sys.exit(f'ERROR: database path ({database_path}) does not exists!')
-            for file in FILES:
-                file_path = database_path.joinpath(file)
-                if(not file_path.is_file()):
-                    log.error('Database file missing! file=%s', file_path)
-                    sys.exit(f'ERROR: Database file missing! File={file_path}')
-        except (OSError, ValueError):
-            log.error('provided database not valid! path=%s', args.database)
-            sys.exit(f'ERROR: provided database {args.database} not valid!')
+        database_path = tu.check_db_directory(args.database)
         log.info('database path=%s', database_path)
     else:
         log.error('no plasmid file or database was provided!')
@@ -124,4 +88,3 @@ def setup(args):
     log.info('min-plasmid-identity=%s', min_plasmid_identity)
     gap_sequence_length = args.gap_sequence_length
     log.info('gap-sequence-length=%s', gap_sequence_length)
-    

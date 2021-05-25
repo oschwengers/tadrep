@@ -6,6 +6,9 @@ import tadrep.fasta as tf
 import tadrep.utils as tu
 
 log = logging.getLogger('UTILS')
+REFSEQ = 'refseq'
+PLSDB = 'plsdb'
+CUSTOM = 'custom'
 
 
 def parse_arguments():
@@ -16,8 +19,10 @@ def parse_arguments():
     )
 
     arg_group_io = parser.add_argument_group('Input / Output')
-    arg_group_io.add_argument('--db', action='store', default='RefSeq', choices=['RefSeq', 'PLSDB'], help="Extern DB to import (default = 'RefSeq')")
+    arg_group_io.add_argument('--type', action='store', default='refseq', choices=[REFSEQ, PLSDB, CUSTOM], type=str.lower, help="Extern DB to import (default = 'refseq')")
     arg_group_io.add_argument('--output', '-o', action='store', default=os.getcwd(), help='Output directory for database files (default = current working directory)')
+    arg_group_io.add_argument('--files', action='store', default=None, nargs='*', help='Fasta files to create custom database')
+    arg_group_io.add_argument('--db', action='store', default=None, help='Database path to update')
 
     arg_group_general = parser.add_argument_group('General')
     arg_group_general.add_argument('--help', '-h', action='help', help='Show this help message and exit')
@@ -40,8 +45,20 @@ def create_blast_db(output_path, fasta_tmp_path, tmp_path):
         'makeblastdb',
         '-in', str(fasta_tmp_path),
         '-dbtype', 'nucl',
-        '-out', str(output_path),
-        '-parse_seqids'
+        '-out', str(output_path)
     ]
     log.debug('cmd_blastdb=%s', cmd_blastdb)
     tu.run_cmd(cmd_blastdb, tmp_path)
+
+
+def reverse_database(fasta_path, db_path, tmp_path):
+    log.debug('Reverse database: input-path=%s, output-path=%s', db_path, fasta_path)
+
+    cmd_reverse = [
+        'blastdbcmd',
+        '-entry', 'all',
+        '-db', str(db_path),
+        '-out', str(fasta_path)
+    ]
+    log.debug('cmd_reverse=%s', cmd_reverse)
+    tu.run_cmd(cmd_reverse, tmp_path)

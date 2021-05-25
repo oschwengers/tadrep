@@ -30,17 +30,3 @@ def download_database(tmp_path):
     except OSError:
         log.error('Could not write file')
         sys.exit(f'ERROR: Could not write file')
-
-
-def reverse_database(fasta_path, tmp_path):
-    database_path = tmp_path.joinpath('plsdb.fna')
-    log.debug('Database path: input=%s, output=%s', database_path, fasta_path)
-
-    cmd_reverse = [
-        'blastdbcmd',
-        '-entry', 'all',
-        '-db', str(database_path),
-        '-out', str(fasta_path)
-    ]
-    log.debug('cmd_reverse=%s', cmd_reverse)
-    tu.run_cmd(cmd_reverse, tmp_path)

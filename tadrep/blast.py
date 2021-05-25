@@ -37,7 +37,8 @@ def search_contigs(genome_path):
         for line in fh:
             cols = line.strip().split('\t')
             if(cfg.database_path):
-                cols[4] = cols[4].split('|')[1]
+                if('|' in cols[4]):
+                    cols[4] = cols[4].split('|')[1]
             hit = {
                 'contig_id': cols[0],
                 'contig_start': int(cols[1]),
