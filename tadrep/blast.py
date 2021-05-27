@@ -77,7 +77,7 @@ def filter_contig_hits(raw_hits):
             plasmid_hits.append(hit)
             if(len(plasmid_hits) == 1):
                 filtered_hits[hit['plasmid_id']] = plasmid_hits
-            log.debug('contig hit: contig-id=%s, plasmid-id=%s, alignment length=%s, identity%s', hit['contig_id'], hit['plasmid_id'], hit['length'], hit['perc_identity'])
+            log.debug('contig hit: contig-id=%s, plasmid-id=%s, alignment length=%s, identity=%s', hit['contig_id'], hit['plasmid_id'], hit['length'], hit['perc_identity'])
 
     log.info('filtered blast-hits: raw-hits=%s, filtered-hits=%s', len(raw_hits), len(filtered_hits))
     return filtered_hits
