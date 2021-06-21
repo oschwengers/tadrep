@@ -21,7 +21,8 @@ def detect_plasmids(filtered_contigs, plasmids):
                     'id': plasmid_id,
                     'hits': hits,
                     'coverage': plasmid_coverage,
-                    'identity': plasmid_identity
+                    'identity': plasmid_identity,
+                    'length': plasmid['length']
                 }
                 detected_plasmids.append(detected_plasmid)
                 log.info("plasmid detected: id=%s, contig-hits=%s, total identity=%s, total coverage=%s", plasmid_id, len(hits), plasmid_identity, plasmid_coverage)

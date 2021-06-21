@@ -10,6 +10,7 @@ import tadrep.config as cfg
 import tadrep.fasta as fasta
 import tadrep.plasmids as tp
 import tadrep.utils as tu
+import tadrep.visuals as tv
 
 
 def main():
@@ -102,11 +103,11 @@ def main():
                 sys.exit('ERROR: wrong genome file format!')
 
             print('Blasting against reference...')
-            hits = tb.search_contigs(genome)  # align contigs
+            hits = tb.search_contigs(genome)  # List of BLAST hits
             print('Filtering hits...')
-            filtered_hits = tb.filter_contig_hits(hits)  # filter hits
+            filtered_hits = tb.filter_contig_hits(hits)  # Dictionary of Plasmids, with Blast hits filtered by coverage and identity
             print('Detecting plasmids...')
-            detected_plasmids = tp.detect_plasmids(filtered_hits, plasmids)  # detect reference plasmids above cov/id thresholds
+            detected_plasmids = tp.detect_plasmids(filtered_hits, plasmids)  # List of detect reference plasmids above cov/id thresholds
 
             # Write output files
             print('write genome sequences...\n')
@@ -162,6 +163,9 @@ def main():
                         ssp.write(f"{hit['plasmid_start']}\t")
                         ssp.write(f"{hit['plasmid_end']}\t")
                         ssp.write(f"{reference_plasmid['length']}\n")
+
+                    png_path = output_path.joinpath(f'{sample}-{plasmid["id"]}.png')
+                    tv.create_plasmid_figure(plasmid, genome.name, png_path)
 
                     # Create console output
                     if (cfg.verbose):
