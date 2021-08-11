@@ -13,7 +13,7 @@ CUSTOM = 'custom'
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        prog='TaDReP - Database',
+        prog='TaDReP_DB',
         description='Download and create database for TaDReP',
         add_help=False
     )
@@ -22,7 +22,7 @@ def parse_arguments():
     arg_group_io.add_argument('--type', action='store', default='refseq', choices=[REFSEQ, PLSDB, CUSTOM], type=str.lower, help="Extern DB to import (default = 'refseq')")
     arg_group_io.add_argument('--output', '-o', action='store', default=os.getcwd(), help='Output directory for database files (default = current working directory)')
     arg_group_io.add_argument('--files', action='store', default=None, nargs='*', help='Fasta files to create custom database')
-    arg_group_io.add_argument('--db', action='store', default=None, help='Database path to update')
+    arg_group_io.add_argument('--database', '-db', action='store', default=None, help='Database path to update')
 
     arg_group_general = parser.add_argument_group('General')
     arg_group_general.add_argument('--help', '-h', action='help', help='Show this help message and exit')

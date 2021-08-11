@@ -42,7 +42,7 @@ def main():
     input_files = args.files
     log.info('Provided files: %s', input_files)
 
-    update_path = args.db
+    update_path = args.database
     log.info('Update database: %s', update_path)
 
     tmp_path = Path(tempfile.mkdtemp())

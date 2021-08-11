@@ -7,3 +7,8 @@ dependencies:
   - biopython>=1.72
   - xopen>=1.1.0
   - blast>=2.7.1
+  - matplotlib>=1.4
+  - pip=21.0.1
+  - pip:
+      - attrs==20.3.0
+      - dnaplotlib==1.0

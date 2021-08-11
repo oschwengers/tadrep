@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 from pathlib import Path
+import multiprocessing as mp
 
 import tadrep.utils as tu
 
@@ -29,6 +30,10 @@ min_contig_identity = None
 min_plasmid_coverage = None
 min_plasmid_identity = None
 gap_sequence_length = None
+
+# multithreading
+lock = None
+blast_threads = None
 
 
 def setup(args):
@@ -88,3 +93,11 @@ def setup(args):
     log.info('min-plasmid-identity=%s', min_plasmid_identity)
     gap_sequence_length = args.gap_sequence_length
     log.info('gap-sequence-length=%s', gap_sequence_length)
+
+    # multithreading
+    global lock, blast_threads
+    lock = mp.Lock()
+    blast_threads = threads // len(genome_path)
+    if blast_threads == 0:
+        blast_threads = 1
+    log.info('blast-threads=%s', blast_threads)
