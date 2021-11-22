@@ -98,7 +98,7 @@ def main():
         genome_index = genome[0]
         plasmid_summary = genome[1]
         for plasmid_id, summary_string in plasmid_summary.items():
-            plasmid_string_summary.extend('\t'.join(summary_string))
+            plasmid_string_summary.append(summary_string)
             if(not plasmid_list.get(plasmid_id, None)):
                 plasmid_list[plasmid_id] = [0] * len(cfg.genome_path)
                 log.info('Plasmid added: id=%s', plasmid_id)
