@@ -51,7 +51,8 @@ def reconstruct_plasmid(plasmid, genome, contigs):
     gap_sequence = 'N' * cfg.gap_sequence_length
     plasmid['sequence'] = gap_sequence.join(sequences)
 
-    plasmid['description'] = f"{genome}_{plasmid['id']} pseudo plasmid reference={plasmid['id']} contigs={len(plasmid['hits'])}, coverage={plasmid['coverage']:.3f}, identity={plasmid['identity']:.3f}"
+    plasmid['id'] = f"{genome}_{plasmid['id']}"
+    plasmid['description'] = f"reference={plasmid['id']} contigs={len(plasmid['hits'])} coverage={plasmid['coverage']:.3f} identity={plasmid['identity']:.3f}"
     log.info('reconstruct plasmid: genome=%s, id=%s, length=%s, description=%s', genome, plasmid['id'], len(plasmid['sequence']), plasmid['description'])
     return plasmid_contigs_sorted
 
