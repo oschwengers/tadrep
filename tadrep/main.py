@@ -159,7 +159,7 @@ def pooling(genome, plasmids, index):
     plasmid_summary_strings = {}
 
     with sample_summary_path.open('w+') as ssp:
-        ssp.write(f"plasmid_id\tcontig_id\tcontig_start\tcontig_end\tcontig_length\tcoverage[%]\tidentity[%]\tmatch_length\tstrand\tplasmid_start\tplasmid_end\tplasmid_length\n")
+        ssp.write(f"plasmid\tcontig\tcontig start\tcontig end\tcontig length\tcoverage[%]\tidentity[%]\talignment length\tstrand\tplasmid start\tplasmid end\tplasmid length\n")
 
         for plasmid in detected_plasmids:
 
