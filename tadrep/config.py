@@ -68,8 +68,8 @@ def setup(args):
 
     if(args.plasmids):
         plasmids_path = tu.check_file_permission(args.plasmids, 'plasmids')
-    elif(args.database):
-        database_path = tu.check_db_directory(args.database)
+    elif(args.db):
+        database_path = tu.check_db_directory(args.db)
         log.info('database path=%s', database_path)
     else:
         log.error('no plasmid file or database was provided!')
