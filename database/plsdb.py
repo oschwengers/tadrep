@@ -1,13 +1,13 @@
+import io
 import logging
 import sys
 import urllib.request
 import urllib.error
 import zipfile
-import io
 
-import tadrep.utils as tu
 
 log = logging.getLogger('PLSDB')
+
 
 PLSDB_URL = 'https://ccb-microbe.cs.uni-saarland.de/plsdb/plasmids/download/?zip'
 FILES = ['plsdb.fna.nhr', 'plsdb.fna.nin', 'plsdb.fna.nsq']

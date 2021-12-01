@@ -1,10 +1,13 @@
 import logging
+
 import dnaplotlib as dpl
 import matplotlib.pyplot as plt
+
 from matplotlib import gridspec
 
 logging.getLogger('matplotlib.font_manager').disabled = True
 log = logging.getLogger('VISUALS')
+
 
 HEIGHT = 0.5                                                                # Height per track
 LABEL_Y_OFFSET = -3                                                         # Offset Label from track center
@@ -80,7 +83,6 @@ def plot_plasmid(grid_pos, design):
     plasmid_plot = plt.subplot(grid_pos)
     dr = dpl.DNARenderer(linewidth=0.8)
     part_renderers = dr.trace_part_renderers()
-
     start, end = dr.renderDNA(plasmid_plot, design, part_renderers, plot_backbone=False)
     plasmid_plot.set_xlim([start - 100, end + 100])
     plasmid_plot.set_ylim([-(MARGIN_SPACE - 1), MARGIN_SPACE - 1])
@@ -97,11 +99,9 @@ def plot_contigs(grid_pos, plasmid_plot, num_contig_tracks, combined_tracks, y_l
     part_renderers = dr.trace_part_renderers()
 
     start, end = dr.renderDNA(contig_plot, combined_tracks, part_renderers, plot_backbone=False)
-    # set view limitations to show everything
-    contig_plot.set_ylim([-MARGIN_SPACE, set_ylim_contigs])
+    contig_plot.set_ylim([-MARGIN_SPACE, set_ylim_contigs])  # set view limitations to show everything
     log.info('Subplot created: contig, start=%s, end=%s, tracks=%s', start, end, num_contig_tracks)
-    # remove ticks and axis
-    if(y_label):
+    if(y_label):  # remove ticks and axis
         wrapped_label, label_width = wrap_y_label(y_label, num_contig_tracks)
         contig_plot.set_ylabel(wrapped_label, labelpad=1, fontsize=8)
         contig_plot.spines['right'].set_visible(False)
@@ -183,4 +183,3 @@ def find_track(contig_track, match_track, contig_config, length):
         if(track + 1 == len(contig_track)):
             contig_track.append([])
             match_track.append([])
-

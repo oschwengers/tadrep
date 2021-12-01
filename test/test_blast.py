@@ -1,7 +1,7 @@
-import tadrep.fasta as fasta
-import tadrep.blast as tb
 from pathlib import Path
 from unittest.mock import patch
+
+import tadrep.blast as tb
 
 
 @patch("tadrep.blast.cfg.min_contig_coverage", 40 / 100)

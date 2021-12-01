@@ -1,5 +1,6 @@
-import tadrep.plasmids as tp
 from unittest.mock import patch
+
+import tadrep.plasmids as tp
 
 
 @patch('tadrep.plasmids.cfg.min_plasmid_coverage', 80 / 100)
@@ -78,6 +79,7 @@ def test_plasmid_detection():
     expected_plasmids = [
         {
             'id': 'test_p1',
+            'reference': 'test_p1',
             'hits': filtered_contigs['test_p1'],
             'coverage': 0.86,
             'identity': 0.93,

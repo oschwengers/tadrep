@@ -1,7 +1,8 @@
 import logging
-import tadrep.config as cfg
 
 from Bio.Seq import Seq
+
+import tadrep.config as cfg
 
 
 log = logging.getLogger('PLASMIDS')
@@ -19,6 +20,7 @@ def detect_plasmids(filtered_contigs, plasmids):
             if (plasmid_identity >= cfg.min_plasmid_identity):
                 detected_plasmid = {
                     'id': plasmid_id,
+                    'reference': plasmid_id,
                     'hits': hits,
                     'coverage': plasmid_coverage,
                     'identity': plasmid_identity,

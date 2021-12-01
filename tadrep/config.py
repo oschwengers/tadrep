@@ -1,9 +1,9 @@
 import logging
-import os
+import multiprocessing as mp
 import sys
 import tempfile
+
 from pathlib import Path
-import multiprocessing as mp
 
 import tadrep.utils as tu
 

@@ -1,24 +1,20 @@
 import logging
 import sys
-
-import urllib.request
 import urllib.error
+import urllib.request
 import gzip
 
+
 log = logging.getLogger('REFSEQ')
+
 
 NCBI_PATH = 'https://ftp.ncbi.nlm.nih.gov/refseq/release/plasmid'
 FILE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 
-# check if database is already present
-# download files from https://ftp.ncbi.nlm.nih.gov/refseq/release/plasmid/
-# parse files into single fasta file
 def download_database(merged_file_path):
     log.info('Download NCBI files: destination=%s', merged_file_path)
-
     with merged_file_path.open('wb') as fh_out:
-
         for file in FILE_NUMBERS:
             ncbi_url = f'{NCBI_PATH}/plasmid.{file}.1.genomic.fna.gz'
             print(f'Downloading file: {ncbi_url} ...')

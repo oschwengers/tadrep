@@ -8,8 +8,7 @@ log = logging.getLogger('BLAST')
 
 
 ############################################################################
-# Setup blastn search
-# Run Blastn search
+# Setup and run blastn search
 ############################################################################
 def search_contigs(genome_path, blast_output_path):
 
@@ -62,9 +61,7 @@ def search_contigs(genome_path, blast_output_path):
 
 
 ############################################################################
-# Process contig-hits into columns
-# Check strand direction
-# return hits
+# Parse and filter contig hits
 ############################################################################
 def filter_contig_hits(raw_hits):
     filtered_hits = {}

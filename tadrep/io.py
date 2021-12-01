@@ -1,11 +1,12 @@
 import logging
 
-from Bio import SeqIO
-from xopen import xopen
 from pathlib import Path
 
+from Bio import SeqIO
+from xopen import xopen
 
-log = logging.getLogger('FASTA')
+
+log = logging.getLogger('IO')
 
 
 FASTA_LINE_WRAPPING = 60
@@ -19,7 +20,7 @@ def import_sequences(contigs_path, sequence=False):
             seq = str(record.seq).upper()
             contig = {
                 'id': record.id,
-                'description': record.description,
+                'description': record.description.split(' ', maxsplit=1)[1] if ' ' in record.description else '',
                 'sequence': seq if sequence else None,
                 'length': len(seq)
             }
