@@ -13,7 +13,7 @@ def detect_plasmids(filtered_contigs, plasmids):
 
     for plasmid_id, hits in filtered_contigs.items():
         plasmid = plasmids[plasmid_id]
-        plasmid_coverage = calc_coverage(plasmid, hits)
+        plasmid_coverage, covered_bp, uncovered_bp = calc_coverage(plasmid, hits)
         plasmid_identity = calc_identity(hits)
 
         if (plasmid_coverage >= cfg.min_plasmid_coverage):
@@ -23,6 +23,8 @@ def detect_plasmids(filtered_contigs, plasmids):
                     'reference': plasmid_id,
                     'hits': hits,
                     'coverage': plasmid_coverage,
+                    'covered_bp': covered_bp,
+                    'uncovered_bp': uncovered_bp,
                     'identity': plasmid_identity,
                     'length': plasmid['length']
                 }
@@ -60,9 +62,15 @@ def reconstruct_plasmid(plasmid, genome, contigs):
 
 
 def calc_coverage(plasmid, hits):
-    hits_length_sum = sum([hit['length'] for hit in hits])
-    plasmid_coverage = hits_length_sum / plasmid['length']
-    return plasmid_coverage
+    cov_array = [0 for i in range(0,plasmid['length'])]
+    for hit in hits:
+        for i in range(hit['plasmid_start']-1, hit['plasmid_end']):
+            cov_array[i] += 1
+    uncovered_bp = cov_array.count(0)
+    covered_bp = plasmid['length'] - uncovered_bp
+    coverage = covered_bp / plasmid['length']
+    log.debug("coverage: cov=%.3f, covered-bp=%i, uncovered-bp=%i", coverage, covered_bp, uncovered_bp)
+    return coverage, covered_bp, uncovered_bp
 
 
 def calc_identity(hits):
