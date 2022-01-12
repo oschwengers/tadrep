@@ -12,8 +12,10 @@ import tadrep
 
 
 log = logging.getLogger('UTILS')
+
 FILES_V4 = ['db.nhr', 'db.nin', 'db.nsq', 'db.tsv']
 FILES_V5 = ['db.not', 'db.ntf', 'db.nto', 'db.ndb']
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -69,9 +71,9 @@ def run_cmd(cmd_command, tmp_path):
     )
 
     if(process.returncode != 0):
-        log.debug('blast command: %s', cmd_command)
+        log.debug('command: %s', cmd_command)
         log.debug('stdout=%s, stderr=%s', process.stdout, process.stderr)
-        log.warning('Blast command failed! Error-code: %s', process.returncode)
+        log.warning('command failed! Error-code: %s', process.returncode)
         sys.exit(f'ERROR: {process.stderr}\nBlast command error! Error code: {process.returncode}')
 
 

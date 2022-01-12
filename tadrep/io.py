@@ -34,8 +34,7 @@ def import_sequences(contigs_path, sequence=False):
 
 def export_sequences(contigs, fasta_path, description=False, wrap=False):
     """Write sequences to Fasta file."""
-    log.info('write genome sequences: path=%s, description=%s, wrap=%s', fasta_path, description, wrap)
-
+    log.debug('write: path=%s, description=%s, wrap=%s', fasta_path, description, wrap)
     with fasta_path.open('wt') as fh:
         for contig in contigs:
             if(description):
@@ -56,9 +55,9 @@ def wrap_sequence(sequence):
     return '\n'.join(lines) + '\n'
 
 
-def import_tsv(tsv_path):
-    complete_path = Path(f'{tsv_path}/db.tsv')
+def import_tsv(database_path):
     plasmids = {}
+    complete_path = database_path.joinpath('db.tsv')
     with complete_path.open('r') as fh:
         for line in fh:
             cols = line.strip().split('\t')
@@ -68,5 +67,6 @@ def import_tsv(tsv_path):
                 'length': int(cols[2])
             }
             plasmids[plasmid['id']] = plasmid
-            log.info('imported: id=%s, description=%s, length=%s', plasmid['id'], plasmid['description'], plasmid['length'])
+            log.debug('imported: id=%s, description=%s, length=%i', plasmid['id'], plasmid['description'], plasmid['length'])
+    log.info('imported: # plasmids=%i', len(plasmids))
     return plasmids

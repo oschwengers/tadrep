@@ -26,16 +26,22 @@ def test_plasmid_detection():
             {
                 'contig_id': 'test_c1',
                 'length': 1300,
+                'reference_plasmid_start': 1,
+                'reference_plasmid_end': 1300,
                 'num_identity': 1200
             },
             {
                 'contig_id': 'test_c2',
                 'length': 2100,
+                'reference_plasmid_start': 1301,
+                'reference_plasmid_end': 3400,
                 'num_identity': 1900
             },
             {
                 'contig_id': 'test_c3',
                 'length': 900,
+                'reference_plasmid_start': 3401,
+                'reference_plasmid_end': 4300,
                 'num_identity': 899
             },
         ],
@@ -44,35 +50,47 @@ def test_plasmid_detection():
             {
                 'contig_id': 'test_c1',
                 'length': 1300,
-                'num_identity': 1100
+                'reference_plasmid_start': 1,
+                'reference_plasmid_end': 1300,
+                'num_identity': 1000
             },
             {
                 'contig_id': 'test_c2',
                 'length': 2100,
-                'num_identity': 1800
+                'reference_plasmid_start': 1301,
+                'reference_plasmid_end': 3400,
+                'num_identity': 1700
             },
             {
                 'contig_id': 'test_c3',
                 'length': 900,
-                'num_identity': 700
+                'reference_plasmid_start': 3401,
+                'reference_plasmid_end': 4300,
+                'num_identity': 500
             },
         ],
         # Coverage below threshold
         'test_p3': [
             {
                 'contig_id': 'test_c1',
-                'length': 1300,
-                'num_identity': 1300
+                'length': 900,
+                'reference_plasmid_start': 1,
+                'reference_plasmid_end': 900,
+                'num_identity': 850
             },
             {
                 'contig_id': 'test_c2',
-                'length': 2100,
-                'num_identity': 2100
+                'length': 1000,
+                'reference_plasmid_start': 1301,
+                'reference_plasmid_end': 2300,
+                'num_identity': 900
             },
             {
                 'contig_id': 'test_c3',
-                'length': 900,
-                'num_identity': 900
+                'length': 500,
+                'reference_plasmid_start': 3401,
+                'reference_plasmid_end': 3900,
+                'num_identity': 400
             },
         ]
     }
@@ -86,8 +104,11 @@ def test_plasmid_detection():
             'length': 5000
         }
     ]
-    detected_plasmids = tp.detect_plasmids(filtered_contigs, plasmids)
-    assert detected_plasmids == expected_plasmids
+    detected_plasmids = tp.detect_reference_plasmids('test-sample', filtered_contigs, plasmids)
+    assert len(detected_plasmids) == 1
+    detected_plasmid = detected_plasmids[0]
+    assert detected_plasmid['coverage'] == expected_plasmids[0]['coverage']
+    assert detected_plasmid['identity'] == expected_plasmids[0]['identity']
 
-    detected_plasmids = tp.detect_plasmids({}, plasmids)
+    detected_plasmids = tp.detect_reference_plasmids('test-sample', {}, plasmids)
     assert detected_plasmids == []

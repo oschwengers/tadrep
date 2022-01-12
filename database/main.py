@@ -31,7 +31,7 @@ def main():
     log = logging.getLogger('MAIN')
     log.info('version %s', tadrep.__version__)
     log.info('command line: %s', ' '.join(sys.argv))
-    log.info('output_path=%s', output_path)
+    log.info('output-path=%s', output_path)
 
     verbose = args.verbose
     log.info('verbose=%s', verbose)
@@ -39,12 +39,12 @@ def main():
     log.info('force=%s', force)
 
     selected_db = args.type
-    log.info('Selected database: %s', selected_db)
+    log.info('selected database: %s', selected_db)
     input_files = args.files
-    log.info('Provided files: %s', input_files)
+    log.info('provided files: %s', input_files)
 
     update_path = args.database
-    log.info('Update database: %s', update_path)
+    log.info('update database: %s', update_path)
 
     tmp_path = Path(tempfile.mkdtemp())
     log.info('tmp-path=%s', tmp_path)
@@ -71,39 +71,39 @@ def main():
 
     if(update_path or db_name == du.CUSTOM):
         if(not input_files):
-            log.error('No files for database provided!')
+            log.error('no files for database provided!')
             sys.exit('ERROR: No files for database provided!')
         input_files = [tu.check_file_permission(file, 'fasta') for file in input_files]
 
     fasta_tmp_path = tmp_path.joinpath(f'{db_name}.fna')
-    log.info('Merged fasta file: path=%s', fasta_tmp_path)
+    log.info('merged fasta file: path=%s', fasta_tmp_path)
 
     if(update_path):
         db_tmp_path = update_path.joinpath('db')
-        log.info('Reverse database: path=%s', db_tmp_path)
+        log.info('reverse database: path=%s', db_tmp_path)
         du.reverse_database(fasta_tmp_path, db_tmp_path, tmp_path)
 
     db_output_path = output_path.joinpath(f'{db_name}')
     if(db_output_path.exists()):
         if(force or update_path):
             shutil.rmtree(db_output_path)
-            log.info('Directory removed: path=%s', db_output_path)
+            log.info('directory removed: path=%s', db_output_path)
         else:
             shutil.rmtree(str(tmp_path))
             log.debug('removed tmp dir: %s', tmp_path)
-            log.debug('Database directory already exists! path=%s', db_output_path)
+            log.debug('database directory already exists! path=%s', db_output_path)
             sys.exit(f'ERROR: Directory "{db_output_path.stem}" already exists in {output_path} !')
 
     db_output_path.mkdir(parents=True, exist_ok=True)
-    log.info('Directory created: path=%s', db_output_path)
+    log.info('directory created: path=%s', db_output_path)
 
     print('Database creation starting...')
     if(update_path):
-        print('Updating database...')
+        print('updating database...')
         with fasta_tmp_path.open('a') as fh_out:
-            log.info('Update file: path=%s', fasta_tmp_path)
+            log.info('update file: path=%s', fasta_tmp_path)
             for file in input_files:
-                log.info('Add file: file=%s', file)
+                log.info('add file: file=%s', file)
                 with file.open('r') as fh_in:
                     fh_out.write(fh_in.read())
     else:
@@ -118,12 +118,12 @@ def main():
             print('Combining files...')
             with fasta_tmp_path.open('w+') as fh_out:
                 for file in input_files:
-                    log.info('Write file: file=%s', file)
+                    log.info('write file: file=%s', file)
                     with file.open('r') as fh_in:
                         fh_out.write(fh_in.read())
     print('Create blast database...')
     db_file_name = db_output_path.joinpath('db')
-    log.info('Database files: name=%s', db_file_name)
+    log.info('database files: name=%s', db_file_name)
     du.create_blast_db(db_file_name, fasta_tmp_path, tmp_path)
     
     
@@ -137,5 +137,5 @@ def main():
     log.debug('removed tmp dir: %s', tmp_path)
 
 
-if(__name__ == "__main__"):
+if(__name__ == '__main__'):
     main()

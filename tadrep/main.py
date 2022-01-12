@@ -29,7 +29,7 @@ def main():
         cfg.output_path = output_path
     except:
         sys.exit(f'ERROR: could not resolve or create output directory ({args.output})!')
-    log_prefix = args.prefix if args.prefix else "tadrep"
+    log_prefix = args.prefix if args.prefix else 'tadrep'
     logging.basicConfig(
         filename=str(output_path.joinpath(f'{log_prefix}.log')),
         filemode='w',
@@ -67,19 +67,19 @@ def main():
     ############################################################################
     if(cfg.plasmids_path):
         try:
-            verboseprint('\nparse plasmids sequences...')
-            plasmids = tio.import_sequences(cfg.plasmids_path)
-            log.info('imported plasmids: sequences=%i, file=%s', len(plasmids), cfg.plasmids_path)
-            verboseprint(f'\timported: {len(plasmids)}')
+            verboseprint('\nimport plasmids sequences...')
+            reference_plasmids = tio.import_sequences(cfg.plasmids_path)
+            log.info('imported reference plasmids: sequences=%i, file=%s', len(reference_plasmids), cfg.plasmids_path)
+            verboseprint(f'\timported: {len(reference_plasmids)}')
         except ValueError:
-            log.error('wrong plasmids file format!', exc_info=True)
-            sys.exit('ERROR: wrong plasmids file format!')
+            log.error('wrong reference plasmids file format!', exc_info=True)
+            sys.exit('ERROR: wrong reference plasmids file format!')
     else:
         try:
-            verboseprint('\nload plasmid database...')
-            plasmids = tio.import_tsv(cfg.database_path)
-            log.info('imported plasmids: sequence=%i, file=%s', len(plasmids), cfg.database_path)
-            verboseprint(f'\timported: {len(plasmids)}')
+            verboseprint('\nload reference plasmids database...')
+            reference_plasmids = tio.import_tsv(cfg.database_path)
+            log.info('imported reference plasmids: sequence=%i, file=%s', len(reference_plasmids), cfg.database_path)
+            verboseprint(f'\timported: {len(reference_plasmids)}')
         except:
             log.error('wrong database path!', exc_info=True)
             sys.exit('ERROR: wrong database path!')
@@ -94,7 +94,7 @@ def main():
     plasmid_string_summary = []
 
     verboseprint('Analyze genome sequences...')
-    values = ((genome_path, plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
+    values = ((genome_path, reference_plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
     with mp.Pool(cfg.threads) as pool:
         genomes_summary = pool.starmap(pooling, values)
 
@@ -108,7 +108,7 @@ def main():
 
     cfg.summary_path = cfg.output_path.joinpath('summary.tsv')
     with cfg.summary_path.open('w') as fh:
-        fh.write(f'# {len(cfg.genome_path)} draft genome(s), {len(plasmids)} plasmid(s)\n')
+        fh.write(f'# {len(cfg.genome_path)} draft genome(s), {len(reference_plasmids)} reference plasmid(s)\n')
         fh.write('Genome\tPlasmid\tCoverage\tIdentity\tContigs\tContig IDs\n')
         for line in plasmid_string_summary:
             fh.write(line)
@@ -121,40 +121,36 @@ def main():
     log.debug('removed tmp dir: %s', cfg.tmp_path)
 
 
-def pooling(genome, plasmids, index):
-    log = logging.getLogger('Process')
+def pooling(genome, reference_plasmids, index):
+    log = logging.getLogger('PROCESS')
 
     # Import draft genome contigs
     try:
         contigs = tio.import_sequences(genome, sequence=True)
-        log.info('imported genomes: sequences=%i, file=%s', len(contigs), genome)
+        log.info('imported genome contigs: genome=%s, # contigs=%i', genome, len(contigs))
     except ValueError:
         log.error('wrong genome file format!', exc_info=True)
         sys.exit('ERROR: wrong genome file format!')
 
     sample = genome.stem
     blast_output_path = cfg.tmp_path.joinpath(f'{sample}-{index}-blastn.tsv')
-    log.debug('Blast output: path=%s', blast_output_path)
-
-    hits = tb.search_contigs(genome, blast_output_path)  # List of BLAST hits
-    filtered_hits = tb.filter_contig_hits(hits)  # Dictionary of Plasmids, with Blast hits filtered by coverage and identity
-    detected_plasmids = tp.detect_plasmids(filtered_hits, plasmids)  # List of detect reference plasmids above cov/id thresholds
+    hits = tb.search_contigs(genome, blast_output_path)  # plasmid raw hits
+    filtered_hits = tb.filter_contig_hits(hits)  # plasmid hits filtered by coverage and identity
+    detected_plasmids = tp.detect_reference_plasmids(sample, filtered_hits, reference_plasmids)  # detect reference plasmids above cov/id thresholds
 
     # Write output files
-    sample_summary_path = cfg.output_path.joinpath(f'{sample}-summary.tsv')
     plasmid_summary_strings = {}
+    sample_summary_path = cfg.output_path.joinpath(f'{sample}-summary.tsv')
     with sample_summary_path.open('w') as ssp:
         ssp.write(f"plasmid\tcontig\tcontig start\tcontig end\tcontig length\tcoverage[%]\tidentity[%]\talignment length\tstrand\tplasmid start\tplasmid end\tplasmid length\n")
 
         for plasmid in detected_plasmids:
 
+            plasmid_contigs_sorted = tp.reconstruct_plasmid(plasmid, contigs)
+            
             prefix = f"{cfg.prefix}-{sample}-{plasmid['reference']}" if cfg.prefix else f"{sample}-{plasmid['reference']}"
             plasmid_contigs_path = cfg.output_path.joinpath(f'{prefix}-contigs.fna')
             plasmid_pseudosequence_path = cfg.output_path.joinpath(f'{prefix}-pseudo.fna')
-
-            log.debug('prepare output: plasmid-id=%s, contigs-path=%s, assembly-path=%s', plasmid['id'], plasmid_contigs_path, plasmid_pseudosequence_path)
-            plasmid_contigs_sorted = tp.reconstruct_plasmid(plasmid, sample, contigs)
-
             tio.export_sequences(plasmid_contigs_sorted, plasmid_contigs_path, description=True, wrap=True)
             tio.export_sequences([plasmid], plasmid_pseudosequence_path, description=True, wrap=True)
 
@@ -163,13 +159,13 @@ def pooling(genome, plasmids, index):
 
             # Write detailed plasmid hits to sample summary file
             for hit in plasmid['hits']:
-                ssp.write(f"{plasmid['reference']}\t{hit['contig_id']}\t{hit['contig_start']}\t{hit['contig_end']}\t{hit['contig_length']}\t{hit['coverage']:.3f}\t{hit['perc_identity']:.3f}\t{hit['length']}\t{hit['strand']}\t{hit['plasmid_start']}\t{hit['plasmid_end']}\t{plasmid['length']}\n")
+                ssp.write(f"{plasmid['reference']}\t{hit['contig_id']}\t{hit['contig_start']}\t{hit['contig_end']}\t{hit['contig_length']}\t{hit['coverage']:.3f}\t{hit['perc_identity']:.3f}\t{hit['length']}\t{hit['strand']}\t{hit['reference_plasmid_start']}\t{hit['reference_plasmid_end']}\t{plasmid['length']}\n")
 
             png_path = cfg.output_path.joinpath(f"{sample}-{plasmid['reference']}.png")
             tv.create_plasmid_figure(plasmid, genome.name, png_path)
 
     cfg.lock.acquire()
-    log.debug('Lock acquired: genome=%s, index=%s', sample, index)
+    log.debug('lock acquired: genome=%s, index=%s', sample, index)
     print(f'\n\nGenome: {sample}, contigs: {len(contigs)}, detected plasmids: {len(detected_plasmids)}')
     for plasmid in detected_plasmids:
         # Create console output
@@ -178,10 +174,10 @@ def pooling(genome, plasmids, index):
             print(f"\t{'contig':^17}  alignment length  contig length  contig start  contig end  strand  plasmid start  plasmid end  coverage[%]  identity[%]")
             for hit in plasmid['hits']:
                 contig = contigs[hit['contig_id']]
-                print(f"\t{hit['contig_id']:^18} {hit['length']:>11} {contig['length']:>14} {hit['contig_start']:>13} {hit['contig_end']:>13} {hit['strand']:^13} {hit['plasmid_start']:>9} {hit['plasmid_end']:>12} {(hit['length'] / contig['length'] * 100):>13.1f} {hit['perc_identity'] * 100:>12.1f}")
+                print(f"\t{hit['contig_id']:^18} {hit['length']:>11} {contig['length']:>14} {hit['contig_start']:>13} {hit['contig_end']:>13} {hit['strand']:^13} {hit['reference_plasmid_start']:>9} {hit['reference_plasmid_end']:>12} {(hit['length'] / contig['length'] * 100):>13.1f} {hit['perc_identity'] * 100:>12.1f}")
         else:
             print(f"{sample}\t{plasmid['id']}\t{plasmid['length']}\t{len(plasmid['hits'])}\t{plasmid['coverage']:f}\t{plasmid['identity']:f}\t{','.join(contig['contig_id'] for contig in plasmid['hits'])}")
-    log.debug('Lock released: genome=%s, index=%s', sample, index)
+    log.debug('lock released: genome=%s, index=%s', sample, index)
     cfg.lock.release()
 
     return index, plasmid_summary_strings
@@ -190,15 +186,14 @@ def pooling(genome, plasmids, index):
 def write_cohort_table(plasmid_dict):
     plasmid_cohort_path = cfg.output_path.joinpath('plasmids.tsv')
     with plasmid_cohort_path.open('w') as fh:
-        # Write plasmid header
-        plasmid_order = []
+        plasmid_order = []  # write plasmid header
         for plasmid in plasmid_dict.keys():
             plasmid_order.append(plasmid_dict[plasmid])
             fh.write(f'\t{plasmid}')
         fh.write('\n')
         
-        transposed_plasmid_order = np.array(plasmid_order).T.tolist()  # Transpose information for easier writing
-        for num_genome, genome in enumerate(cfg.genome_path):  # Mark which plasmid was found for each draft genome
+        transposed_plasmid_order = np.array(plasmid_order).T.tolist()  # transpose information for easier writing
+        for num_genome, genome in enumerate(cfg.genome_path):  # mark which plasmid was found for each draft genome
             sample = genome.stem
             fh.write(f'{sample}')
             for plasmid in transposed_plasmid_order[num_genome]:

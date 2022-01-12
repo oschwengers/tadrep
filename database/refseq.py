@@ -13,12 +13,12 @@ FILE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
 
 def download_database(merged_file_path):
-    log.info('Download NCBI files: destination=%s', merged_file_path)
+    log.info('download NCBI files: destination=%s', merged_file_path)
     with merged_file_path.open('wb') as fh_out:
         for file in FILE_NUMBERS:
             ncbi_url = f'{NCBI_PATH}/plasmid.{file}.1.genomic.fna.gz'
             print(f'Downloading file: {ncbi_url} ...')
-            log.info('Download file: number=%s, url=%s, destination=%s', file, ncbi_url, merged_file_path)
+            log.info('download file: number=%s, url=%s, destination=%s', file, ncbi_url, merged_file_path)
             try:
                 with urllib.request.urlopen(ncbi_url) as response:
                     with gzip.GzipFile(fileobj=response) as fh_in:

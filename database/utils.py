@@ -35,7 +35,7 @@ def parse_arguments():
 
 
 def create_tsv(fasta_path, tsv_output_path):
-    log.info('Create .tsv: input=%s, output=%s', fasta_path, tsv_output_path)
+    log.info('create tsv: input=%s, output=%s', fasta_path, tsv_output_path)
     plasmids = tio.import_sequences(fasta_path)
     with tsv_output_path.open('w') as fh_out:
         for plasmid_id, plasmid in plasmids.items():
@@ -43,25 +43,23 @@ def create_tsv(fasta_path, tsv_output_path):
 
 
 def create_blast_db(output_path, fasta_tmp_path, tmp_path):
-
     cmd_blastdb = [
         'makeblastdb',
         '-in', str(fasta_tmp_path),
         '-dbtype', 'nucl',
         '-out', str(output_path)
     ]
-    log.debug('cmd_blastdb=%s', cmd_blastdb)
+    log.debug('cmd=%s', cmd_blastdb)
     tu.run_cmd(cmd_blastdb, tmp_path)
 
 
 def reverse_database(fasta_path, db_path, tmp_path):
-    log.debug('Reverse database: input-path=%s, output-path=%s', db_path, fasta_path)
-
+    log.debug('reverse database: input-path=%s, output-path=%s', db_path, fasta_path)
     cmd_reverse = [
         'blastdbcmd',
         '-entry', 'all',
         '-db', str(db_path),
         '-out', str(fasta_path)
     ]
-    log.debug('cmd_reverse=%s', cmd_reverse)
+    log.debug('cmd=%s', cmd_reverse)
     tu.run_cmd(cmd_reverse, tmp_path)

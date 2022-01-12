@@ -21,10 +21,10 @@ CONTIG_HEAD_MODIFIER = 200                                                  # Mo
 
 def create_plasmid_figure(plasmid, file_name, output_path):
     plasmid_head_length = int(plasmid['length'] / PLASMID_HEAD_MODIFIER)
-    log.info('Create graphic: plasmid=%s, head length=%s, output_path=%s', plasmid['id'], plasmid_head_length, output_path)
+    log.info('create graphic: plasmid=%s, head length=%i, output_path=%s', plasmid['id'], plasmid_head_length, output_path)
 
     plasmid_track = create_part_config(plasmid['id'], 0, plasmid['length'], label=True, head_length=plasmid_head_length)
-    combined_tracks, num_contig_tracks = create_contig_tracks(sorted(plasmid['hits'], key=lambda k: k['plasmid_start']), plasmid['length'])
+    combined_tracks, num_contig_tracks = create_contig_tracks(sorted(plasmid['hits'], key=lambda k: k['reference_plasmid_start']), plasmid['length'])
 
     figure, grid = plot_setup(num_contig_tracks + 1, 2)
     plasmid_plot = plot_plasmid(grid[-1], [plasmid_track])
@@ -35,7 +35,7 @@ def create_plasmid_figure(plasmid, file_name, output_path):
 def create_contig_tracks(contig_hits, plasmid_length):
 
     head_length = int(plasmid_length / CONTIG_HEAD_MODIFIER)
-    log.info('Contig tracks: head length / cutoff = %s', head_length)
+    log.info('contig tracks: plasmid-length=%i, head-length=%i', plasmid_length, head_length)
 
     contig_complete_tracks = [[]]
     contig_matched_tracks = [[]]
@@ -43,18 +43,18 @@ def create_contig_tracks(contig_hits, plasmid_length):
     for hit in contig_hits:
         contig_fwd = True if hit['strand'] == '+' else False
         if(contig_fwd):
-            start = hit['plasmid_start'] - hit['contig_start'] + 1
+            start = hit['reference_plasmid_start'] - hit['contig_start'] + 1
             end = start + hit['contig_length']
-            match_start = hit['plasmid_start']
-            match_end = hit['plasmid_end']
+            match_start = hit['reference_plasmid_start']
+            match_end = hit['reference_plasmid_end']
         else:
-            start = hit['plasmid_end'] + hit['contig_start'] - 1
+            start = hit['reference_plasmid_end'] + hit['contig_start'] - 1
             end = start - hit['contig_length']
-            match_start = hit['plasmid_end']
-            match_end = hit['plasmid_start']
+            match_start = hit['reference_plasmid_end']
+            match_end = hit['reference_plasmid_start']
 
         if(abs(end - start) < head_length):
-            log.info('Contig skipped: id=%s, length=%s', hit['contig_id'], hit['contig_length'])
+            log.info('contig skipped: id=%s, length=%s', hit['contig_id'], hit['contig_length'])
             continue
 
         contig_config = create_part_config(hit['contig_id'], int(start), int(end), fwd=contig_fwd, head_length=head_length)
@@ -63,7 +63,7 @@ def create_contig_tracks(contig_hits, plasmid_length):
         track = find_track(contig_complete_tracks, contig_matched_tracks, contig_config, len(contig_hits) + 1)
         contig_complete_tracks[track].append(contig_config)
         contig_matched_tracks[track].append(match_config)
-        log.info('Contig added: id=%s, start=%s, end=%s, length=%s, type=%s, strand=%s, fwd=%s',
+        log.info('contig added: id=%s, start=%s, end=%s, length=%s, type=%s, strand=%s, fwd=%s',
                   contig_config['name'], contig_config['start'], contig_config['end'], hit['length'], contig_config['type'], hit['strand'], contig_config['fwd'])
     combined_tracks = combine_tracks(contig_complete_tracks, contig_matched_tracks)
 
@@ -75,7 +75,7 @@ def plot_setup(num_total_tracks, num_grids):
     fig = plt.figure(figsize=(10.0, height))
     gs = gridspec.GridSpec(num_grids, 1, height_ratios=[(num_total_tracks - 1) * HEIGHT, HEIGHT + 0.1], figure=fig)
     gs.update(hspace=0.2)
-    log.info('Figure created: tracks=%s, height=%s, grids=%s', num_total_tracks, height, num_grids)
+    log.info('figure created: tracks=%i, height=%i, grids=%i', num_total_tracks, height, num_grids)
     return fig, gs
 
 
@@ -87,8 +87,7 @@ def plot_plasmid(grid_pos, design):
     plasmid_plot.set_xlim([start - 100, end + 100])
     plasmid_plot.set_ylim([-(MARGIN_SPACE - 1), MARGIN_SPACE - 1])
     plasmid_plot.axis('off')
-    log.info('Subplot created: plasmid, start=%s, end=%s, y_limitation=%s', start, end, MARGIN_SPACE - 1)
-
+    log.info('subplot created: plasmid, start=%s, end=%s, y_limitation=%s', start, end, MARGIN_SPACE - 1)
     return plasmid_plot
 
 
@@ -100,7 +99,7 @@ def plot_contigs(grid_pos, plasmid_plot, num_contig_tracks, combined_tracks, y_l
 
     start, end = dr.renderDNA(contig_plot, combined_tracks, part_renderers, plot_backbone=False)
     contig_plot.set_ylim([-MARGIN_SPACE, set_ylim_contigs])  # set view limitations to show everything
-    log.info('Subplot created: contig, start=%s, end=%s, tracks=%s', start, end, num_contig_tracks)
+    log.info('subplot created: contig, start=%s, end=%s, tracks=%s', start, end, num_contig_tracks)
     if(y_label):  # remove ticks and axis
         wrapped_label, label_width = wrap_y_label(y_label, num_contig_tracks)
         contig_plot.set_ylabel(wrapped_label, labelpad=1, fontsize=8)
@@ -114,7 +113,7 @@ def plot_contigs(grid_pos, plasmid_plot, num_contig_tracks, combined_tracks, y_l
     else:
         label_width = 0
         contig_plot.axis('off')
-        log.debug('Subplot axis: disabled')
+        log.debug('subplot axis: disabled')
     return label_width
 
 
@@ -122,7 +121,7 @@ def finalize_plot(figure, output_path, pad_left=0):
     plt.subplots_adjust(left=pad_left + 0.01, right=0.99, top=0.985, bottom=0.01)
     figure.savefig(output_path, dpi=300, format='png')
     plt.close('all')
-    log.info('Plot exported: path=%s', output_path)
+    log.info('plot exported: path=%s', output_path)
 
 
 def wrap_y_label(y_label, num_contig_tracks):
@@ -150,7 +149,7 @@ def create_part_config(name, start, end, head_length=10, label_y_offset=0, color
             'color': color
         }
     }
-    log.debug('Design created! id=%s, start=%s, end=%s', part_config['name'], part_config['start'], part_config['end'])
+    log.debug('design created! id=%s, start=%s, end=%s', part_config['name'], part_config['start'], part_config['end'])
     return part_config
 
 
