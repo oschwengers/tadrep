@@ -16,11 +16,15 @@ log = logging.getLogger('UTILS')
 FILES_V4 = ['db.nhr', 'db.nin', 'db.nsq', 'db.tsv']
 FILES_V5 = ['db.not', 'db.ntf', 'db.nto', 'db.ndb']
 
+CITATION = 'Schwengers et al. (2021)\nTaDReP: Targeted Detection and Reconstruction of Plasmids.\nGitHub https://github.com/oschwengers/tadrep'
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
         prog='TaDReP',
         description='Targeted Detection and Reconstruction of Plasmids',
+        epilog=f'Citation:\n{CITATION}\n\nGitHub:\nhttps://github.com/oschwengers/tadrep',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         add_help=False
     )
 
