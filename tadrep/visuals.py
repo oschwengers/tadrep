@@ -28,7 +28,8 @@ def create_plasmid_figure(plasmid, file_name, output_path):
 
     figure, grid = plot_setup(num_contig_tracks + 1, 2)
     plasmid_plot = plot_plasmid(grid[-1], [plasmid_track])
-    label_width = plot_contigs(grid[0], plasmid_plot, num_contig_tracks, combined_tracks, y_label=file_name)
+    label_width = plot_contigs(grid[0], plasmid_plot, num_contig_tracks, combined_tracks)
+    # label_width = plot_contigs(grid[0], plasmid_plot, num_contig_tracks, combined_tracks, y_label=file_name)
     finalize_plot(figure, output_path, label_width)
 
 
