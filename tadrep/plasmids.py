@@ -8,9 +8,9 @@ import tadrep.config as cfg
 log = logging.getLogger('PLASMIDS')
 
 
-def detect_reference_plasmids(sample, filtered_contigs, reference_plasmids):
+def detect_reference_plasmids(sample, filtered_hits, reference_plasmids):
     detected_plasmids = []
-    for reference_plasmid_id, hits in filtered_contigs.items():
+    for reference_plasmid_id, hits in filtered_hits.items():
         reference_plasmid = reference_plasmids[reference_plasmid_id]
         coverage, covered_bp, uncovered_bp = calc_coverage(reference_plasmid, hits)
         identity = calc_identity(hits)

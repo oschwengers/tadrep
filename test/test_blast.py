@@ -3,6 +3,32 @@ from unittest.mock import patch
 
 import tadrep.blast as tb
 
+plasmids = {
+    'p1': {
+        'id': 'p1',
+        'length': 5000
+    },
+    'p2': {
+        'id': 'p2',
+        'length': 5000
+    },
+    'p3': {
+        'id': 'p3',
+        'length': 5400
+    }
+}
+
+expected_hits = {
+    "p1": [
+        15, 23, 27, 31, 35, 36, 40, 48, 51, 53, 57, 58, 67, 68, 78
+    ],
+    "p2": [
+        24, 32, 41, 49, 60
+    ],
+    "p3": [
+        34, 34
+    ]
+}
 
 @patch("tadrep.blast.cfg.min_contig_coverage", 40 / 100)
 @patch("tadrep.blast.cfg.min_contig_identity", 90 / 100)
@@ -28,20 +54,8 @@ def test_hit_filtering():
             raw_hits.append(hit)
     assert len(raw_hits) == 36
 
-    expected_hits = {
-        "p1": [
-            15, 23, 27, 31, 35, 36, 40, 48, 51, 53, 57, 58, 67, 68, 78
-        ],
-        "p2": [
-            24, 32, 41, 49, 60
-        ],
-        "p3": [
-            34, 34
-        ]
-    }
-
     # assert with hits
-    filtered_hits = tb.filter_contig_hits('test', raw_hits)
+    filtered_hits = tb.filter_contig_hits('test', raw_hits, plasmids)
     assert filtered_hits.keys() == expected_hits.keys()
     assert len(filtered_hits) == len(expected_hits)
 
@@ -49,5 +63,5 @@ def test_hit_filtering():
         assert len(filtered_hits[plasmid_id]) == len(hits)
 
     # assert without hits
-    filtered_hits = tb.filter_contig_hits('test', {})
+    filtered_hits = tb.filter_contig_hits('test', {}, plasmids)
     assert filtered_hits == {}

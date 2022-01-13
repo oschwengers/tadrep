@@ -31,27 +31,29 @@ def search_contigs(genome_path, blast_output_path):
     hits = []
     with blast_output_path.open('r') as fh:
         for line in fh:
-            cols = line.strip().split('\t')
-            log.debug('raw hit: %s', cols)
+            # cols = line.strip().split('\t')
+            (qseqid, qstart, qend, qlen, sseqid, sstart, send, length, nident, sstrand, evalue, bitscore) = line.strip().split('\t')
             if(cfg.database_path):
-                if('|' in cols[4]):
-                    cols[4] = cols[4].split('|')[1]
+                if('|' in sseqid):
+                    sseqid = sseqid.split('|')[1]
             hit = {
-                'contig_id': cols[0],
-                'contig_start': int(cols[1]),
-                'contig_end': int(cols[2]),
-                'contig_length': int(cols[3]),
-                'reference_plasmid_id': cols[4],
-                'reference_plasmid_start': int(cols[5]),
-                'reference_plasmid_end': int(cols[6]),
-                'length': int(cols[7]),
-                'strand': '+' if cols[9] == 'plus' else '-',
-                'coverage': int(cols[7]) / int(cols[3]),
-                'perc_identity': int(cols[8]) / int(cols[7]),
-                'num_identity': int(cols[8]),
-                'evalue': float(cols[10]),
-                'bitscore': float(cols[11])
+                'contig_id': qseqid,
+                'contig_start': int(qstart),
+                'contig_end': int(qend),
+                'contig_length': int(qlen),
+                'reference_plasmid_id': sseqid,
+                'reference_plasmid_start': int(sstart),
+                'reference_plasmid_end': int(send),
+                'length': int(length),
+                'strand': '+' if sstrand == 'plus' else '-',
+                'coverage': int(length) / int(qlen),
+                'perc_identity': int(nident) / int(length),
+                'num_identity': int(nident),
+                'evalue': float(evalue),
+                'bitscore': float(bitscore)
             }
+            if(hit['strand'] == '-'):
+                hit['reference_plasmid_start'], hit['reference_plasmid_end'] = hit['reference_plasmid_end'], hit['reference_plasmid_start']
             hits.append(hit)
     log.info('raw blast hits: genome=%s, # hits=%i', genome_path.stem, len(hits))
     return hits
@@ -60,21 +62,57 @@ def search_contigs(genome_path, blast_output_path):
 ############################################################################
 # Parse and filter contig hits
 ############################################################################
-def filter_contig_hits(genome, raw_hits):
-    filtered_hits = {}
+def filter_contig_hits(genome, raw_hits, reference_plasmids):
+    filtered_hits_per_ref_plasmid = {}
+    edge_hits_per_ref_plasmid = {}
     for hit in raw_hits:
-        if(hit['strand'] == '-'):
-            hit['reference_plasmid_start'], hit['reference_plasmid_end'] = hit['reference_plasmid_end'], hit['reference_plasmid_start']
+        reference_plasmid_id = hit['reference_plasmid_id']
+        if(hit['perc_identity'] >= cfg.min_contig_identity):
+            reference_plasmid = reference_plasmids[reference_plasmid_id]
+            if(hit['reference_plasmid_start'] == 1 or hit['reference_plasmid_end'] == reference_plasmid['length']):  # hit at plasmid edge either 5' or 3', store for combined coverage check
+                edge_hits_per_contig = edge_hits_per_ref_plasmid.get(reference_plasmid_id, [])
+                edge_hits_per_contig.append(hit)
+                if(reference_plasmid_id not in edge_hits_per_ref_plasmid):
+                    edge_hits_per_ref_plasmid[reference_plasmid_id] = edge_hits_per_contig
+            elif(hit['coverage'] >= cfg.min_contig_coverage):  # hit within plasmid with sufficient coverage
+                plasmid_hits = filtered_hits_per_ref_plasmid.get(reference_plasmid_id, [])
+                plasmid_hits.append(hit)
+                if(reference_plasmid_id not in filtered_hits_per_ref_plasmid):
+                    filtered_hits_per_ref_plasmid[reference_plasmid_id] = plasmid_hits
+                log.debug(
+                    'filtered hit: contig-id=%s, reference-plasmid-id=%s, alignment-length=%i, identity=%0.3f, contig-coverage=%0.3f',
+                    hit['contig_id'], reference_plasmid_id, hit['length'], hit['perc_identity'], hit['coverage']
+                )
+    
+    for reference_plasmid_id, edge_hits in edge_hits_per_ref_plasmid.items():
+        if(len(edge_hits) == 1):
+            edge_hit = edge_hits[0]
+            if(edge_hit['coverage'] >= cfg.min_contig_coverage):
+                plasmid_hits = filtered_hits_per_ref_plasmid.get(reference_plasmid_id, [])
+                plasmid_hits.append(edge_hit)
+                if(reference_plasmid_id not in filtered_hits_per_ref_plasmid):
+                    filtered_hits_per_ref_plasmid[reference_plasmid_id] = plasmid_hits
+                log.debug(
+                    'filtered single edge hit: contig-id=%s, reference-plasmid-id=%s, length=%i, identity=%0.3f, contig-coverage=%0.3f, plasmid-start=%i, plasmid-end=%i',
+                    edge_hit['contig_id'], reference_plasmid_id, edge_hit['length'], edge_hit['perc_identity'], edge_hit['coverage'], edge_hit['reference_plasmid_start'], edge_hit['reference_plasmid_end']
+                )
+        elif(len(edge_hits) == 2):
+            (edge_hit_a, edge_hit_b) = edge_hits
+            if(edge_hit_a['contig_id'] == edge_hit_b['contig_id']):  # check hits belong to the same contig
+                alignment_sum = edge_hit_a['length'] + edge_hit_b['length']
+                reference_plasmid = reference_plasmids[reference_plasmid_id]
+                contig_cov = alignment_sum / edge_hit_a['contig_length']
+                contig_ident = (edge_hit_a['num_identity'] + edge_hit_b['num_identity']) / ((edge_hit_a['length'] + edge_hit_b['length']))
+                if(contig_cov >= cfg.min_contig_coverage):
+                    plasmid_hits = filtered_hits_per_ref_plasmid.get(reference_plasmid_id, [])
+                    plasmid_hits.append(edge_hit_a)
+                    plasmid_hits.append(edge_hit_b)
+                    if(reference_plasmid_id not in filtered_hits_per_ref_plasmid):
+                        filtered_hits_per_ref_plasmid[reference_plasmid_id] = plasmid_hits
+                    log.debug(
+                        'filtered combined edge hits: contig-id=%s, reference-plasmid-id=%s, combined-length=%i, identity=%0.3f, combined-coverage=%0.3f',
+                        edge_hit_a['contig_id'], edge_hit_a['reference_plasmid_id'], alignment_sum, contig_ident, contig_cov
+                    )
 
-        if(hit['coverage'] >= cfg.min_contig_coverage and hit['perc_identity'] >= cfg.min_contig_identity):
-            plasmid_hits = filtered_hits.get(hit['reference_plasmid_id'], [])
-            plasmid_hits.append(hit)
-            if(len(plasmid_hits) == 1):
-                filtered_hits[hit['reference_plasmid_id']] = plasmid_hits
-            log.debug(
-                'filtered hit: contig-id=%s, reference-plasmid-id=%s, alignment-length=%i, identity=%0.3f, contig-coverage=%0.3f',
-                hit['contig_id'], hit['reference_plasmid_id'], hit['length'], hit['perc_identity'], hit['coverage']
-            )
-
-    log.info('filtered blast hits: genome=%s, # raw-hits=%i, # filtered-hits=%i', genome, len(raw_hits), len(filtered_hits))
-    return filtered_hits
+    log.info('filtered blast hits: genome=%s, # raw-hits=%i, # filtered-hits=%i', genome, len(raw_hits), len(filtered_hits_per_ref_plasmid))
+    return filtered_hits_per_ref_plasmid
