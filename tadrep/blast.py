@@ -60,7 +60,7 @@ def search_contigs(genome_path, blast_output_path):
 ############################################################################
 # Parse and filter contig hits
 ############################################################################
-def filter_contig_hits(raw_hits):
+def filter_contig_hits(genome, raw_hits):
     filtered_hits = {}
     for hit in raw_hits:
         if(hit['strand'] == '-'):
@@ -76,5 +76,5 @@ def filter_contig_hits(raw_hits):
                 hit['contig_id'], hit['reference_plasmid_id'], hit['length'], hit['perc_identity'], hit['coverage']
             )
 
-    log.info('filtered blast hits: genome=%s, # raw-hits=%i, # filtered-hits=%i', len(raw_hits), len(filtered_hits))
+    log.info('filtered blast hits: genome=%s, # raw-hits=%i, # filtered-hits=%i', genome, len(raw_hits), len(filtered_hits))
     return filtered_hits

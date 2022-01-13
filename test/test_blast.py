@@ -41,7 +41,7 @@ def test_hit_filtering():
     }
 
     # assert with hits
-    filtered_hits = tb.filter_contig_hits(raw_hits)
+    filtered_hits = tb.filter_contig_hits('test', raw_hits)
     assert filtered_hits.keys() == expected_hits.keys()
     assert len(filtered_hits) == len(expected_hits)
 
@@ -49,5 +49,5 @@ def test_hit_filtering():
         assert len(filtered_hits[plasmid_id]) == len(hits)
 
     # assert without hits
-    filtered_hits = tb.filter_contig_hits({})
+    filtered_hits = tb.filter_contig_hits('test', {})
     assert filtered_hits == {}

@@ -135,7 +135,7 @@ def pooling(genome, reference_plasmids, index):
     sample = genome.stem
     blast_output_path = cfg.tmp_path.joinpath(f'{sample}-{index}-blastn.tsv')
     hits = tb.search_contigs(genome, blast_output_path)  # plasmid raw hits
-    filtered_hits = tb.filter_contig_hits(hits)  # plasmid hits filtered by coverage and identity
+    filtered_hits = tb.filter_contig_hits(sample, hits)  # plasmid hits filtered by coverage and identity
     detected_plasmids = tp.detect_reference_plasmids(sample, filtered_hits, reference_plasmids)  # detect reference plasmids above cov/id thresholds
 
     # Write output files
