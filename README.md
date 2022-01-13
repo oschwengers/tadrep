@@ -1,9 +1,9 @@
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-brightgreen.svg)](https://github.com/oschwengers/bakta/blob/master/LICENSE)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/bakta.svg)
-![PyPI - Status](https://img.shields.io/pypi/status/bakta.svg)
-![GitHub release](https://img.shields.io/github/release/oschwengers/bakta.svg)
-[![PyPI](https://img.shields.io/pypi/v/bakta.svg)](https://pypi.org/project/bakta)
-[![Conda](https://img.shields.io/conda/v/bioconda/bakta.svg)](https://bioconda.github.io/recipes/bakta/README.html)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-brightgreen.svg)](https://github.com/oschwengers/tadrep/blob/master/LICENSE)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tadrep.svg)
+![PyPI - Status](https://img.shields.io/pypi/status/tadrep.svg)
+![GitHub release](https://img.shields.io/github/release/oschwengers/tadrep.svg)
+[![PyPI](https://img.shields.io/pypi/v/bakta.svg)](https://pypi.org/project/tadrep)
+[![Conda](https://img.shields.io/conda/v/bioconda/bakta.svg)](https://bioconda.github.io/recipes/tadrep/README.html)
 
 # TaDReP: Targeted Detection and Reconstruction of Plasmids
 
@@ -19,9 +19,9 @@ TaDReP is a tool for the rapid and targeted detection and reconstruction of plas
 
 ## Description
 
-TaDReP facilitates the rapid screening of target plasmids within a singe genome or entire genome cohorts.
-TaDReP is a tool for the targeted detection and reconstruction of reference plasmids with bacterial draft assemblies.
-Contigs from draft assemblies are aligned against reference plasmid sequences via BLAST+ and rigourously filtered for contig-wise coverage and identity thresholds. Reference plasmids are finally detected and reconstructed upon strict plasmid-wise coverage and identity thresholds.
+TaDReP facilitates the rapid screening of target plasmids within single genomes or genome cohorts.
+
+It detects and reconstructs reference plasmids within bacterial draft assemblies via contig alignments. Therefore, contigs from draft assemblies are aligned against reference plasmid sequences via BLAST+ and rigourously filtered for contig-wise coverage and identity thresholds. Reference plasmids are finally detected and reconstructed upon strict plasmid-wise coverage and identity thresholds.
 
 ## Installation
 
@@ -67,10 +67,10 @@ Per draft genome
 For each draft genome TaDReP writes a TSV summary file providing all detected reference plasmids and aligned genome contigs. For each reference plasmid that was detected in a draft assembly, ordered and rearranged contigs are exported as mere contigs and as a single pseudomolecule sequence combining contigs separated by multiple `N`.
 Furthermore, for each reconstructed plasmid, the reference plasmid backbone and all contig alignments are visualized as `PDF`.
 
-- `<GENOME>-summary.tsv`: detailed per contig alignment summary
-- `<GENOME>-<PLASMID>-contigs.fna`: ordered and rearranged contigs of the reconstructed plasmid
-- `<GENOME>-<PLASMID>-pseudo.fna`: pseudomolecule sequence of the reconstructed plasmid
-- `<GENOME>-<PLASMID>.pdf`: visualization of aligned contigs against the detected reference plasmid
+- `<genome>-summary.tsv`: detailed per contig alignment summary
+- `<genome>-<plasmid>-contigs.fna`: ordered and rearranged contigs of the reconstructed plasmid
+- `<genome>-<plasmid>-pseudo.fna`: pseudomolecule sequence of the reconstructed plasmid
+- `<genome>-<plasmid>.pdf`: visualization of aligned contigs against the detected reference plasmid
 
 If multiple genomes were provided, TaDReP also provides a presence/absence matrix of all detected plasmids for convenient cohort analyses.
 
