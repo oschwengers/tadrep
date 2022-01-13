@@ -119,7 +119,7 @@ def plot_contigs(grid_pos, plasmid_plot, num_contig_tracks, combined_tracks, y_l
 
 def finalize_plot(figure, output_path, pad_left=0):
     plt.subplots_adjust(left=pad_left + 0.01, right=0.99, top=0.985, bottom=0.01)
-    figure.savefig(output_path, dpi=300, format='png')
+    figure.savefig(output_path, dpi=600, format='pdf')
     plt.close('all')
     log.info('plot exported: path=%s', output_path)
 
