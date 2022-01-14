@@ -68,9 +68,17 @@ def main():
     if(cfg.plasmids_path):
         try:
             verboseprint('\nimport plasmids sequences...')
-            reference_plasmids = tio.import_sequences(cfg.plasmids_path)
+            reference_plasmids = tio.import_sequences(cfg.plasmids_path, sequence=True)
             log.info('imported reference plasmids: sequences=%i, file=%s', len(reference_plasmids), cfg.plasmids_path)
             verboseprint(f'\timported: {len(reference_plasmids)}')
+            ref_plasmid_sizes = []
+            for ref_plasmid in sorted(reference_plasmids.values(), key=lambda k: k['length']):
+                size = ref_plasmid['length']
+                ref_plasmid_sizes.append(size)
+                seq = ref_plasmid['sequence']
+                gc = (seq.count('G') + seq.count('C')) / (size - seq.count('N'))
+                verboseprint(f"\t{ref_plasmid['id']}: {(size/1000):.1f} kbp, GC {(gc*100):0.1f} %")
+                verboseprint(f'reference plasmid sizes: mean={np.mean(ref_plasmid_sizes):.1f} bp, sdev={np.std(ref_plasmid_sizes):.1f} bp')
         except ValueError:
             log.error('wrong reference plasmids file format!', exc_info=True)
             sys.exit('ERROR: wrong reference plasmids file format!')
