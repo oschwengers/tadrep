@@ -20,9 +20,9 @@ setup(
     license='GPLv3',
     author='Oliver Schwengers',
     author_email='oliver.schwengers@computational.bio.uni-giessen.de',
-    url='',
+    url='https://github.com/oschwengers/tadrep',
     packages=find_packages(include=['tadrep', 'tadrep.*', 'database', 'database.*']),
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     include_package_data=False,
     zip_safe=False,
     install_requires=[
@@ -38,9 +38,8 @@ setup(
     classifiers=[
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Development Status :: 4 - Beta ',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
@@ -49,7 +48,9 @@ setup(
         'Natural Language :: English'
     ],
     project_urls={
-        'Bug Reports': '',
-        'Source': ''
+        'Documentation': 'https://github.com/oschwengers/tadrep/blob/main/README.md',
+        'Source': 'https://github.com/oschwengers/tadrep',
+        'Bug Reports': 'https://github.com/oschwengers/tadrep/issues',
+        'CI': 'https://github.com/oschwengers/tadrep/actions'
     },
 )
