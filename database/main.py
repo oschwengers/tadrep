@@ -110,10 +110,7 @@ def main():
         if(selected_db == du.REFSEQ):
             dr.download_database(fasta_tmp_path)
         elif(selected_db == du.PLSDB):
-            dp.download_database(tmp_path)
-            print('Fetch database information...')
-            db_tmp_path = tmp_path.joinpath('plsdb.fna')
-            du.reverse_database(fasta_tmp_path, db_tmp_path, tmp_path)
+            dp.download_database(fasta_tmp_path)
         else:
             print('Combining files...')
             with fasta_tmp_path.open('w+') as fh_out:
