@@ -2,8 +2,8 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tadrep.svg)
 ![PyPI - Status](https://img.shields.io/pypi/status/tadrep.svg)
 ![GitHub release](https://img.shields.io/github/release/oschwengers/tadrep.svg)
-[![PyPI](https://img.shields.io/pypi/v/bakta.svg)](https://pypi.org/project/tadrep)
-[![Conda](https://img.shields.io/conda/v/bioconda/bakta.svg)](https://bioconda.github.io/recipes/tadrep/README.html)
+[![PyPI](https://img.shields.io/pypi/v/tadrep.svg)](https://pypi.org/project/tadrep)
+[![Conda](https://img.shields.io/conda/v/bioconda/tadrep.svg)](https://bioconda.github.io/recipes/tadrep/README.html)
 
 # TaDReP: Targeted Detection and Reconstruction of Plasmids
 
