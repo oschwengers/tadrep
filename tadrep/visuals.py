@@ -40,7 +40,6 @@ def create_contig_tracks(contig_hits, plasmid_length):
 
     contig_complete_tracks = [[]]
     contig_matched_tracks = [[]]
-
     for hit in contig_hits:
         contig_fwd = True if hit['strand'] == '+' else False
         if(contig_fwd):

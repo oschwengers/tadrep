@@ -76,7 +76,7 @@ def run_cmd(cmd_command, tmp_path):
         log.debug('command: %s', cmd_command)
         log.debug('stdout=%s, stderr=%s', process.stdout, process.stderr)
         log.warning('command failed! Error-code: %s', process.returncode)
-        sys.exit(f'ERROR: {process.stderr}\nBlast command error! Error code: {process.returncode}')
+        sys.exit(f'ERROR: {process.stderr}\nError code: {process.returncode}')
 
 
 def check_file_permission(file, purpose):
