@@ -1,18 +1,12 @@
 import logging
-import multiprocessing as mp
-import numpy as np
 import shutil
 import sys
 
 from pathlib import Path
 
 import tadrep
-import tadrep.blast as tb
 import tadrep.config as cfg
-import tadrep.io as tio
-import tadrep.plasmids as tp
 import tadrep.utils as tu
-import tadrep.visuals as tv
 import tadrep.detection as td
 
 
