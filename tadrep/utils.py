@@ -26,6 +26,13 @@ def parse_arguments():
         add_help=False
     )
 
+    arg_group_modules = parser.add_argument_group('Modules')
+    arg_group_modules.add_argument('--extraction', action='store_true', help='Extract unique plasmid sequences')
+    arg_group_modules.add_argument('--characterization', action='store_true', help='Characterize plasmids (length, GC content, Inc types, conjugation genes)')
+    arg_group_modules.add_argument('--clustering', action='store_true', help='Cluster related plasmids')
+    arg_group_modules.add_argument('--detection', action='store_true', default=False, help='Detect and reconstruct plasmids from draft genomes')
+    arg_group_modules.add_argument('--visualization', action='store_true', help='Visualize plasmid coverage of contigs')
+
     arg_group_io = parser.add_argument_group('Input / Output')
     arg_group_io.add_argument('--genome', '-g', action='store', default=None, nargs="+", help='Draft genome path')
     arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, help='Plasmids path')
