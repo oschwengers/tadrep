@@ -55,7 +55,8 @@ def main():
     verboseprint(f'\ttmp directory: {cfg.tmp_path}')
     verboseprint(f'\t# threads: {cfg.threads}')
 
-    td.detect_and_reconstruct()
+    if(cfg.detection):
+        td.detect_and_reconstruct()
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))

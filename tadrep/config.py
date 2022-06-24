@@ -10,6 +10,12 @@ import tadrep.utils as tu
 
 log = logging.getLogger('CONFIG')
 
+# module configuration
+extraction = False
+characterization = False
+clustering = False
+detection = False
+visualization = False
 
 # runtime configurations
 threads = None
@@ -38,6 +44,23 @@ blast_threads = None
 
 def setup(args):
     """Test environment and build a runtime configuration."""
+    # module configuration
+    global extraction, characterization, clustering, detection, visualization
+    extraction = args.extraction
+    log.info('extraction=%s', extraction)
+    characterization = args.characterization
+    log.info('characterization=%s', characterization)
+    clustering = args.clustering
+    log.info('clustering=%s', clustering)
+    detection = args.detection
+    log.info('detection=%s', detection)
+    visualization = args.visualization
+    log.info('visualization=%s', visualization)
+
+    if(not (extraction or characterization or clustering or detection or visualization)):
+        log.debug('no module for processing was selected!')
+        sys.exit(f'ERROR: no module was selected!')
+
     # runtime configurations
     global threads, verbose
     threads = args.threads
