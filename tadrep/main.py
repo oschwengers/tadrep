@@ -55,8 +55,21 @@ def main():
     verboseprint(f'\ttmp directory: {cfg.tmp_path}')
     verboseprint(f'\t# threads: {cfg.threads}')
 
+    if(cfg.extraction):
+        verboseprint('\nExtraction started...')
+
+    if(cfg.characterization):
+        verboseprint('\nCharacterization started...')
+
+    if(cfg.clustering):
+        verboseprint('\nClustering started...')
+
     if(cfg.detection):
+        verboseprint('\nDetection and reconstruction started ...')
         td.detect_and_reconstruct()
+
+    if(cfg.visualization):
+        verboseprint('\nVisualization started...')
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))
