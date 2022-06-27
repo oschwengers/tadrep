@@ -1,4 +1,5 @@
 import logging
+import json
 
 from pathlib import Path
 
@@ -70,3 +71,16 @@ def import_tsv(database_path):
             log.debug('imported: id=%s, description=%s, length=%i', plasmid['id'], plasmid['description'], plasmid['length'])
     log.info('imported: # plasmids=%i', len(plasmids))
     return plasmids
+
+
+def import_json(json_path):
+    with open(json_path, 'r') as fh:
+        data = json.load(fh)
+    log.info('imported json: # sequences=%i', len(data))
+    return data
+
+
+def export_json(data, json_path):
+    log.info('write json: path=%s, # sequences=%i', json_path, len(data))
+    with open(json_path, 'w') as fh:
+        json.dump(data, fh)
