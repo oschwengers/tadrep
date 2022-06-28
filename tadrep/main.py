@@ -8,6 +8,7 @@ import tadrep
 import tadrep.config as cfg
 import tadrep.utils as tu
 import tadrep.detection as td
+import tadrep.visuals as tv
 
 
 def main():
@@ -70,6 +71,7 @@ def main():
 
     if(cfg.visualization):
         verboseprint('\nVisualization started...')
+        tv.create_plots()
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))
