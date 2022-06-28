@@ -1,7 +1,11 @@
 import logging
+from pathlib import Path
 
 import dnaplotlib as dpl
 import matplotlib.pyplot as plt
+
+import tadrep.io as tio
+import tadrep.config as cfg
 
 from matplotlib import gridspec
 
@@ -17,6 +21,15 @@ MARGIN_SPACE = 4                                                            # Ve
 LABEL_WRAPPING = 7                                                          # Number of characters per contig track
 PLASMID_HEAD_MODIFIER = 100                                                 # Modifier of plasmid head length
 CONTIG_HEAD_MODIFIER = 200                                                  # Modifier of contig head length
+
+
+def create_plots():
+    json_files = cfg.output_path.glob('*.json')
+    for file in json_files:
+        plasmids = tio.import_json(file)
+        for plasmid in plasmids:
+            plot_file_path = cfg.output_path.joinpath(f"{file.stem.split('-')[1]}-{plasmid['reference']}.pdf")
+            create_plasmid_figure(plasmid, file.stem, plot_file_path)
 
 
 def create_plasmid_figure(plasmid, file_name, output_path):
