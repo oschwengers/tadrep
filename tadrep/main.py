@@ -48,28 +48,30 @@ def main():
     verboseprint = print if cfg.verbose else lambda *a, **k: None
     verboseprint(f'TaDReP v{tadrep.__version__}')
     verboseprint('Options and arguments:')
-    verboseprint(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
-    verboseprint(f'\tplasmid(s): {cfg.plasmids_path}')
-    verboseprint(f'\tdatabase path: {cfg.database_path}')
     verboseprint(f'\toutput: {cfg.output_path}')
     verboseprint(f'\tprefix: {cfg.prefix}')
     verboseprint(f'\ttmp directory: {cfg.tmp_path}')
     verboseprint(f'\t# threads: {cfg.threads}')
 
-    if(cfg.extraction):
+    if(args.subcommand == "extraction"):
         verboseprint('\nExtraction started...')
 
-    if(cfg.characterization):
+    if(args.subcommand == "characterization"):
         verboseprint('\nCharacterization started...')
 
-    if(cfg.clustering):
+    if(args.subcommand == "clusterin"):
         verboseprint('\nClustering started...')
 
-    if(cfg.detection):
+    if(args.subcommand == "detection"):
+        cfg.setup_detection(args)
+        verboseprint(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
+        verboseprint(f'\tplasmid(s): {cfg.plasmids_path}')
+        verboseprint(f'\tdatabase path: {cfg.database_path}')
+
         verboseprint('\nDetection and reconstruction started ...')
         td.detect_and_reconstruct()
 
-    if(cfg.visualization):
+    if(args.subcommand == "visualization"):
         verboseprint('\nVisualization started...')
         tv.create_plots()
 
