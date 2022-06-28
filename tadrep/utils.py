@@ -28,17 +28,6 @@ def parse_arguments():
         add_help=False
     )
 
-    # arg_group_modules = parser.add_argument_group('Modules')
-    # arg_group_modules.add_argument('--extraction', action='store_true', help='Extract unique plasmid sequences')
-    # arg_group_modules.add_argument('--characterization', action='store_true', help='Characterize plasmids (length, GC content, Inc types, conjugation genes)')
-    # arg_group_modules.add_argument('--clustering', action='store_true', help='Cluster related plasmids')
-    # arg_group_modules.add_argument('--detection', action='store_true', default=False, help='Detect and reconstruct plasmids from draft genomes')
-    # arg_group_modules.add_argument('--visualization', action='store_true', help='Visualize plasmid coverage of contigs')
-
-    
-    # arg_group_io.add_argument('--output', '-o', action='store', default=os.getcwd(), help='Output directory (default = current working directory)')
-    # arg_group_io.add_argument('--prefix', action='store', default=None, type=not_empty, help='Prefix for all output files (default = None)')
-    
     arg_group_general = parser.add_argument_group('General')
     arg_group_general.add_argument('--help', '-h', action='help', help='Show this help message and exit')
     arg_group_general.add_argument('--verbose', '-v', action='store_true', help='Print verbose information')
@@ -51,7 +40,7 @@ def parse_arguments():
     arg_group_gio.add_argument('--prefix', action='store', default=None, type=not_empty, help='Prefix for all output files (default = None)')
 
     # add subparser
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='subcommand')
     extraction_parser = subparsers.add_parser('extraction', help='Extract unique plasmid sequences')
     characterization_parser = subparsers.add_parser('characterization', help='Identify plasmids with GC content, Inc types, conjugation genes')
     clustering_parser = subparsers.add_parser('clustering', help='Cluster related plasmids')
