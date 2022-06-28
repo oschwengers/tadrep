@@ -93,6 +93,7 @@ def pooling(genome, reference_plasmids, index):
     detected_plasmids = tp.detect_reference_plasmids(sample, filtered_hits, reference_plasmids)  # detect reference plasmids above cov/id thresholds
 
     # Write output files
+    plasmid_json = []
     plasmid_summary_strings = {}
     sample_summary_path = cfg.output_path.joinpath(f'{sample}-summary.tsv')
     with sample_summary_path.open('w') as ssp:
@@ -115,8 +116,11 @@ def pooling(genome, reference_plasmids, index):
             for hit in plasmid['hits']:
                 ssp.write(f"{plasmid['reference']}\t{hit['contig_id']}\t{hit['contig_start']}\t{hit['contig_end']}\t{hit['contig_length']}\t{hit['coverage']:.3f}\t{hit['perc_identity']:.3f}\t{hit['length']}\t{hit['strand']}\t{hit['reference_plasmid_start']}\t{hit['reference_plasmid_end']}\t{plasmid['length']}\n")
 
-            png_path = cfg.output_path.joinpath(f"{sample}-{plasmid['reference']}.pdf")
-            tv.create_plasmid_figure(plasmid, genome.name, png_path)
+            plasmid_json.append({k: plasmid[k] for k in ['id', 'reference', 'length', 'hits']})
+
+    if(plasmid_json):
+        json_path = cfg.output_path.joinpath(f"plasmids-{sample}.json")
+        tio.export_json(plasmid_json, json_path)
 
     cfg.lock.acquire()
     log.debug('lock acquired: genome=%s, index=%s', sample, index)
