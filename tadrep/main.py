@@ -56,13 +56,13 @@ def main():
     if(args.subcommand == "extraction"):
         verboseprint('\nExtraction started...')
 
-    if(args.subcommand == "characterization"):
+    elif(args.subcommand == "characterization"):
         verboseprint('\nCharacterization started...')
 
-    if(args.subcommand == "clusterin"):
+    elif(args.subcommand == "clusterin"):
         verboseprint('\nClustering started...')
 
-    if(args.subcommand == "detection"):
+    elif(args.subcommand == "detection"):
         cfg.setup_detection(args)
         verboseprint(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
         verboseprint(f'\tplasmid(s): {cfg.plasmids_path}')
@@ -71,9 +71,12 @@ def main():
         verboseprint('\nDetection and reconstruction started ...')
         td.detect_and_reconstruct()
 
-    if(args.subcommand == "visualization"):
+    elif(args.subcommand == "visualization"):
         verboseprint('\nVisualization started...')
         tv.create_plots()
+    else:
+        verboseprint('\nUnknown subcommand')
+        sys.exit('Unknown subcommand used')
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))
