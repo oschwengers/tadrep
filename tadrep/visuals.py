@@ -25,8 +25,10 @@ CONTIG_HEAD_MODIFIER = 200                                                  # Mo
 
 def create_plots():
     json_files = cfg.output_path.glob('*.json')
+    log.info('detectet json-files=%i, path=%s', len(json_files), cfg.output_path)
     for file in json_files:
         plasmids = tio.import_json(file)
+        log.debug('import file=%s', file)
         for plasmid in plasmids:
             plot_file_path = cfg.output_path.joinpath(f"{file.stem.split('-')[1]}-{plasmid['reference']}.pdf")
             create_plasmid_figure(plasmid, file.stem, plot_file_path)
