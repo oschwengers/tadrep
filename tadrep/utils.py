@@ -41,10 +41,28 @@ def parse_arguments():
 
     # add subparser
     subparsers = parser.add_subparsers(dest='subcommand')
+
+    # extraction parser
     extraction_parser = subparsers.add_parser('extraction', help='Extract unique plasmid sequences')
+
+    arg_group_io = extraction_parser.add_argument_group('Input')
+    arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, nargs="+", help='Draft plasmids path')
+
+    # characterization parser
     characterization_parser = subparsers.add_parser('characterization', help='Identify plasmids with GC content, Inc types, conjugation genes')
+
+    arg_group_io = characterization_parser.add_argument_group('Input')
+    arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, nargs='+', help='Plasmids path')
+
+    # clustering parser
     clustering_parser = subparsers.add_parser('clustering', help='Cluster related plasmids')
-    visualization_parser = subparsers.add_parser('visualization', help='Visualize plasmid coverage of contigs')
+    
+    arg_group_parameters = clustering_parser.add_argument_group('Parameter')
+    arg_group_parameters.add_argument('--min-coverage', action='store', type=int, default=90, choices=(1,101), metavar='[1-100]', dest='min_coverage', help='Minimal plasmid coverage (default = 90%%)')
+    arg_group_parameters.add_argument('--min-identity', action='store', type=int, default=90, choices=(1,101), metavar='[1-100]', dest='min_coverage', help='Minimal plasmid identity (default = 90%%)')
+
+
+    # detection parser
     detection_parser = subparsers.add_parser('detection', help='Detect and reconstruct plasmids in draft genomes')
 
     arg_group_io = detection_parser.add_argument_group('Input / Output')
@@ -58,6 +76,18 @@ def parse_arguments():
     arg_group_parameters.add_argument('--min-plasmid-coverage', action='store', type=int, default=80, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_coverage', help="Minimal plasmid coverage (default = 80%%)")
     arg_group_parameters.add_argument('--min-plasmid-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_identity', help="Minimal plasmid identity (default = 90%%)")
     arg_group_parameters.add_argument('--gap-sequence-length', action='store', type=is_positive, default=10, dest='gap_sequence_length', help="Gap sequence N length (default = 10)")
+
+    # visualization parser
+    visualization_parser = subparsers.add_parser('visualization', help='Visualize plasmid coverage of contigs')
+    
+    arg_group_plot = visualization_parser.add_argument_group('Plot parameter')
+    arg_group_plot.add_argument('--height', action='store', default=0.5,  help='Height per track')
+    arg_group_plot.add_argument('--label_y_offset', action='store', default=-3, help='Offset label from track center')
+    arg_group_plot.add_argument('--track_edge_distance', action='store', default=1, help='Distance between label and top of previous track')
+    arg_group_plot.add_argument('--margin_space', action='store', default=4,  help='Vertical space between plotted elements and plot margin')
+    arg_group_plot.add_argument('--label_wrapping', action='store', default=7,  help='Number of characters per contig track')
+    arg_group_plot.add_argument('--plasmid_head_modifier', action='store', default=100,  help='Modifier of plasmid head length')
+    arg_group_plot.add_argument('--contig_head_modifier', action='store' ,default=200,  help='Modifier of contig head length')
 
     return parser.parse_args()
 
