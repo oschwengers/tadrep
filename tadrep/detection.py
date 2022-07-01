@@ -64,7 +64,6 @@ def detect_and_reconstruct():
                 log.info('Plasmid added: id=%s', plasmid_id)
             plasmid_dict[plasmid_id][genome_index] = 1
 
-    cfg.summary_path = cfg.output_path.joinpath('summary.tsv')
     with cfg.summary_path.open('w') as fh:
         fh.write(f'# {len(cfg.genome_path)} draft genome(s), {len(reference_plasmids)} reference plasmid(s)\n')
         fh.write('Genome\tPlasmid\tCoverage\tIdentity\tContigs\tContig IDs\n')

@@ -10,18 +10,21 @@ import tadrep.utils as tu
 
 log = logging.getLogger('CONFIG')
 
+# general setup
 # runtime configurations
 threads = None
 verbose = None
 
 # input / output configuration
-genome_path = []
-plasmids_path = None
 output_path = None
 tmp_path = None
-summary_path = None
 prefix = None
+
+# detection setup
+plasmids_path = None
+genome_path = []
 database_path = None
+summary_path = None
 
 # workflow configuration
 min_contig_coverage = None
@@ -86,6 +89,9 @@ def setup_detection(args):
         sys.exit('ERROR: neither plasmid file nor database provided!')
 
     log.info('plasmids-path=%s', plasmids_path)
+
+    summary_path = output_path.joinpath('summary.tsv')
+    log.info('summary_path=%s', summary_path)
 
     # workflow configuration
     global min_contig_coverage, min_contig_identity, min_plasmid_coverage, min_plasmid_identity, gap_sequence_length
