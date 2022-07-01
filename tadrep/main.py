@@ -74,9 +74,6 @@ def main():
     elif(args.subcommand == "visualization"):
         verboseprint('\nVisualization started...')
         tv.create_plots()
-    else:
-        verboseprint('\nUnknown subcommand')
-        sys.exit('Unknown subcommand used')
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))
