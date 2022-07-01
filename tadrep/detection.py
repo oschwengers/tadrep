@@ -50,6 +50,7 @@ def detect_and_reconstruct():
     ############################################################################
     plasmid_dict = {}
     plasmid_string_summary = []
+    plasmid_detected = {}
 
     verboseprint('Analyze genome sequences...')
     values = ((genome_path, reference_plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
@@ -57,8 +58,16 @@ def detect_and_reconstruct():
         genomes_summary = pool.starmap(pooling, values)
 
     for genome_index, plasmid_summary in genomes_summary:
-        for plasmid_id, summary_string in plasmid_summary.items():
-            plasmid_string_summary.append(summary_string)
+        for plasmid in plasmid_summary:
+            plasmid_id = plasmid['reference']
+            if(plasmid_id not in plasmid_detected):
+                plasmid_detected[plasmid_id] = {k: plasmid[k] for k in ['id', 'reference', 'length']}
+                plasmid_detected[plasmid_id]['found_in'] = {}
+            plasmid_detected[plasmid_id]['found_in'][plasmid['genome']] = plasmid['hits']
+
+            # Create string for plasmid summary
+            plasmid_string_summary.append(f"{plasmid['genome']}\t{plasmid['reference']}\t{plasmid['coverage']:.3f}\t{plasmid['identity']:.3f}\t{len(plasmid['hits'])}\t{','.join([hit['contig_id'] for hit in plasmid['hits']])}\n")
+
             if(plasmid_id not in plasmid_dict):
                 plasmid_dict[plasmid_id] = [0] * len(cfg.genome_path)
                 log.info('Plasmid added: id=%s', plasmid_id)
@@ -73,6 +82,9 @@ def detect_and_reconstruct():
     if(plasmid_dict):
         write_cohort_table(plasmid_dict)
 
+    if(plasmid_detected):
+        json_path = cfg.output_path.joinpath(f"plasmids.json")
+        tio.export_json(plasmid_detected, json_path)
 
 def pooling(genome, reference_plasmids, index):
     log = logging.getLogger('PROCESS')
@@ -92,8 +104,6 @@ def pooling(genome, reference_plasmids, index):
     detected_plasmids = tp.detect_reference_plasmids(sample, filtered_hits, reference_plasmids)  # detect reference plasmids above cov/id thresholds
 
     # Write output files
-    plasmid_json = []
-    plasmid_summary_strings = {}
     sample_summary_path = cfg.output_path.joinpath(f'{sample}-summary.tsv')
     with sample_summary_path.open('w') as ssp:
         ssp.write(f"plasmid\tcontig\tcontig start\tcontig end\tcontig length\tcoverage[%]\tidentity[%]\talignment length\tstrand\tplasmid start\tplasmid end\tplasmid length\n")
@@ -108,18 +118,9 @@ def pooling(genome, reference_plasmids, index):
             tio.export_sequences(plasmid_contigs_sorted, plasmid_contigs_path, description=True, wrap=True)
             tio.export_sequences([plasmid], plasmid_pseudosequence_path, description=True, wrap=True)
 
-            # Create string for plasmid summary
-            plasmid_summary_strings[plasmid['reference']] = f"{sample}\t{plasmid['reference']}\t{plasmid['coverage']:.3f}\t{plasmid['identity']:.3f}\t{len(plasmid['hits'])}\t{','.join([hit['contig_id'] for hit in plasmid['hits']])}\n"
-
             # Write detailed plasmid hits to sample summary file
             for hit in plasmid['hits']:
                 ssp.write(f"{plasmid['reference']}\t{hit['contig_id']}\t{hit['contig_start']}\t{hit['contig_end']}\t{hit['contig_length']}\t{hit['coverage']:.3f}\t{hit['perc_identity']:.3f}\t{hit['length']}\t{hit['strand']}\t{hit['reference_plasmid_start']}\t{hit['reference_plasmid_end']}\t{plasmid['length']}\n")
-
-            plasmid_json.append({k: plasmid[k] for k in ['id', 'reference', 'length', 'hits']})
-
-    if(plasmid_json):
-        json_path = cfg.output_path.joinpath(f"plasmids-{sample}.json")
-        tio.export_json(plasmid_json, json_path)
 
     cfg.lock.acquire()
     log.debug('lock acquired: genome=%s, index=%s', sample, index)
@@ -137,7 +138,7 @@ def pooling(genome, reference_plasmids, index):
     log.debug('lock released: genome=%s, index=%s', sample, index)
     cfg.lock.release()
 
-    return index, plasmid_summary_strings
+    return index, detected_plasmids
 
 
 def write_cohort_table(plasmid_dict):
