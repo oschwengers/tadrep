@@ -10,19 +10,21 @@ import tadrep.utils as tu
 
 log = logging.getLogger('CONFIG')
 
-
+# general setup
 # runtime configurations
 threads = None
 verbose = None
 
 # input / output configuration
-genome_path = []
-plasmids_path = None
 output_path = None
 tmp_path = None
-summary_path = None
 prefix = None
+
+# detection setup
+plasmids_path = None
+genome_path = []
 database_path = None
+summary_path = None
 
 # workflow configuration
 min_contig_coverage = None
@@ -38,6 +40,7 @@ blast_threads = None
 
 def setup(args):
     """Test environment and build a runtime configuration."""
+
     # runtime configurations
     global threads, verbose
     threads = args.threads
@@ -46,7 +49,7 @@ def setup(args):
     log.info('verbose=%s', verbose)
 
     # input / output path configurations
-    global tmp_path, genome_path, plasmids_path, output_path, prefix, summary_path, database_path
+    global tmp_path, output_path, prefix
 
     if(args.tmp_dir):
         tmp_path = Path(args.tmp_dir)
@@ -59,6 +62,16 @@ def setup(args):
     else:
         tmp_path = Path(tempfile.mkdtemp())
     log.info('tmp-path=%s', tmp_path)
+
+    if(args.prefix):
+        prefix = args.prefix
+    log.info('output-path=%s', output_path)
+    log.info('prefix=%s', prefix)
+
+
+def setup_detection(args):
+    # input / output path configurations
+    global genome_path, plasmids_path, summary_path, database_path
 
     if(not args.genome):
         log.error('genome file not provided!')
@@ -75,11 +88,10 @@ def setup(args):
         log.error('no plasmid file or database provided!')
         sys.exit('ERROR: neither plasmid file nor database provided!')
 
-    if(args.prefix):
-        prefix = args.prefix
     log.info('plasmids-path=%s', plasmids_path)
-    log.info('output-path=%s', output_path)
-    log.info('prefix=%s', prefix)
+
+    summary_path = output_path.joinpath('summary.tsv')
+    log.info('summary_path=%s', summary_path)
 
     # workflow configuration
     global min_contig_coverage, min_contig_identity, min_plasmid_coverage, min_plasmid_identity, gap_sequence_length
