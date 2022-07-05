@@ -55,6 +55,7 @@ def main():
 
     if(args.subcommand == "extraction"):
         verboseprint('\nExtraction started...')
+        cfg.setup_extraction(args)
 
     elif(args.subcommand == "characterization"):
         verboseprint('\nCharacterization started...')

@@ -21,6 +21,7 @@ tmp_path = None
 prefix = None
 
 # detection setup
+# Input
 plasmids_path = None
 genome_path = []
 database_path = None
@@ -36,6 +37,10 @@ gap_sequence_length = None
 # multithreading
 lock = None
 blast_threads = None
+
+# extraction setup
+# Input
+plasmids_to_extract = None
 
 
 def setup(args):
@@ -113,3 +118,9 @@ def setup_detection(args):
     if(blast_threads == 0):
         blast_threads = 1
     log.info('blast-threads=%i', blast_threads)
+
+
+def setup_extraction(args):
+    global plasmids_to_extract
+
+    plasmids_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.plasmids]
