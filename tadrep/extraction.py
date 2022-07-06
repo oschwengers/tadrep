@@ -7,31 +7,31 @@ log = logging.getLogger('EXTRACT')
 
 
 def extract():
-    plasmids = []
+    plasmids = {}
     for file in cfg.plasmids_to_extract:
         genomes = tio.import_sequences(file)
         
-        circular_genomes = get_circular(genomes, file.name)
+        circular_genomes = get_circular(genomes)
 
         if(not circular_genomes):
             continue
 
         circular_genomes = filter_longest(circular_genomes)
 
-        plasmids.append(circular_genomes)
+        circular_genomes = update_keys(circular_genomes, file.name)
+        plasmids.update(circular_genomes)
     
     return plasmids
 
 
-def get_circular(genomes, file_name):
+def get_circular(genomes):
     not_circular_ids = []
     for id, genome in genomes.items():
         if('circular=true' not in genome['description']):
             not_circular_ids.append(id)
             continue
-        genome['file'] = file_name
     
-    log.info('loaded genomes: total=%i, not circular=%i file=%s', len(genomes), len(not_circular_ids), file_name)
+    log.info('loaded genomes: total=%i, not circular=%i', len(genomes), len(not_circular_ids))
     circular_genomes = {k: genomes[k] for k in genomes.keys() if k not in not_circular_ids}
 
     return circular_genomes
@@ -45,3 +45,12 @@ def filter_longest(circular_genomes):
             circular_genomes.pop(longest_genome['id'])
             log.debug('dropped genome=%s, length=%i', longest_genome['id'], longest_genome['length'])
         return circular_genomes
+
+
+def update_keys(circular_dict, filename):
+    for key in circular_dict.keys():
+        circular_dict[key]['filename'] = filename
+
+    updated_dict = dict((f'{filename}_p{plasmid_id}', value) for plasmid_id, value in circular_dict.items())
+
+    return updated_dict
