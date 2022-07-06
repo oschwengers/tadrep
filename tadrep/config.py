@@ -123,4 +123,8 @@ def setup_detection(args):
 def setup_extraction(args):
     global plasmids_to_extract
 
+    if(not args.plasmids):
+        log.error('plasmid file not provided!')
+        sys.exit('ERROR: no plasmid file was provided!')
+
     plasmids_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.plasmids]
