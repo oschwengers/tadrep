@@ -9,7 +9,7 @@ log = logging.getLogger('EXTRACT')
 def extract():
     plasmids = {}
     for file in cfg.plasmids_to_extract:
-        genomes = tio.import_sequences(file)
+        genomes = tio.import_sequences(file, sequence=True)
         
         circular_genomes = get_circular(genomes)
 
@@ -21,7 +21,8 @@ def extract():
         circular_genomes = update_keys(circular_genomes, file.name)
         plasmids.update(circular_genomes)
     
-    return plasmids
+    plasmid_output_path = cfg.output_path.joinpath('plasmids.json')
+    tio.export_json(plasmids, plasmid_output_path)
 
 
 def get_circular(genomes):
