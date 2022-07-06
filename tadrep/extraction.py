@@ -16,12 +16,8 @@ def extract():
         if(not circular_genomes):
             continue
 
-        longest_genome = sorted(circular_genomes.values(), key=lambda k: k['length'])[-1]
-        log.info('longest genome: id=%s, length=%i', longest_genome['id'], longest_genome['length'])
+        circular_genomes = filter_longest(circular_genomes)
 
-        if(longest_genome['length'] > 112_000):
-            circular_genomes.pop(longest_genome['id'])
-            log.debug('dropped genome=%s, length=%i', longest_genome['id'], longest_genome['length'])
         plasmids.append(circular_genomes)
     
     return plasmids
@@ -39,3 +35,13 @@ def get_circular(genomes, file_name):
     circular_genomes = {k: genomes[k] for k in genomes.keys() if k not in not_circular_ids}
 
     return circular_genomes
+
+
+def filter_longest(circular_genomes):
+        longest_genome = sorted(circular_genomes.values(), key=lambda k: k['length'])[-1]
+        log.info('longest genome: id=%s, length=%i', longest_genome['id'], longest_genome['length'])
+
+        if(longest_genome['length'] > 112_000):
+            circular_genomes.pop(longest_genome['id'])
+            log.debug('dropped genome=%s, length=%i', longest_genome['id'], longest_genome['length'])
+        return circular_genomes
