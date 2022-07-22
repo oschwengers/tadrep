@@ -47,6 +47,7 @@ def parse_arguments():
 
     arg_group_io = extraction_parser.add_argument_group('Input')
     arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, nargs="+", help='Draft plasmids path')
+    arg_group_io.add_argument('--drop-longest', action='store_false', dest='drop_longest', help='Remove longest circular read from output')
 
     # characterization parser
     characterization_parser = subparsers.add_parser('characterization', help='Identify plasmids with GC content, Inc types, conjugation genes')

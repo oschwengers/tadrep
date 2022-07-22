@@ -41,6 +41,7 @@ blast_threads = None
 # extraction setup
 # Input
 plasmids_to_extract = None
+drop_longest = True
 
 
 def setup(args):
@@ -121,10 +122,12 @@ def setup_detection(args):
 
 
 def setup_extraction(args):
-    global plasmids_to_extract
+    global plasmids_to_extract, drop_longest
 
     if(not args.plasmids):
         log.error('plasmid file not provided!')
         sys.exit('ERROR: no plasmid file was provided!')
 
     plasmids_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.plasmids]
+
+    drop_longest = args.drop_longest

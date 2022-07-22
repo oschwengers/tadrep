@@ -16,7 +16,8 @@ def extract():
         if(not circular_genomes):
             continue
 
-        circular_genomes = filter_longest(circular_genomes)
+        if(cfg.drop_longest):
+            circular_genomes = filter_longest(circular_genomes)
 
         circular_genomes = update_keys(circular_genomes, file.name)
         plasmids.update(circular_genomes)
