@@ -40,9 +40,10 @@ blast_threads = None
 
 # extraction setup
 # Input
-plasmids_to_extract = None
-drop_longest = True
-
+files_to_extract = None
+drop = 1
+file_type = None
+header = None
 
 def setup(args):
     """Test environment and build a runtime configuration."""
@@ -122,12 +123,17 @@ def setup_detection(args):
 
 
 def setup_extraction(args):
-    global plasmids_to_extract, drop_longest
+    global files_to_extract, drop, file_type, header
 
-    if(not args.plasmids):
-        log.error('plasmid file not provided!')
-        sys.exit('ERROR: no plasmid file was provided!')
+    if(not args.files):
+        log.error('No files provided!')
+        sys.exit('ERROR: No input file was provided!')
 
-    plasmids_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.plasmids]
+    files_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.files]
 
-    drop_longest = args.drop_longest
+    drop = args.drop
+    if(drop < 0):
+        log.error('Can not drop negative files!')
+        sys.exit('Can not drop negative files!')
+
+    
