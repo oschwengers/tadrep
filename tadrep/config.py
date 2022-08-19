@@ -134,6 +134,11 @@ def setup_extraction(args):
     drop = args.drop
     if(drop < 0):
         log.error('Can not drop negative files!')
-        sys.exit('Can not drop negative files!')
+        sys.exit('ERROR: Can not drop negative files!')
 
-    
+    file_type = args.type
+    if(file_type == 'draft'):
+        header = args.header
+        if(not header):
+            log.error('No header provided!')
+            sys.exit('ERROR: No header provided!')
