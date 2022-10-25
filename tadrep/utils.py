@@ -47,7 +47,7 @@ def parse_arguments():
 
     arg_group_io = extraction_parser.add_argument_group('Input')
     arg_group_io.add_argument('--type', '-t', action='store', default='genome', choices=['genome', 'plasmid', 'draft'], help='Type of input files')
-    arg_group_io.add_argument('--header', '-h', action='store', default=None, help='Template for header description inside input files: e.g.: header: ">pl1234" --> -f "pl"')
+    arg_group_io.add_argument('--header', action='store', default=None, help='Template for header description inside input files: e.g.: header: ">pl1234" --> --header "pl"')
     arg_group_io.add_argument('--files', '-f', action='store', default=None, nargs="+", help='File path')
     arg_group_io.add_argument('--drop', '-d', action='store', type=int, default=1, help='Remove n longest circular read(s) in output')
 
