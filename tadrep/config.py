@@ -140,5 +140,5 @@ def setup_extraction(args):
     if(file_type == 'draft'):
         header = args.header
         if(not header):
-            log.error('No header provided!')
-            sys.exit('ERROR: No header provided!')
+            log.info('No custom header provided!')
+            print('Info: No custom header provided! Only searching for "complete", "circular" and "plasmid"')
