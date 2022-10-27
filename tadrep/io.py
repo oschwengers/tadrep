@@ -84,3 +84,13 @@ def export_json(data, json_path):
     log.info('write json: path=%s, # sequences=%i', json_path, len(data))
     with open(json_path, 'w') as fh:
         json.dump(data, fh)
+
+
+def check_existing_JSON(json_path):
+    if json_path.is_file():
+        log.info('%s existing', json_path)
+        plasmid_dict = import_json(json_path)
+    else:
+        log.info('%s NOT existing', json_path)
+        plasmid_dict = {}
+    return plasmid_dict
