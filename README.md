@@ -25,12 +25,12 @@ It detects and reconstructs reference plasmids within bacterial draft assemblies
 
 ## Installation
 
-TaDRep can be installed via BioConda and Pip. However, we encourage to use [Conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to automatically install all required 3rd party dependencies.
+TaDRep can be installed via Conda and Pip. However, we encourage to use [Conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to automatically install all required 3rd party dependencies.
 
-### BioConda
+### Conda
 
 ```bash
-$ conda install -c conda-forge -c bioconda -c defaults tadrep
+$ conda env create --prefix ~/tmp/conda-envs/tadrep/ --file environment.yml
 ```
 
 ### Pip
