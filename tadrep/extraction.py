@@ -39,10 +39,27 @@ def draft_extract(plasmid_count):
     return seq_dict
 
 
-def genome_extract(seq_dict):
+def genome_extract(plasmid_count):
     # read all sequences from input excluding longest
+    log.info('start extraction with "genome" from %d files', len(cfg.files_to_extract))
     # find longest X sequences and remove them
-    return seq_dict
+    new_plasmids = {}
+
+    for input_file in cfg.files_to_extract:
+
+        file_sequences = tio.import_sequences(input_file, sequence=True)
+        verboseprint(f'file: {input_file.name}, sequences: {len(file_sequences)}')
+        log.info('file: %s, sequences: %d', input_file.name, len(file_sequences))
+
+        file_sequences = filter_longest(file_sequences)
+
+        for sequence in file_sequences:
+            sequence['file'] = input_file.name
+
+            new_plasmids[plasmid_count] = sequence
+            plasmid_count += 1
+
+    return new_plasmids
 
 
 def plasmid_extract(plasmid_count):
@@ -75,5 +92,6 @@ def search_headers(seq_dict):
 
 
 def filter_longest(seq_dict):
-    # filter out longest sequences
+    log.info('drop %d longest sequences from %d entries', cfg.drop, len(seq_dict))
+    seq_dict = sorted(seq_dict, key=lambda x: x['length'])[cfg.drop:]
     return seq_dict
