@@ -21,7 +21,7 @@ def extract():
     if(cfg.file_type == 'genome'):
         new_plasmids = genome_extract(plasmid_counter)
     elif(cfg.file_type == 'plasmids'):
-        new_plasmids = plasmids_extract(plasmid_counter)
+        new_plasmids = plasmid_extract(plasmid_counter)
     else:
         new_plasmids = draft_extract(plasmid_counter)
 
@@ -45,9 +45,9 @@ def genome_extract(seq_dict):
     return seq_dict
 
 
-def plasmids_extract(plasmid_count):
+def plasmid_extract(plasmid_count):
     # read all sequences from input file without filtering
-    log.info('start extraction with plasmids from %d files', len(cfg.files_to_extract))
+    log.info('start extraction with "plasmid" from %d files', len(cfg.files_to_extract))
     # create new empty dict
     new_plasmids = {}
 
