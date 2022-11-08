@@ -40,9 +40,25 @@ def genome_extract(seq_dict):
     return seq_dict
 
 
-def plasmids_extract(seq_dict):
+def plasmids_extract(plasmid_count):
     # read all sequences from input file without filtering
-    return seq_dict
+    # create new empty dict
+    new_plasmids = {}
+
+    # for each file
+    for input_file in cfg.files_to_extract:
+        # read file     tio.import_sequences sequences=true
+        file_plasmids = tio.import_sequences(input_file, sequences=True)
+        
+        for plasmid in file_plasmids:
+            # add filename to each sequence in dict
+            plasmid['file'] = input_file.name
+
+            # add each plasmid to new dict with plasmid_count as key
+            new_plasmids[plasmid_count] = plasmid
+            plasmid_count += 1
+        
+    return new_plasmids
 
 
 def search_headers(seq_dict):
