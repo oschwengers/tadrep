@@ -36,6 +36,24 @@ def extract():
 
 def draft_extract(plasmid_count):
     # remove all sequences without 'circular' 'complete' 'plasmid' or custom header
+    log.info('start extraction with "draft" from %d files', len(cfg.files_to_extract))
+
+    new_plasmids = {}
+
+    for input_file in cfg.files_to_extract:
+
+        file_sequences = tio.import_sequences(input_file, sequence=True)
+        verboseprint(f'file: {input_file.name}, sequences: {len(file_sequences)}')
+        log.info('file: %s, sequences: %d', input_file.name, len(file_sequences))
+
+        file_sequences = search_headers(file_sequences)
+
+        for sequence in file_sequences:
+            sequence['file'] = input_file.name
+
+            new_plasmids[plasmid_count] = sequence
+            plasmid_count += 1
+
     return seq_dict
 
 
@@ -87,8 +105,20 @@ def plasmid_extract(plasmid_count):
 
 
 def search_headers(seq_dict):
+    filtered_dict = {}
     # search headers for 'plasmid' 'complete' or custom string
-    return seq_dict
+    standard_headers = ['plasmid', 'complete', 'circular']
+    if(cfg.header):
+        standard_headers.append(cfg.header)
+
+    log.info('searching %s', standard_headers)
+    
+    for entry in seq_dict:
+        if(any(substring in entry['description'] for substring in standard_headers)):
+            filtered_dict.update(entry)
+    
+    log.info('found %d matching sequences', len(filtered_dict))
+    return filtered_dict
 
 
 def filter_longest(seq_dict):
