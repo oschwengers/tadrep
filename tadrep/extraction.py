@@ -4,6 +4,7 @@ import tadrep.config as cfg
 import tadrep.io as tio
 
 log = logging.getLogger('EXTRACT')
+verboseprint = print if cfg.verbose else lambda *a, **k: None
 
 
 def extract():
@@ -13,6 +14,8 @@ def extract():
     
     # update counter    plasmid_count
     plasmid_counter = len(existing_plasmid_dict)
+    verboseprint(f'found {plasmid_counter} existing plasmids!')
+    log.info('found %d existing plasmids in file %s', plasmid_counter, json_output_path)
 
     # call genome/draft/plasmid methods
     if(cfg.file_type == 'genome'):
@@ -24,6 +27,8 @@ def extract():
 
     # update existing_plasmid_dict
     existing_plasmid_dict.update(new_plasmids)
+    verboseprint(f'total plasmids found: {len(existing_plasmid_dict)}')
+    log.info('total plasmids found: %d', len(existing_plasmid_dict))
     
     # export to json
     tio.export_json(existing_plasmid_dict, json_output_path)
@@ -42,6 +47,7 @@ def genome_extract(seq_dict):
 
 def plasmids_extract(plasmid_count):
     # read all sequences from input file without filtering
+    log.info('start extraction with plasmids from %d files', len(cfg.files_to_extract))
     # create new empty dict
     new_plasmids = {}
 
@@ -49,6 +55,8 @@ def plasmids_extract(plasmid_count):
     for input_file in cfg.files_to_extract:
         # read file     tio.import_sequences sequences=true
         file_plasmids = tio.import_sequences(input_file, sequences=True)
+        verboseprint(f'file: {input_file.name}, sequences: {len(file_plasmids)}')
+        log.info('file: %s, sequences: %d', input_file.name, len(file_plasmids))
         
         for plasmid in file_plasmids:
             # add filename to each sequence in dict
