@@ -8,16 +8,28 @@ log = logging.getLogger('EXTRACT')
 
 def extract():
     # get existing json existing_plasmid_dict
+    json_output_path = cfg.output_path.joinpath('extraction.json')
+    existing_plasmid_dict = tio.check_existing_JSON(json_output_path)
+    
     # update counter    plasmid_count
+    plasmid_counter = len(existing_plasmid_dict)
 
-    # load files
-        # call genome/draft/plasmid methods
-        # update existing_plasmid_dict
+    # call genome/draft/plasmid methods
+    if(cfg.file_type == 'genome'):
+        new_plasmids = genome_extract(plasmid_counter)
+    elif(cfg.file_type == 'plasmids'):
+        new_plasmids = plasmids_extract(plasmid_counter)
+    else:
+        new_plasmids = draft_extract(plasmid_counter)
+
+    # update existing_plasmid_dict
+    existing_plasmid_dict.update(new_plasmids)
+    
     # export to json
-    pass
+    tio.export_json(existing_plasmid_dict, json_output_path)
 
 
-def draft_extract(seq_dict):
+def draft_extract(plasmid_count):
     # remove all sequences without 'circular' 'complete' 'plasmid' or custom header
     return seq_dict
 
