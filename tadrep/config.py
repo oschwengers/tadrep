@@ -41,7 +41,7 @@ blast_threads = None
 # extraction setup
 # Input
 files_to_extract = None
-drop = 1
+discard = 1
 file_type = None
 header = None
 
@@ -123,7 +123,7 @@ def setup_detection(args):
 
 
 def setup_extraction(args):
-    global files_to_extract, drop, file_type, header
+    global files_to_extract, discard, file_type, header
 
     if(not args.files):
         log.error('No files provided!')
@@ -131,8 +131,8 @@ def setup_extraction(args):
 
     files_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.files]
 
-    drop = args.drop
-    if(drop < 0):
+    discard = args.discard-longest
+    if(discard < 0):
         log.error('Can not drop negative files!')
         sys.exit('ERROR: Can not drop negative files!')
 
