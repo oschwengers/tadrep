@@ -10,20 +10,20 @@ verboseprint = print if cfg.verbose else lambda *a, **k: None
 def extract():
     # get existing json existing_plasmid_dict
     json_output_path = cfg.output_path.joinpath('extraction.json')
-    existing_plasmid_dict = tio.check_existing_JSON(json_output_path)
+    existing_plasmid_dict = tio.load_data(json_output_path)
     
-    # update counter    plasmid_count
-    plasmid_counter = len(existing_plasmid_dict)
-    verboseprint(f'found {plasmid_counter} existing plasmids!')
-    log.info('found %d existing plasmids in file %s', plasmid_counter, json_output_path)
+    # update counter plasmid_count
+    number_of_plasmids = max([id for id in existing_plasmid_dict.keys()])
+    verboseprint(f'found {number_of_plasmids} existing plasmids!')
+    log.info('found %d existing plasmids in file %s', number_of_plasmids, json_output_path)
 
     # call genome/draft/plasmid methods
     if(cfg.file_type == 'genome'):
-        new_plasmids = genome_extract(plasmid_counter)
+        new_plasmids = genome_extract(number_of_plasmids)
     elif(cfg.file_type == 'plasmids'):
-        new_plasmids = plasmid_extract(plasmid_counter)
+        new_plasmids = plasmid_extract(number_of_plasmids)
     else:
-        new_plasmids = draft_extract(plasmid_counter)
+        new_plasmids = draft_extract(number_of_plasmids)
 
     # update existing_plasmid_dict
     existing_plasmid_dict.update(new_plasmids)
@@ -36,8 +36,6 @@ def extract():
 
 def draft_extract(plasmid_count):
     # remove all sequences without 'circular' 'complete' 'plasmid' or custom header
-    log.info('start extraction with "draft" from %d files', len(cfg.files_to_extract))
-
     new_plasmids = {}
 
     for input_file in cfg.files_to_extract:
@@ -50,6 +48,7 @@ def draft_extract(plasmid_count):
 
         for sequence in file_sequences:
             sequence['file'] = input_file.name
+            sequence['new_id'] = plasmid_count
 
             new_plasmids[plasmid_count] = sequence
             plasmid_count += 1
@@ -59,8 +58,6 @@ def draft_extract(plasmid_count):
 
 def genome_extract(plasmid_count):
     # read all sequences from input excluding longest
-    log.info('start extraction with "genome" from %d files', len(cfg.files_to_extract))
-    # find longest X sequences and remove them
     new_plasmids = {}
 
     for input_file in cfg.files_to_extract:
@@ -73,6 +70,7 @@ def genome_extract(plasmid_count):
 
         for sequence in file_sequences:
             sequence['file'] = input_file.name
+            sequence['new_id'] = plasmid_count
 
             new_plasmids[plasmid_count] = sequence
             plasmid_count += 1
@@ -82,8 +80,6 @@ def genome_extract(plasmid_count):
 
 def plasmid_extract(plasmid_count):
     # read all sequences from input file without filtering
-    log.info('start extraction with "plasmid" from %d files', len(cfg.files_to_extract))
-    # create new empty dict
     new_plasmids = {}
 
     # for each file
@@ -96,6 +92,7 @@ def plasmid_extract(plasmid_count):
         for plasmid in file_plasmids:
             # add filename to each sequence in dict
             plasmid['file'] = input_file.name
+            plasmid['new_id'] = plasmid_count
 
             # add each plasmid to new dict with plasmid_count as key
             new_plasmids[plasmid_count] = plasmid
@@ -122,6 +119,6 @@ def search_headers(seq_dict):
 
 
 def filter_longest(seq_dict):
-    log.info('drop %d longest sequences from %d entries', cfg.drop, len(seq_dict))
-    seq_dict = sorted(seq_dict, key=lambda x: x['length'])[cfg.drop:]
+    log.info('drop %d longest sequences from %d entries', cfg.discard, len(seq_dict))
+    seq_dict = sorted(seq_dict, key=lambda x: x['length'])[cfg.discard:]
     return seq_dict
