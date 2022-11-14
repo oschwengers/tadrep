@@ -4,7 +4,6 @@ import tadrep.config as cfg
 import tadrep.io as tio
 
 log = logging.getLogger('EXTRACT')
-verboseprint = print if cfg.verbose else lambda *a, **k: None
 
 
 def extract():
@@ -13,17 +12,18 @@ def extract():
     existing_plasmid_dict = tio.load_data(json_output_path)
     
     # update plasmid count
-    number_of_plasmids = max([id for id in existing_plasmid_dict.keys()], default=0)
-    verboseprint(f'found {number_of_plasmids} existing plasmids!')
+    number_of_plasmids = max([int(id) for id in existing_plasmid_dict.keys()], default=0)
+    cfg.verboseprint(f'found {number_of_plasmids} existing plasmids!')
     log.info('found %d existing plasmids in file %s', number_of_plasmids, json_output_path)
 
     new_plasmids = {}
+    number_of_plasmids += 1
 
     # load sequences
     for input_file in cfg.files_to_extract:
 
         file_sequences = tio.import_sequences(input_file, sequence=True)
-        verboseprint(f'file: {input_file.name}, sequences: {len(file_sequences)}')
+        cfg.verboseprint(f'file: {input_file.name}, sequences: {len(file_sequences)}')
         log.info('file: %s, sequences: %d', input_file.name, len(file_sequences))
 
         # call genome/draft/plasmid methods
@@ -33,16 +33,16 @@ def extract():
             file_sequences = search_headers(file_sequences)
         
         # add file name and new id to plasmids
-        for sequence in file_sequences:
-            sequence['file'] = input_file.name
-            sequence['new_id'] = plasmid_count
+        for entry in file_sequences.values():
+            entry['file'] = input_file.name
+            entry['new_id'] = number_of_plasmids
 
-            new_plasmids[plasmid_count] = sequence
-            plasmid_count += 1
+            new_plasmids[number_of_plasmids] = entry
+            number_of_plasmids += 1
 
     # update existing_plasmid_dict
     existing_plasmid_dict.update(new_plasmids)
-    verboseprint(f'total plasmids found: {len(existing_plasmid_dict)}')
+    cfg.verboseprint(f'total plasmids found: {len(existing_plasmid_dict)}')
     log.info('total plasmids found: %d', len(existing_plasmid_dict))
     
     # export to json
@@ -70,7 +70,7 @@ def search_headers(seq_dict):
 
 def filter_longest(seq_dict):
     log.info('discard %d longest sequences from %d entries', cfg.discard, len(seq_dict))
-    verboseprint(f'discard {cfg.discard} longest sequences from {len(seq_dict)} entries')
+    cfg.verboseprint(f'discard {cfg.discard} longest sequences from {len(seq_dict)} entries')
 
     # Error if discard too high
     if(cfg.discard > len(seq_dict)):

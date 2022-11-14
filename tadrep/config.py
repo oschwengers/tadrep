@@ -14,6 +14,7 @@ log = logging.getLogger('CONFIG')
 # runtime configurations
 threads = None
 verbose = None
+verboseprint = None
 
 # input / output configuration
 output_path = None
@@ -49,11 +50,12 @@ def setup(args):
     """Test environment and build a runtime configuration."""
 
     # runtime configurations
-    global threads, verbose
+    global threads, verbose, verboseprint
     threads = args.threads
     log.info('threads=%i', threads)
     verbose = args.verbose
     log.info('verbose=%s', verbose)
+    verboseprint = print if verbose else lambda *a, **k: None
 
     # input / output path configurations
     global tmp_path, output_path, prefix
@@ -131,7 +133,7 @@ def setup_extraction(args):
 
     files_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.files]
 
-    discard = args.discard-longest
+    discard = args.discard_longest
     if(discard < 0):
         log.error('Can not drop negative files!')
         sys.exit('ERROR: Can not drop negative files!')
