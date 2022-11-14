@@ -13,7 +13,7 @@ def extract():
     existing_plasmid_dict = tio.load_data(json_output_path)
     
     # update plasmid count
-    number_of_plasmids = max([id for id in existing_plasmid_dict.keys()])
+    number_of_plasmids = max([id for id in existing_plasmid_dict.keys()], default=0)
     verboseprint(f'found {number_of_plasmids} existing plasmids!')
     log.info('found %d existing plasmids in file %s', number_of_plasmids, json_output_path)
 
@@ -22,7 +22,7 @@ def extract():
     # load sequences
     for input_file in cfg.files_to_extract:
 
-        file_sequences = tio.import_sequences(input_file, sequences=True)
+        file_sequences = tio.import_sequences(input_file, sequence=True)
         verboseprint(f'file: {input_file.name}, sequences: {len(file_sequences)}')
         log.info('file: %s, sequences: %d', input_file.name, len(file_sequences))
 
@@ -69,6 +69,20 @@ def search_headers(seq_dict):
 
 
 def filter_longest(seq_dict):
-    log.info('drop %d longest sequences from %d entries', cfg.discard, len(seq_dict))
-    seq_dict = sorted(seq_dict, key=lambda x: x['length'])[cfg.discard:]
-    return seq_dict
+    log.info('discard %d longest sequences from %d entries', cfg.discard, len(seq_dict))
+    verboseprint(f'discard {cfg.discard} longest sequences from {len(seq_dict)} entries')
+
+    # Error if discard too high
+    if(cfg.discard > len(seq_dict)):
+        log.error('ERROR: can not discard %d sequences from %d present!', cfg.discard, len(seq_dict))
+        sys.exit('ERROR: can not discard more sequences than present!')
+    
+    # sort dict entries by length and discard longest
+    filtered_list = sorted(seq_dict.values(), key=lambda x: x['length'], reverse=True)[cfg.discard:]
+
+    # rewrite list into dict
+    filtered_dict = {}
+    for entry in filtered_list:
+        filtered_dict[entry['id']] = entry
+    
+    return filtered_dict
