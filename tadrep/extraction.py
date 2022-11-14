@@ -54,16 +54,16 @@ def search_headers(seq_dict):
     # search headers for 'plasmid' 'complete', 'circular=true' or custom string
     description_headers = ['plasmid', 'complete', 'circular=true']
 
-    for sequence in seq_dict:
+    for seq_id, sequence in seq_dict.items():
         # test if id contains custom string
         if(cfg.header):
             if(cfg.header in sequence['id']):
-                filtered_dict.update(sequence)
+                filtered_dict[seq_id] = sequence
                 continue
-        
-        # test description for predefined headers
-        if(any(description in sequence['description'] for description in description_headers)):
-            filtered_dict.update(sequence)
+        else:
+            # test description for predefined headers
+            if(any(description in sequence['description'] for description in description_headers)):
+                filtered_dict[seq_id] = sequence
 
     return filtered_dict
 
