@@ -11,6 +11,7 @@ def extract():
     json_output_path = cfg.output_path.joinpath('extraction.json')
     existing_data = tio.load_data(json_output_path)
     plasmid_dict = existing_data.get('extraction', {})      # are previous sequences available
+    file_list = existing_data.get('files', [])              # which files were already extracted from
     
     # update plasmid count
     number_of_plasmids = max([int(id) for id in plasmid_dict.keys()], default=0)
@@ -22,7 +23,16 @@ def extract():
 
     # load sequences
     for input_file in cfg.files_to_extract:
+        # check if file was already extracted
+        if(str(input_file) in file_list):
+            cfg.verboseprint(f'skipping {input_file.name}, already extracted from!')
+            log.info('skipping %s, already extracted from!', input_file)
+            continue
+    
+        # add complete filepath to extracted files
+        file_list.append(str(input_file))
 
+        # import sequence
         file_sequences = tio.import_sequences(input_file, sequence=True)
         cfg.verboseprint(f'file: {input_file.name}, sequences: {len(file_sequences)}')
         log.info('file: %s, sequences: %d', input_file.name, len(file_sequences))
@@ -48,6 +58,7 @@ def extract():
     
     # export to json
     existing_data['extraction'] = plasmid_dict
+    existing_data['files'] = file_list
     tio.export_json(existing_data, json_output_path)
 
 
