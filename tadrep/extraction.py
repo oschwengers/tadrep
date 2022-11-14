@@ -51,18 +51,20 @@ def extract():
 
 def search_headers(seq_dict):
     filtered_dict = {}
-    # search headers for 'plasmid' 'complete' or custom string
-    standard_headers = ['plasmid', 'complete', 'circular']
-    if(cfg.header):
-        standard_headers.append(cfg.header)
+    # search headers for 'plasmid' 'complete', 'circular=true' or custom string
+    description_headers = ['plasmid', 'complete', 'circular=true']
 
-    log.info('searching %s', standard_headers)
-    
-    for entry in seq_dict:
-        if(any(substring in entry['description'] for substring in standard_headers)):
-            filtered_dict.update(entry)
-    
-    log.info('found %d matching sequences', len(filtered_dict))
+    for sequence in seq_dict:
+        # test if id contains custom string
+        if(cfg.header):
+            if(cfg.header in sequence['id']):
+                filtered_dict.update(sequence)
+                continue
+        
+        # test description for predefined headers
+        if(any(description in sequence['description'] for description in description_headers)):
+            filtered_dict.update(sequence)
+
     return filtered_dict
 
 
