@@ -9,10 +9,11 @@ log = logging.getLogger('EXTRACT')
 def extract():
     # get existing json existing_plasmid_dict
     json_output_path = cfg.output_path.joinpath('extraction.json')
-    existing_plasmid_dict = tio.load_data(json_output_path)
+    existing_data = tio.load_data(json_output_path)
+    plasmid_dict = existing_data.get('extraction', {})      # are previous sequences available
     
     # update plasmid count
-    number_of_plasmids = max([int(id) for id in existing_plasmid_dict.keys()], default=0)
+    number_of_plasmids = max([int(id) for id in plasmid_dict.keys()], default=0)
     cfg.verboseprint(f'found {number_of_plasmids} existing plasmids!')
     log.info('found %d existing plasmids in file %s', number_of_plasmids, json_output_path)
 
@@ -41,12 +42,13 @@ def extract():
             number_of_plasmids += 1
 
     # update existing_plasmid_dict
-    existing_plasmid_dict.update(new_plasmids)
-    cfg.verboseprint(f'total plasmids found: {len(existing_plasmid_dict)}')
-    log.info('total plasmids found: %d', len(existing_plasmid_dict))
+    plasmid_dict.update(new_plasmids)
+    cfg.verboseprint(f'total plasmids found: {len(plasmid_dict)}')
+    log.info('total plasmids found: %d', len(plasmid_dict))
     
     # export to json
-    tio.export_json(existing_plasmid_dict, json_output_path)
+    existing_data['extraction'] = plasmid_dict
+    tio.export_json(existing_data, json_output_path)
 
 
 def search_headers(seq_dict):
