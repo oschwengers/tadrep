@@ -139,8 +139,10 @@ def setup_extraction(args):
         sys.exit('ERROR: Can not drop negative files!')
 
     file_type = args.type
-    if(file_type == 'draft'):
-        header = args.header
-        if(not header):
-            log.info('No custom header provided!')
-            print('Info: No custom header provided! Only searching for "complete", "circular" and "plasmid"')
+    header = args.header
+    if(file_type == 'draft' and not header):
+        log.debug('No custom header provided!')
+        verboseprint('Info: No custom header provided! Only searching for "complete", "circular" and "plasmid"')
+    else:
+        verboseprint(f'Searching custom header: {header}')
+        log.debug('Custom header: %s', header)
