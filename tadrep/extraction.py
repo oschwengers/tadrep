@@ -15,8 +15,8 @@ def extract():
     
     # update plasmid count
     number_of_plasmids = max([int(id) for id in plasmid_dict.keys()], default=0)
-    cfg.verboseprint(f'found {number_of_plasmids} existing plasmids!')
-    log.info('found %d existing plasmids in file %s', number_of_plasmids, json_output_path)
+    cfg.verboseprint(f'Found {number_of_plasmids} existing plasmids!')
+    log.info('Found %d existing plasmids in file %s', number_of_plasmids, json_output_path)
 
     new_plasmids = {}
     number_of_plasmids += 1
@@ -25,8 +25,8 @@ def extract():
     for input_file in cfg.files_to_extract:
         # check if file was already extracted
         if(str(input_file) in file_list):
-            cfg.verboseprint(f'skipping {input_file.name}, already extracted from!')
-            log.info('skipping %s, already extracted from!', input_file)
+            cfg.verboseprint(f'Skipping {input_file.name}, already extracted from!')
+            log.info('Skipping %s, already extracted from!', input_file)
             continue
     
         # add complete filepath to extracted files
@@ -34,8 +34,8 @@ def extract():
 
         # import sequence
         file_sequences = tio.import_sequences(input_file, sequence=True)
-        cfg.verboseprint(f'file: {input_file.name}, sequences: {len(file_sequences)}')
-        log.info('file: %s, sequences: %d', input_file.name, len(file_sequences))
+        cfg.verboseprint(f'File: {input_file.name}, sequences: {len(file_sequences)}')
+        log.info('File: %s, sequences: %d', input_file.name, len(file_sequences))
 
         # call genome/draft/plasmid methods
         if(cfg.file_type == 'genome'):
@@ -53,8 +53,8 @@ def extract():
 
     # update existing_plasmid_dict
     plasmid_dict.update(new_plasmids)
-    cfg.verboseprint(f'total plasmids found: {len(plasmid_dict)}')
-    log.info('total plasmids found: %d', len(plasmid_dict))
+    cfg.verboseprint(f'Total plasmids found: {len(plasmid_dict)}')
+    log.info('Total plasmids found: %d', len(plasmid_dict))
     
     # export to json
     existing_data['extraction'] = plasmid_dict
@@ -82,13 +82,13 @@ def search_headers(seq_dict):
 
 
 def filter_longest(seq_dict):
-    log.info('discard %d longest sequences from %d entries', cfg.discard, len(seq_dict))
-    cfg.verboseprint(f'discard {cfg.discard} longest sequences from {len(seq_dict)} entries')
+    log.info('Discard %d longest sequences from %d entries', cfg.discard, len(seq_dict))
+    cfg.verboseprint(f'Discard {cfg.discard} longest sequences from {len(seq_dict)} entries')
 
     # Error if discard too high
     if(cfg.discard > len(seq_dict)):
-        log.error('ERROR: can not discard %d sequences from %d present!', cfg.discard, len(seq_dict))
-        sys.exit('ERROR: can not discard more sequences than present!')
+        log.error('ERROR: Can not discard %d sequences from %d present!', cfg.discard, len(seq_dict))
+        sys.exit('ERROR: Can not discard more sequences than present!')
     
     # sort dict entries by length and discard longest
     filtered_list = sorted(seq_dict.values(), key=lambda x: x['length'], reverse=True)[cfg.discard:]
