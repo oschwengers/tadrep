@@ -62,7 +62,6 @@ def gc_content(sequence):
 
     return percentage
 
-
 def download_inc_reference():
 
     inc_types_path = cfg.output_path.joinpath('inc-types.fasta')
