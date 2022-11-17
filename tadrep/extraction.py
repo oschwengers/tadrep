@@ -15,8 +15,8 @@ def extract():
     
     # update plasmid count
     number_of_plasmids = max([int(id) for id in plasmid_dict.keys()], default=0)
-    cfg.verboseprint(f'Found {number_of_plasmids} existing plasmids!')
-    log.info('Found %d existing plasmids in file %s', number_of_plasmids, json_output_path)
+    cfg.verboseprint(f'Loaded {number_of_plasmids} previously extracted plasmids!')
+    log.info('Loaded %d previously extracted plasmids from file %s', number_of_plasmids, json_output_path)
 
     new_plasmids = {}
     number_of_plasmids += 1
@@ -44,6 +44,8 @@ def extract():
             file_sequences = search_headers(file_sequences)
         
         # add file name and new id to plasmids
+        cfg.verboseprint(f'File: {input_file.name}, detected plasmids: {len(file_sequences)}')
+        log.info('File: %s, plasmids detected: %d', input_file.name, len(file_sequences))
         for entry in file_sequences.values():
             entry['file'] = input_file.name
             entry['new_id'] = number_of_plasmids
@@ -53,8 +55,8 @@ def extract():
 
     # update existing_plasmid_dict
     plasmid_dict.update(new_plasmids)
-    cfg.verboseprint(f'Total plasmids found: {len(plasmid_dict)}')
-    log.info('Total plasmids found: %d', len(plasmid_dict))
+    cfg.verboseprint(f'Total plasmids detected: {len(plasmid_dict)}')
+    log.info('Total plasmids detected: %d', len(plasmid_dict))
     
     # export to json
     existing_data['extraction'] = plasmid_dict
