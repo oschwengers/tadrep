@@ -146,3 +146,5 @@ def setup_extraction(args):
     else:
         verboseprint(f'Searching custom header: {header}')
         log.debug('Custom header: %s', header)
+def setup_characterize(args):
+    pass
