@@ -34,24 +34,24 @@ def extract():
         file_list.append(str(input_file))
 
         # import sequence
-        file_sequences = tio.import_sequences(input_file, sequence=True)
-        cfg.verboseprint(f'File: {input_file.name}, sequences: {len(file_sequences)}')
-        log.info('File: %s, sequences: %d', input_file.name, len(file_sequences))
+        plasmids = tio.import_sequences(input_file, sequence=True)
+        cfg.verboseprint(f'File: {input_file.name}, sequences: {len(plasmids)}')
+        log.info('File: %s, sequences: %d', input_file.name, len(plasmids))
 
         # call genome/draft/plasmid methods
         if(cfg.file_type == 'genome'):
-            file_sequences = filter_longest(file_sequences)
+            plasmids = filter_longest(plasmids)
         elif(cfg.file_type == 'draft'):
-            file_sequences = search_headers(file_sequences)
+            plasmids = search_headers(plasmids)
         
         # add file name and new id to plasmids
-        cfg.verboseprint(f'File: {input_file.name}, detected plasmids: {len(file_sequences)}')
-        log.info('File: %s, plasmids detected: %d', input_file.name, len(file_sequences))
-        for entry in file_sequences.values():
-            entry['file'] = input_file.name
-            entry['new_id'] = number_of_plasmids
+        cfg.verboseprint(f'File: {input_file.name}, detected plasmids: {len(plasmids)}')
+        log.info('File: %s, plasmids detected: %d', input_file.name, len(plasmids))
+        for plasmid in plasmids.values():
+            plasmid['file'] = input_file.name
+            plasmid['new_id'] = number_of_plasmids
 
-            new_plasmids[number_of_plasmids] = entry
+            new_plasmids[number_of_plasmids] = plasmid
             number_of_plasmids += 1
 
     # update existing_plasmid_dict
