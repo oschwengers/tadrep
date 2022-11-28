@@ -11,14 +11,14 @@ def characterize():
     # load json from output path
     json_path = cfg.output_path.joinpath('extraction.json')
     existing_data = tio.load_data(json_path)
-    loaded_plasmids = existing_data.get('extraction', {})
+    plasmids = existing_data.get('extraction', {})
 
     # check if data is available
-    if(not existing_data or not loaded_plasmids):
-        log.error('ERROR: Failed to load data from %s', json_path)
+    if(not existing_data or not plasmids):
+        log.error('Failed to load data from %s', json_path)
         sys.exit(f'ERROR: Failed to load data from {json_path}!')
 
-    for plasmid in loaded_plasmids:
+    for plasmid in plasmids:
         # set length
         plasmid['length'] = len(plasmid['sequence'])
 
