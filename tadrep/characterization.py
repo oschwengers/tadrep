@@ -47,6 +47,7 @@ def characterize():
         cfg.verboseprint(f"Plasmid: {plasmid['id']:20} Length: {plasmid['length']:7} GC: {plasmid['gc_content']:.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
         log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
 
+    download_inc_types()
     # update json
     tio.export_json(existing_data, db_path)
 
@@ -62,9 +63,9 @@ def gc_content(sequence):
 
     return percentage
 
+
 def download_inc_reference():
 
-<<<<<<< HEAD
     inc_types_path = cfg.output_path.joinpath('inc-types.fasta')
 
     # check if inc-types.fasta is already available
@@ -170,11 +171,23 @@ def gene_prediction(plasmid_sequence):
         plasmid_cds.append(hit)
 
     return plasmid_cds
-=======
-def search_inc_types():
-    pass
 
 
-def gene_prediction():
-    pass
->>>>>>> b388381 (create inc-types / gene predict scaffold #5)
+def download_inc_types():
+    
+    inc_types_path = cfg.output_path.joinpath('inc-types.fasta')
+    
+    # check if inc-types.fasta is already available
+    if(inc_types_path.is_file()):
+        return
+    
+    inc_types_cmd = [
+        'git clone https://bitbucket.org/genomicepidemiology/plasmidfinder_db.git;',
+        'for f in plasmidfinder_db/*.fsa; do cat $f >> inc-types-raw.fasta; done;',
+        'cat inc-types-raw.fasta | sed -r "s/^>([a-zA-Z0-9()]+)_([0-9]+)_(.*)_(.*)$/>\1 \4/" > inc-types-mixed.fasta;',
+        "awk '{if(!/>/){print toupper($0)}else{print $1}}' inc-types-mixed.fasta > ", f"{inc_types_path};",
+        'rm -rf plasmidfinder_db inc-types-raw.fasta inc-types-mixed.fasta'
+    ]
+
+    tu.run_cmd(inc_types_cmd, cfg.output_path)
+    return
