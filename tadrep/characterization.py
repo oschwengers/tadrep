@@ -64,6 +64,7 @@ def gc_content(sequence):
 
 def download_inc_reference():
 
+<<<<<<< HEAD
     inc_types_path = cfg.output_path.joinpath('inc-types.fasta')
 
     # check if inc-types.fasta is already available
@@ -169,3 +170,11 @@ def gene_prediction(plasmid_sequence):
         plasmid_cds.append(hit)
 
     return plasmid_cds
+=======
+def search_inc_types():
+    pass
+
+
+def gene_prediction():
+    pass
+>>>>>>> b388381 (create inc-types / gene predict scaffold #5)
