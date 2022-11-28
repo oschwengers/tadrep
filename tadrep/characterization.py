@@ -9,9 +9,9 @@ log = logging.getLogger('CHARACTERIZE')
 
 def characterize():
     # load json from output path
-    json_path = cfg.output_path.joinpath('extraction.json')
+    json_path = cfg.output_path.joinpath('db.json')
     existing_data = tio.load_data(json_path)
-    plasmids = existing_data.get('extraction', {})
+    plasmids = existing_data.get('plasmids', {})
 
     # check if data is available
     if(not existing_data or not plasmids):
