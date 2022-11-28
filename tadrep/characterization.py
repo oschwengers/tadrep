@@ -24,7 +24,13 @@ def characterize():
 
         # set gc_content
         plasmid['gc_content'] = gc_content(plasmid['sequence'])
+
         # calculate INC_types (Platon)
+            # write multifasta
+            # find inc-types.fasta
+            # threads = cfg.threads
+
+        # gene prediction (pyrodigal)
 
     # update json
     tio.export_json(existing_data, json_path)
@@ -42,5 +48,9 @@ def gc_content(sequence):
     return percentage
 
 
-def inc_types():
+def search_inc_types():
+    pass
+
+
+def gene_prediction():
     pass
