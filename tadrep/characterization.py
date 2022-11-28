@@ -3,6 +3,8 @@ import sys
 
 import tadrep.io as tio
 import tadrep.config as cfg
+import tadrep.utils as tu
+
 
 log = logging.getLogger('CHARACTERIZE')
 
@@ -32,6 +34,7 @@ def characterize():
 
         # gene prediction (pyrodigal)
 
+    download_inc_types()
     # update json
     tio.export_json(existing_data, json_path)
 
@@ -46,6 +49,26 @@ def gc_content(sequence):
     percentage = gc_combined / float(len(sequence))
 
     return percentage
+
+
+def download_inc_types():
+    
+    inc_types_path = cfg.output_path.joinpath('inc-types.fasta')
+    
+    # check if inc-types.fasta is already available
+    if(inc_types_path.is_file()):
+        return
+    
+    inc_types_cmd = [
+        'git clone https://bitbucket.org/genomicepidemiology/plasmidfinder_db.git;',
+        'for f in plasmidfinder_db/*.fsa; do cat $f >> inc-types-raw.fasta; done;',
+        'cat inc-types-raw.fasta | sed -r "s/^>([a-zA-Z0-9()]+)_([0-9]+)_(.*)_(.*)$/>\1 \4/" > inc-types-mixed.fasta;',
+        "awk '{if(!/>/){print toupper($0)}else{print $1}}' inc-types-mixed.fasta > ", f"{inc_types_path};",
+        'rm -rf plasmidfinder_db inc-types-raw.fasta inc-types-mixed.fasta'
+    ]
+
+    tu.run_cmd(inc_types_cmd, cfg.output_path)
+    return
 
 
 def search_inc_types():
