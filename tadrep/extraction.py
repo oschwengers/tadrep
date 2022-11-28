@@ -9,9 +9,9 @@ log = logging.getLogger('EXTRACT')
 
 def extract():
     # get existing json existing_plasmid_dict
-    json_output_path = cfg.output_path.joinpath('extraction.json')
+    json_output_path = cfg.output_path.joinpath('db.json')
     existing_data = tio.load_data(json_output_path)
-    plasmid_dict = existing_data.get('extraction', {})      # are previous sequences available
+    plasmid_dict = existing_data.get('plasmids', {})      # are previous sequences available
     file_list = existing_data.get('files', [])              # which files were already extracted from
     
     # update plasmid count
@@ -60,7 +60,7 @@ def extract():
     log.info('Total plasmids detected: %d', len(plasmid_dict))
     
     # export to json
-    existing_data['extraction'] = plasmid_dict
+    existing_data['plasmids'] = plasmid_dict
     existing_data['files'] = file_list
     tio.export_json(existing_data, json_output_path)
 
@@ -90,7 +90,7 @@ def filter_longest(seq_dict):
 
     # Error if discard too high
     if(cfg.discard > len(seq_dict)):
-        log.error('ERROR: Can not discard %d sequences from %d present!', cfg.discard, len(seq_dict))
+        log.error('Can not discard %d sequences from %d present!', cfg.discard, len(seq_dict))
         sys.exit('ERROR: Can not discard more sequences than present!')
     
     # sort dict entries by length and discard longest
