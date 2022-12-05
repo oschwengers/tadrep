@@ -1,5 +1,6 @@
 import logging
 import sys
+import pyrodigal
 
 import tadrep.io as tio
 import tadrep.config as cfg
@@ -38,6 +39,7 @@ def characterize():
         plasmid['inc_types'] = inc_types_per_plasmid.get(plasmid['id'], [])
 
         # gene prediction (pyrodigal)
+        plasmid['cds'] = gene_prediction(plasmid['sequence'])
 
     # update json
     tio.export_json(existing_data, json_path)
@@ -120,5 +122,17 @@ def search_inc_types(db_path):
     return hits_per_plasmid
 
 
-def gene_prediction():
-    pass
+def gene_prediction(plasmid_sequence):
+    plasmid_cds = []
+    orffinder = pyrodigal.OrfFinder(meta=True, closed=False)
+    for prediction in orffinder.find_genes(plasmid_sequence.encode()):
+        hit = {
+            'start': prediction.begin,
+            'stop': prediction.end,
+            'strand': '+' if prediction.strand == 1 else '-',
+            'start_type': prediction.start_type,
+            'rbs_motif': prediction.rbs_motif
+        }
+        plasmid_cds.append(hit)
+
+    return plasmid_cds
