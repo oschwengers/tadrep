@@ -177,14 +177,3 @@ def gene_prediction(plasmid_sequence):
         plasmid_cds.append(hit)
 
     return plasmid_cds
-
-
-def download_inc_types():
-
-    inc_types_path = cfg.output_path.joinpath('inc-types.fasta')
-
-    # check if inc-types.fasta is already available
-    if(inc_types_path.is_file()):
-        return
-
-    return
