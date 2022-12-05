@@ -35,6 +35,8 @@ def characterize():
     fasta_path = cfg.output_path.joinpath('db.fasta')
     tio.export_sequences(plasmids.values(), fasta_path)
 
+    search_inc_types(fasta_path)
+
     for plasmid in plasmids.values():
         # set length
         plasmid['length'] = len(plasmid['sequence'])
