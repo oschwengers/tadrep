@@ -41,6 +41,9 @@ def characterize():
         # gene prediction (pyrodigal)
         plasmid['cds'] = gene_prediction(plasmid['sequence'])
 
+        cfg.verboseprint(f"Plasmid: {plasmid['id']}, Length: {plasmid['length']}, GC: {plasmid['gc_content']:.2}, CDS: {len(plasmid['cds'])}, INC_Types: {len(plasmid['inc_types'])}")
+        log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
+
     # update json
     tio.export_json(existing_data, json_path)
 
