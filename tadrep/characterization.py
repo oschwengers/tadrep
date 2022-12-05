@@ -35,7 +35,8 @@ def characterize():
     fasta_path = cfg.output_path.joinpath('db.fasta')
     tio.export_sequences(plasmids.values(), fasta_path)
 
-    search_inc_types(fasta_path)
+    # search inc_types for all plamids
+    inc_types_per_plasmid = search_inc_types(fasta_path)
 
     for plasmid in plasmids.values():
         # set length
@@ -53,7 +54,6 @@ def characterize():
         cfg.verboseprint(f"Plasmid: {plasmid['id']:20} Length: {plasmid['length']:7} GC: {plasmid['gc_content']:.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
         log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
 
-    download_inc_types()
     # update json
     tio.export_json(existing_data, db_path)
 
