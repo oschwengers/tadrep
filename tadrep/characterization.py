@@ -24,7 +24,8 @@ def characterize():
     fasta_path = cfg.output_path.joinpath('db.fasta')
     tio.export_sequences(plasmids.values(), fasta_path)
 
-    search_inc_types(fasta_path)
+    # search inc_types for all plamids
+    inc_types_per_plasmid = search_inc_types(fasta_path)
 
     for plasmid in plasmids.values():
         # set length
@@ -33,14 +34,11 @@ def characterize():
         # set gc_content
         plasmid['gc_content'] = gc_content(plasmid['sequence'])
 
-        # calculate INC_types (Platon)
-            # write multifasta
-            # find inc-types.fasta
-            # threads = cfg.threads
+        # set individual INC_types
+        plasmid['inc_types'] = inc_types_per_plasmid.get(plasmid['id'], [])
 
         # gene prediction (pyrodigal)
 
-    download_inc_types()
     # update json
     tio.export_json(existing_data, json_path)
 
@@ -117,6 +115,7 @@ def search_inc_types(db_path):
                         'inc-type: hit! contig=%s, type=%s, start=%d, end=%d, strand=%s',
                         plasmid_id, hit['type'], hit['start'], hit['end'], hit['strand']
                     )
+                hits_per_plasmid[plasmid_id] = hits_per_pos
 
     return hits_per_plasmid
 
