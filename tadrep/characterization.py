@@ -16,7 +16,7 @@ def characterize():
     # load json from output path
     db_path = cfg.output_path.joinpath('db.json')
     existing_data = tio.load_data(db_path)
-    plasmids = existing_data.get('plasmids', [])
+    plasmids = existing_data.get('plasmids', {})
 
     # check if data is available
     if(not existing_data or not plasmids):
@@ -25,13 +25,13 @@ def characterize():
 
     # write multifasta
     fasta_path = cfg.output_path.joinpath('db.fasta')
-    tio.export_sequences(plasmids, fasta_path)
+    tio.export_sequences(plasmids.values(), fasta_path)
 
     # search inc_types for all plamids
     download_inc_reference()
     inc_types_per_plasmid = search_inc_types(fasta_path)
 
-    for plasmid in plasmids:
+    for plasmid in plasmids.values():
         # set length
         plasmid['length'] = len(plasmid['sequence'])
 
