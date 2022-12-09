@@ -1,12 +1,28 @@
 import logging
 
+import tadrep.io as tio
+import tadrep.config as cfg
 
 log = logging.getLogger('CLUSTER')
 
 def cluster():
     # load json
+    db_path = cfg.output_path.joinpath('db.json')
+    db_data = tio.load_data(db_path)
+
+    plasmids = db_data.get('plasmids', {})
+    cluster = db_data.get('cluster', [])
     # define method / criteria for clustering
+
     # build clusters
+    for plasmid in plasmids.values():
+        new_cluster = {
+            'rep': plasmid['id'],
+            'member': [plasmid['id']]
+        }
+        cluster.append(new_cluster)
+
     # find cluster representative
+    
     # write json
-    pass
+    tio.export_json(db_data, db_path)
