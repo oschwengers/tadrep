@@ -44,7 +44,7 @@ def characterize():
         # gene prediction (pyrodigal)
         plasmid['cds'] = gene_prediction(plasmid['sequence'])
 
-        cfg.verboseprint(f"Plasmid: {plasmid['id']}, Length: {plasmid['length']}, GC: {plasmid['gc_content']:.2}, CDS: {len(plasmid['cds'])}, INC_Types: {len(plasmid['inc_types'])}")
+        cfg.verboseprint(f"Plasmid: {plasmid['id']:20} Length: {plasmid['length']:7} GC: {plasmid['gc_content']:.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
         log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
 
     # update json
@@ -159,14 +159,13 @@ def search_inc_types(db_path):
 
 def gene_prediction(plasmid_sequence):
     plasmid_cds = []
-    orffinder = pyrodigal.OrfFinder(meta=True, closed=False)
+    orffinder = pyrodigal.OrfFinder(meta=True, closed=True)
     for prediction in orffinder.find_genes(plasmid_sequence.encode()):
         hit = {
             'start': prediction.begin,
             'stop': prediction.end,
             'strand': '+' if prediction.strand == 1 else '-',
-            'start_type': prediction.start_type,
-            'rbs_motif': prediction.rbs_motif
+            'aa': prediction.translate()
         }
         plasmid_cds.append(hit)
 
