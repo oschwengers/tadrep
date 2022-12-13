@@ -46,7 +46,10 @@ def parse_arguments():
     extraction_parser = subparsers.add_parser('extraction', help='Extract unique plasmid sequences')
 
     arg_group_io = extraction_parser.add_argument_group('Input')
-    arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, nargs="+", help='Draft plasmids path')
+    arg_group_io.add_argument('--type', '-t', action='store', default='genome', choices=['genome', 'plasmid', 'draft'], help='Type of input files')
+    arg_group_io.add_argument('--header', action='store', default=None, help='Template for header description inside input files: e.g.: header: ">pl1234" --> --header "pl"')
+    arg_group_io.add_argument('--files', '-f', action='store', default=None, nargs="+", help='File path')
+    arg_group_io.add_argument('--discard-longest', '-d', action='store', type=int, default=1, help='Discard n longest sequences in output')
 
     # characterization parser
     characterization_parser = subparsers.add_parser('characterization', help='Identify plasmids with GC content, Inc types, conjugation genes')
