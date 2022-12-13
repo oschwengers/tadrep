@@ -8,6 +8,7 @@ import tadrep
 import tadrep.config as cfg
 import tadrep.utils as tu
 import tadrep.extraction as te
+import tadrep.characterization as tc
 import tadrep.detection as td
 import tadrep.visuals as tv
 
@@ -61,6 +62,8 @@ def main():
 
     elif(args.subcommand == "characterization"):
         verboseprint('\nCharacterization started...')
+        
+        tc.characterize()
 
     elif(args.subcommand == "clusterin"):
         verboseprint('\nClustering started...')

@@ -54,9 +54,6 @@ def parse_arguments():
     # characterization parser
     characterization_parser = subparsers.add_parser('characterization', help='Identify plasmids with GC content, Inc types, conjugation genes')
 
-    arg_group_io = characterization_parser.add_argument_group('Input')
-    arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, nargs='+', help='Plasmids path')
-
     # clustering parser
     clustering_parser = subparsers.add_parser('clustering', help='Cluster related plasmids')
     
