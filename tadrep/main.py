@@ -7,6 +7,7 @@ from pathlib import Path
 import tadrep
 import tadrep.config as cfg
 import tadrep.utils as tu
+import tadrep.extraction as te
 import tadrep.detection as td
 import tadrep.visuals as tv
 
@@ -55,6 +56,8 @@ def main():
 
     if(args.subcommand == "extraction"):
         verboseprint('\nExtraction started...')
+        cfg.setup_extraction(args)
+        te.extract()
 
     elif(args.subcommand == "characterization"):
         verboseprint('\nCharacterization started...')

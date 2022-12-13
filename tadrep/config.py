@@ -14,6 +14,7 @@ log = logging.getLogger('CONFIG')
 # runtime configurations
 threads = None
 verbose = None
+verboseprint = None
 
 # input / output configuration
 output_path = None
@@ -21,6 +22,7 @@ tmp_path = None
 prefix = None
 
 # detection setup
+# Input
 plasmids_path = None
 genome_path = []
 database_path = None
@@ -37,16 +39,23 @@ gap_sequence_length = None
 lock = None
 blast_threads = None
 
+# extraction setup
+# Input
+files_to_extract = None
+discard = 1
+file_type = None
+header = None
 
 def setup(args):
     """Test environment and build a runtime configuration."""
 
     # runtime configurations
-    global threads, verbose
+    global threads, verbose, verboseprint
     threads = args.threads
     log.info('threads=%i', threads)
     verbose = args.verbose
     log.info('verbose=%s', verbose)
+    verboseprint = print if verbose else lambda *a, **k: None
 
     # input / output path configurations
     global tmp_path, output_path, prefix
@@ -113,3 +122,27 @@ def setup_detection(args):
     if(blast_threads == 0):
         blast_threads = 1
     log.info('blast-threads=%i', blast_threads)
+
+
+def setup_extraction(args):
+    global files_to_extract, discard, file_type, header
+
+    if(not args.files):
+        log.error('No files provided!')
+        sys.exit('ERROR: No input file was provided!')
+
+    files_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.files]
+
+    discard = args.discard_longest
+    if(discard < 0):
+        log.error('Can not drop negative files!')
+        sys.exit('ERROR: Can not drop negative files!')
+
+    file_type = args.type
+    header = args.header
+    if(file_type == 'draft' and not header):
+        log.debug('No custom header provided!')
+        verboseprint('Info: No custom header provided! Only searching for "complete", "circular" and "plasmid"')
+    else:
+        verboseprint(f'Searching custom header: {header}')
+        log.debug('Custom header: %s', header)
