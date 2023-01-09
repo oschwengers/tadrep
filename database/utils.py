@@ -12,6 +12,7 @@ log = logging.getLogger('UTILS')
 REFSEQ = 'refseq'
 PLSDB = 'plsdb'
 CUSTOM = 'custom'
+INC = 'inc_types'
 
 
 def parse_arguments():
@@ -22,7 +23,7 @@ def parse_arguments():
     )
 
     arg_group_io = parser.add_argument_group('Input / Output')
-    arg_group_io.add_argument('--type', action='store', default='refseq', choices=[REFSEQ, PLSDB, CUSTOM], type=str.lower, help="External DB to import (default = 'refseq')")
+    arg_group_io.add_argument('--type', action='store', default='refseq', choices=[REFSEQ, PLSDB, CUSTOM, INC], type=str.lower, help="External DB to import (default = 'refseq')")
     arg_group_io.add_argument('--output', '-o', action='store', default=os.getcwd(), help='Output directory for database files (default = current working directory)')
     arg_group_io.add_argument('--files', action='store', default=None, nargs='*', help='Fasta files to create custom database')
     arg_group_io.add_argument('--database', '-db', action='store', default=None, help='Database path to update')

@@ -2,6 +2,7 @@ import logging
 import shutil
 import sys
 import tempfile
+import re
 
 from pathlib import Path
 
@@ -11,6 +12,9 @@ import tadrep.io as tio
 import database.utils as du
 import database.refseq as dr
 import database.plsdb as dp
+
+
+log = logging.getLogger('MAIN')
 
 
 def main():
@@ -29,7 +33,6 @@ def main():
         format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
         level=logging.DEBUG if args.verbose else logging.INFO
     )
-    log = logging.getLogger('MAIN')
     log.info('version %s', tadrep.__version__)
     log.info('command line: %s', ' '.join(sys.argv))
     log.info('output-path=%s', output_path)
@@ -55,8 +58,10 @@ def main():
             db_name = du.REFSEQ
         elif(selected_db == du.PLSDB):
             db_name = du.PLSDB
-        else:
+        elif(selected_db == du.CUSTOM):
             db_name = du.CUSTOM
+        else:
+            db_name = du.INC
     else:
         update_path = tu.check_db_directory(update_path)
         output_path = update_path.parent
@@ -70,85 +75,130 @@ def main():
         print(f"\toutput: {output_path}")
         print(f'\ttmp directory: {tmp_path}')
 
-    if(update_path or db_name == du.CUSTOM):
-        if(not input_files):
-            log.error('no files for database provided!')
-            sys.exit('ERROR: No files for database provided!')
-        input_files = [tu.check_file_permission(file, 'fasta') for file in input_files]
-
-    fasta_tmp_path = tmp_path.joinpath(f'{db_name}.fna')
-    log.info('merged fasta file: path=%s', fasta_tmp_path)
-
-    if(update_path):
-        db_tmp_path = update_path.joinpath('db')
-        log.info('reverse database: path=%s', db_tmp_path)
-        du.reverse_database(fasta_tmp_path, db_tmp_path, tmp_path)
-
-    db_output_path = output_path.joinpath(f'{db_name}')
-    if(db_output_path.exists()):
-        if(force or update_path):
-            shutil.rmtree(db_output_path)
-            log.info('directory removed: path=%s', db_output_path)
-        else:
-            shutil.rmtree(str(tmp_path))
-            log.debug('removed tmp dir: %s', tmp_path)
-            log.debug('database directory already exists! path=%s', db_output_path)
-            sys.exit(f'ERROR: Directory "{db_output_path.stem}" already exists in {output_path} !')
-
-    db_output_path.mkdir(parents=True, exist_ok=True)
-    log.info('directory created: path=%s', db_output_path)
-
-    print('Database creation starting...')
-    if(update_path):
-        print('updating database...')
-        with fasta_tmp_path.open('a') as fh_out:
-            log.info('update file: path=%s', fasta_tmp_path)
-            for file in input_files:
-                log.info('add file: file=%s', file)
-                with file.open('r') as fh_in:
-                    fh_out.write(fh_in.read())
+    if(db_name == 'inc_types'):
+        inc_output_path = output_path.joinpath('inc_types.fasta')
+        download_inc_reference(inc_output_path, tmp_path)
     else:
-        if(selected_db == du.REFSEQ):
-            dr.download_database(fasta_tmp_path)
-        elif(selected_db == du.PLSDB):
-            dp.download_database(fasta_tmp_path)
-        else:
-            print('Combining files...')
-            with fasta_tmp_path.open('w+') as fh_out:
+        if(update_path or db_name == du.CUSTOM):
+            if(not input_files):
+                log.error('no files for database provided!')
+                sys.exit('ERROR: No files for database provided!')
+            input_files = [tu.check_file_permission(file, 'fasta') for file in input_files]
+
+        fasta_tmp_path = tmp_path.joinpath(f'{db_name}.fna')
+        log.info('merged fasta file: path=%s', fasta_tmp_path)
+
+        if(update_path):
+            db_tmp_path = update_path.joinpath('db')
+            log.info('reverse database: path=%s', db_tmp_path)
+            du.reverse_database(fasta_tmp_path, db_tmp_path, tmp_path)
+
+        db_output_path = output_path.joinpath(f'{db_name}')
+        if(db_output_path.exists()):
+            if(force or update_path):
+                shutil.rmtree(db_output_path)
+                log.info('directory removed: path=%s', db_output_path)
+            else:
+                shutil.rmtree(str(tmp_path))
+                log.debug('removed tmp dir: %s', tmp_path)
+                log.debug('database directory already exists! path=%s', db_output_path)
+                sys.exit(f'ERROR: Directory "{db_output_path.stem}" already exists in {output_path} !')
+
+        db_output_path.mkdir(parents=True, exist_ok=True)
+        log.info('directory created: path=%s', db_output_path)
+
+        print('Database creation starting...')
+        if(update_path):
+            print('updating database...')
+            with fasta_tmp_path.open('a') as fh_out:
+                log.info('update file: path=%s', fasta_tmp_path)
                 for file in input_files:
-                    log.info('write file: file=%s', file)
+                    log.info('add file: file=%s', file)
                     with file.open('r') as fh_in:
                         fh_out.write(fh_in.read())
-    print('Create blast database...')
-    db_file_name = db_output_path.joinpath('db')
-    log.info('database files: name=%s', db_file_name)
-    du.create_blast_db(db_file_name, fasta_tmp_path, tmp_path)
-    
-    
-    tsv_output_path = db_output_path.joinpath('db.tsv')
-    log.info('TSV file: name=%s, path=%s', tsv_output_path.stem, tsv_output_path)
-    du.create_tsv(fasta_tmp_path, tsv_output_path)
+        else:
+            if(selected_db == du.REFSEQ):
+                dr.download_database(fasta_tmp_path)
+            elif(selected_db == du.PLSDB):
+                dp.download_database(fasta_tmp_path)
+            else:
+                print('Combining files...')
+                with fasta_tmp_path.open('w+') as fh_out:
+                    for file in input_files:
+                        log.info('write file: file=%s', file)
+                        with file.open('r') as fh_in:
+                            fh_out.write(fh_in.read())
 
-    json_path = db_output_path.joinpath(f'{db_name}.json')
-    log.info('JSON file: name=%s, path=%s', json_path.stem, json_path)
-    db_plasmids = tio.import_sequences(fasta_tmp_path, sequence=True)
-    plasmid_count = 1
-    json_plasmids = {}
+        print('Create blast database...')
+        db_file_name = db_output_path.joinpath('db')
+        log.info('database files: name=%s', db_file_name)
+        du.create_blast_db(db_file_name, fasta_tmp_path, tmp_path)
 
-    for plasmid in db_plasmids.values():
-        plasmid['file'] = db_name
-        plasmid['old_id'] = plasmid['id']
-        plasmid['id'] = str(plasmid_count)
-        json_plasmids[plasmid_count] = plasmid
 
-        plasmid_count += 1
-    db_data = {'plasmids': json_plasmids}
-    tio.export_json(db_data, json_path)
-    
-    print(f'Database successfully created\nDatabase path: {db_output_path}')
+        tsv_output_path = db_output_path.joinpath('db.tsv')
+        log.info('TSV file: name=%s, path=%s', tsv_output_path.stem, tsv_output_path)
+        du.create_tsv(fasta_tmp_path, tsv_output_path)
+
+        json_path = db_output_path.joinpath(f'{db_name}.json')
+        log.info('JSON file: name=%s, path=%s', json_path.stem, json_path)
+        db_plasmids = tio.import_sequences(fasta_tmp_path, sequence=True)
+        plasmid_count = 1
+        json_plasmids = {}
+
+        for plasmid in db_plasmids.values():
+            plasmid['file'] = db_name
+            plasmid['old_id'] = plasmid['id']
+            plasmid['id'] = str(plasmid_count)
+            json_plasmids[plasmid_count] = plasmid
+
+            plasmid_count += 1
+        db_data = {'plasmids': json_plasmids}
+        tio.export_json(db_data, json_path)
+
+        print(f'Database successfully created\nDatabase path: {db_output_path}')
 
     shutil.rmtree(str(tmp_path))
     log.debug('removed tmp dir: %s', tmp_path)
+
+
+def download_inc_reference(output_path, tmp_path):
+
+    inc_types_path = output_path.joinpath('inc-types.fasta')
+
+    # check if inc-types.fasta is already available
+    if(inc_types_path.is_file()):
+        print(f'Found {inc_types_path.name} in {output_path}')
+        log.debug('Found inc-types.fasta in path %s', output_path)
+        return
+
+    plasmidfinder_git = 'https://bitbucket.org/genomicepidemiology/plasmidfinder_db.git'
+
+    print(f'Missing {inc_types_path.name} in output directory, attempting download... ')
+    log.debug('Missing %s, cloning from %s', inc_types_path.name, plasmidfinder_git)
+
+    git_cmd = ['git', 'clone', str(plasmidfinder_git)]
+    tu.run_cmd(git_cmd, tmp_path)
+
+    with open(inc_types_path, 'w') as inc_types:
+
+        # read each .fsa file
+        plasmidfinder_path = tmp_path.joinpath('plasmidfinder_db')
+        for fasta_file in plasmidfinder_path.glob('*.fsa'):
+            log.debug('Reading %s', fasta_file)
+            with open(fasta_file, 'r') as inc_raw:
+
+                for line in inc_raw.readlines():
+                    # if line is header
+                    if(line.startswith('>')):
+                        # check if pattern
+                        if(re.search('^>([a-zA-Z0-9()]+)_([0-9]+)_(.*)_(.*)$', line)):
+                            inc_types.write(line.split('_')[0])
+                        else:
+                            inc_types.write(line)
+                    # write seq in uppercase
+                    else:
+                        inc_types.write(line.upper())
+                    inc_types.write('\n')
 
 
 if(__name__ == '__main__'):
