@@ -55,7 +55,8 @@ def parse_arguments():
     characterization_parser = subparsers.add_parser('characterization', help='Identify plasmids with GC content, Inc types, conjugation genes')
     
     arg_group_char = characterization_parser.add_argument_group('Input')
-    arg_group_char.add_argument('--import', '-i', action='store', default=None, dest='database', help='Import database into current working directory')
+    arg_group_char.add_argument('--database', '-d', action='store', default=None, dest='database', help='Import database from given path into working directory')
+    arg_group_char.add_argument('--inc-types', '-i', action='store', default=None, help='Import inc-types from given path into working directory')
 
     # clustering parser
     clustering_parser = subparsers.add_parser('clustering', help='Cluster related plasmids')
