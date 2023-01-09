@@ -7,6 +7,7 @@ from pathlib import Path
 
 import tadrep
 import tadrep.utils as tu
+import tadrep.io as tio
 import database.utils as du
 import database.refseq as dr
 import database.plsdb as dp
@@ -127,6 +128,22 @@ def main():
     tsv_output_path = db_output_path.joinpath('db.tsv')
     log.info('TSV file: name=%s, path=%s', tsv_output_path.stem, tsv_output_path)
     du.create_tsv(fasta_tmp_path, tsv_output_path)
+
+    json_path = db_output_path.joinpath(f'{db_name}.json')
+    log.info('JSON file: name=%s, path=%s', json_path.stem, json_path)
+    db_plasmids = tio.import_sequences(fasta_tmp_path, sequence=True)
+    plasmid_count = 1
+    json_plasmids = {}
+
+    for plasmid in db_plasmids.values():
+        plasmid['file'] = db_name
+        plasmid['old_id'] = plasmid['id']
+        plasmid['id'] = str(plasmid_count)
+        json_plasmids[plasmid_count] = plasmid
+
+        plasmid_count += 1
+    
+    tio.export_json(json_plasmids, json_path)
     
     print(f'Database successfully created\nDatabase path: {db_output_path}')
 
