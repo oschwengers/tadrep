@@ -137,7 +137,8 @@ def setup_extraction(args):
 
 
 def setup_characterize(args):
-    database_path = tu.check_file_permission(args.database, 'database')
-    json_path = output_path.joinpath('db.json')
-    shutil.copyfile(database_path, json_path)
-    log.debug('Copied file from %s to %s', database_path, json_path)
+    if(args.database):
+        database_path = tu.check_file_permission(args.database, 'database')
+        json_path = output_path.joinpath('db.json')
+        shutil.copyfile(database_path, json_path)
+        log.debug('Copied file from %s to %s', database_path, json_path)
