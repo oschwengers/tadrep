@@ -49,7 +49,8 @@ def extract():
         log.info('File: %s, plasmids detected: %d', input_file.name, len(plasmids))
         for plasmid in plasmids.values():
             plasmid['file'] = input_file.name
-            plasmid['new_id'] = number_of_plasmids
+            plasmid['old_id'] = plasmid['id']
+            plasmid['id'] = str(number_of_plasmids)
 
             new_plasmids[number_of_plasmids] = plasmid
             number_of_plasmids += 1

@@ -17,8 +17,8 @@ def cluster():
     # build clusters
     for plasmid in plasmids.values():
         new_cluster = {
-            'representative': plasmid['new_id'],
-            'members': [plasmid['new_id']]
+            'representative': plasmid['id'],
+            'members': [plasmid['id']]
         }
         cluster.append(new_cluster)
 
