@@ -63,7 +63,7 @@ def main():
 
     elif(args.subcommand == "characterization"):
         verboseprint('\nCharacterization started...')
-        
+        cfg.setup_characterize(args)
         tc.characterize()
 
     elif(args.subcommand == "clustering"):
