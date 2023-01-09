@@ -17,11 +17,12 @@ def cluster():
     # build clusters
     for plasmid in plasmids.values():
         new_cluster = {
-            'representative': plasmid['id'],
-            'members': [plasmid['id']]
+            'representative': plasmid['new_id'],
+            'members': [plasmid['new_id']]
         }
         cluster.append(new_cluster)
 
+    db_data['cluster'] = cluster
     # find cluster representative
     
     # write json
