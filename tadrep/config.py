@@ -2,6 +2,7 @@ import logging
 import multiprocessing as mp
 import sys
 import tempfile
+import shutil
 
 from pathlib import Path
 
@@ -136,4 +137,7 @@ def setup_extraction(args):
 
 
 def setup_characterize(args):
-    pass
+    database_path = tu.check_file_permission(args.database, 'database')
+    json_path = output_path.joinpath('db.json')
+    shutil.copyfile(database_path, json_path)
+    log.debug('Copied file from %s to %s', database_path, json_path)
