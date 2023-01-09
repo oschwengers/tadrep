@@ -23,9 +23,7 @@ prefix = None
 
 # detection setup
 # Input
-plasmids_path = None
 genome_path = []
-database_path = None
 summary_path = None
 
 # workflow configuration
@@ -80,24 +78,13 @@ def setup(args):
 
 def setup_detection(args):
     # input / output path configurations
-    global genome_path, plasmids_path, summary_path, database_path
+    global genome_path, summary_path
 
     if(not args.genome):
         log.error('genome file not provided!')
         sys.exit('ERROR: no genome file was provided!')
 
     genome_path = [tu.check_file_permission(file, 'genome') for file in args.genome]
-
-    if(args.plasmids):
-        plasmids_path = tu.check_file_permission(args.plasmids, 'plasmids')
-    elif(args.db):
-        database_path = tu.check_db_directory(args.db)
-        log.info('database path=%s', database_path)
-    else:
-        log.error('no plasmid file or database provided!')
-        sys.exit('ERROR: neither plasmid file nor database provided!')
-
-    log.info('plasmids-path=%s', plasmids_path)
 
     summary_path = output_path.joinpath('summary.tsv')
     log.info('summary_path=%s', summary_path)

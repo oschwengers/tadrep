@@ -73,8 +73,6 @@ def main():
     elif(args.subcommand == "detection"):
         cfg.setup_detection(args)
         verboseprint(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
-        verboseprint(f'\tplasmid(s): {cfg.plasmids_path}')
-        verboseprint(f'\tdatabase path: {cfg.database_path}')
 
         verboseprint('\nDetection and reconstruction started ...')
         td.detect_and_reconstruct()
