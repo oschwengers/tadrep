@@ -16,14 +16,8 @@ def detect_and_reconstruct():
 
     ############################################################################
     # Import plasmid sequences
-    # - parse contigs in Fasta file
+    # - write multi Fasta file
     ############################################################################
-    
-    # reference_plasmids = {ID: {plasmid_info}, ID: {plasmid_info}, ...}
-    # find Cluster representant ID
-    # get Plasmid from Plasmids Dict
-    # bring them in reference_plasmids form
-    # profit
 
     db_path = cfg.output_path.joinpath('db.json')
     db_data = tio.load_data(db_path)
@@ -42,7 +36,11 @@ def detect_and_reconstruct():
     if(not db_cluster):
         log.debug("No Clusters in %s!", db_path)
         sys.exit(f"ERROR: No cluster in database {db_path}")
-
+    
+    log.info("Loaded %d cluster with %d plasmids", len(db_cluster), len(db_plasmids.keys()))
+    cfg.verboseprint("Loaded data:")
+    cfg.verboseprint(f"\n{len(db_cluster)} cluster")
+    cfg.verboseprint(f"\n{len(db_plasmids.keys())} plasmids")
 
     reference_plasmids = {}
 
@@ -53,7 +51,7 @@ def detect_and_reconstruct():
     # write multifasta for blast search
     fasta_path = cfg.output_path.joinpath("db.fasta")
     tio.export_sequences(reference_plasmids.values(), fasta_path)
-    
+
 
     ############################################################################
     # Prepare summary output file
