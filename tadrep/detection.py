@@ -18,30 +18,31 @@ def detect_and_reconstruct():
     # Import plasmid sequences
     # - parse contigs in Fasta file
     ############################################################################
-    if(cfg.plasmids_path):
-        try:
-            verboseprint('\nimport plasmids sequences...')
-            reference_plasmids = tio.import_sequences(cfg.plasmids_path, sequence=True)
-            log.info('imported reference plasmids: sequences=%i, file=%s', len(reference_plasmids), cfg.plasmids_path)
-            for ref_plasmid in sorted(reference_plasmids.values(), key=lambda k: k['length']):
-                size = ref_plasmid['length']
-                seq = ref_plasmid['sequence']
-                gc = (seq.count('G') + seq.count('C')) / (size - seq.count('N'))
-                verboseprint(f"\t{ref_plasmid['id']}: {size:,} bp, {(gc*100):0.1f} % GC")
-            verboseprint(f'\n\ttotal: {len(reference_plasmids)}')
-        except ValueError:
-            log.error('wrong reference plasmids file format!', exc_info=True)
-            sys.exit('ERROR: wrong reference plasmids file format!')
-    else:
-        try:
-            verboseprint('\nload reference plasmids database...')
-            reference_plasmids = tio.import_tsv(cfg.database_path)
-            log.info('imported reference plasmids: sequence=%i, file=%s', len(reference_plasmids), cfg.database_path)
-            verboseprint(f'\timported: {len(reference_plasmids)}')
-        except:
-            log.error('wrong database path!', exc_info=True)
-            sys.exit('ERROR: wrong database path!')
     
+    # reference_plasmids = {ID: {plasmid_info}, ID: {plasmid_info}, ...}
+    # find Cluster representant ID
+    # get Plasmid from Plasmids Dict
+    # bring them in reference_plasmids form
+    # profit
+
+    db_path = cfg.output_path.joinpath('db.json')
+    db_data = tio.load_data(db_path)
+
+    db_plasmids = db_data.get('plasmids', {})
+    db_cluster = db_data.get('cluster', [])
+
+    if(not db_data):
+        log.debug("No data in %s", db_path)
+        sys.exit(f"ERROR: No data available in {db_path}")
+
+    if(not db_plasmids):
+        log.debug("No plasmids in %s !", db_path)
+        sys.exit(f"ERROR: No plasmids in database {db_path}!")
+    
+    if(not db_cluster):
+        log.debug("No Clusters in %s!", db_path)
+        sys.exit(f"ERROR: No cluster in database {db_path}")
+
 
     ############################################################################
     # Prepare summary output file
