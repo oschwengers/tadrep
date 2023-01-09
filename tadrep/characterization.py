@@ -63,6 +63,9 @@ def gc_content(sequence):
 
 def search_inc_types(db_path):
     """Search for incompatibility motifs."""
+    if(not db_path.is_file()):
+        log.debug("Inc_types reference not found!")
+        sys.exit("ERROR: Inc_types reference not found! Please import with '--inc-types' param!")
 
     tmp_output_path = cfg.output_path.joinpath('db.inc.blast.out')
 
