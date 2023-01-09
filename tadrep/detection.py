@@ -44,6 +44,12 @@ def detect_and_reconstruct():
         sys.exit(f"ERROR: No cluster in database {db_path}")
 
 
+    reference_plasmids = {}
+
+    for cluster in db_cluster:
+        rep_id = cluster['representative']
+        reference_plasmids[rep_id] = db_plasmids[rep_id]
+
     ############################################################################
     # Prepare summary output file
     # - create file
