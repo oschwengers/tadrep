@@ -39,8 +39,8 @@ def detect_and_reconstruct():
     
     log.info("Loaded %d cluster with %d plasmids", len(db_cluster), len(db_plasmids.keys()))
     cfg.verboseprint("Loaded data:")
-    cfg.verboseprint(f"\n{len(db_cluster)} cluster")
-    cfg.verboseprint(f"\n{len(db_plasmids.keys())} plasmids")
+    cfg.verboseprint(f"\t{len(db_cluster)} cluster")
+    cfg.verboseprint(f"\t{len(db_plasmids.keys())} plasmids total")
 
     reference_plasmids = {}
 
