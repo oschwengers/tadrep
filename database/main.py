@@ -76,8 +76,7 @@ def main():
         print(f'\ttmp directory: {tmp_path}')
 
     if(db_name == 'inc_types'):
-        inc_output_path = output_path.joinpath('inc_types.fasta')
-        download_inc_reference(inc_output_path, tmp_path)
+        download_inc_reference(output_path, tmp_path)
     else:
         if(update_path or db_name == du.CUSTOM):
             if(not input_files):
@@ -167,13 +166,13 @@ def download_inc_reference(output_path, tmp_path):
 
     # check if inc-types.fasta is already available
     if(inc_types_path.is_file()):
-        print(f'Found {inc_types_path.name} in {output_path}')
+        print(f'{inc_types_path.name} already exists in {output_path}')
         log.debug('Found inc-types.fasta in path %s', output_path)
         return
 
     plasmidfinder_git = 'https://bitbucket.org/genomicepidemiology/plasmidfinder_db.git'
 
-    print(f'Missing {inc_types_path.name} in output directory, attempting download... ')
+    print(f'Downloading {inc_types_path.name}')
     log.debug('Missing %s, cloning from %s', inc_types_path.name, plasmidfinder_git)
 
     git_cmd = ['git', 'clone', str(plasmidfinder_git)]
