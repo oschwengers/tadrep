@@ -67,8 +67,6 @@ def parse_arguments():
 
     arg_group_io = detection_parser.add_argument_group('Input / Output')
     arg_group_io.add_argument('--genome', '-g', action='store', default=None, nargs="+", help='Draft genome path')
-    arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, help='Plasmids path')
-    arg_group_io.add_argument('--db', action='store', default=None, help='Directory which contains blast database')
 
     arg_group_parameters = detection_parser.add_argument_group('Annotation')
     arg_group_parameters.add_argument('--min-contig-coverage', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_coverage', help="Minimal contig coverage (default = 90%%)")
