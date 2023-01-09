@@ -49,6 +49,11 @@ def detect_and_reconstruct():
     for cluster in db_cluster:
         rep_id = cluster['representative']
         reference_plasmids[rep_id] = db_plasmids[rep_id]
+    
+    # write multifasta for blast search
+    fasta_path = cfg.output_path.joinpath("db.fasta")
+    tio.export_sequences(reference_plasmids.values(), fasta_path)
+    
 
     ############################################################################
     # Prepare summary output file
