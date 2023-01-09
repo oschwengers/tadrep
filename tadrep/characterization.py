@@ -31,13 +31,6 @@ def characterize():
     download_inc_reference()
     inc_types_per_plasmid = search_inc_types(fasta_path)
 
-    # write multifasta
-    fasta_path = cfg.output_path.joinpath('db.fasta')
-    tio.export_sequences(plasmids.values(), fasta_path)
-
-    # search inc_types for all plamids
-    inc_types_per_plasmid = search_inc_types(fasta_path)
-
     for plasmid in plasmids.values():
         # set length
         plasmid['length'] = len(plasmid['sequence'])
