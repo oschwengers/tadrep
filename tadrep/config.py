@@ -142,3 +142,8 @@ def setup_characterize(args):
         json_path = output_path.joinpath('db.json')
         shutil.copyfile(database_path, json_path)
         log.debug('Copied file from %s to %s', database_path, json_path)
+    if(args.inc_types):
+        inc_types_path = tu.check_file_permission(args.inc_types, 'inc-types')
+        target_path = output_path.joinpath('inc-types.fasta')
+        shutil.copyfile(inc_types_path, target_path)
+        log.debug('Copied file from %s to %s', inc_types_path, target_path)
