@@ -46,11 +46,12 @@ def characterize():
         log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
 
     # update json
+    print('Writing JSON...')
     tio.export_json(existing_data, db_path)
 
 
 def gc_content(sequence):
-    # count C and G occurenxes
+    # count C and G occurences
     c_content = sequence.count('C')
     g_content = sequence.count('G')
     gc_combined = c_content + g_content
