@@ -3,6 +3,8 @@ import sys
 
 import pyrodigal
 
+import multiprocessing as mp
+
 import tadrep.io as tio
 import tadrep.config as cfg
 import tadrep.utils as tu
@@ -29,25 +31,37 @@ def characterize():
     # search inc_types for all plamids
     inc_types_per_plasmid = search_inc_types(fasta_path)
 
-    for plasmid in plasmids.values():
-        # set length
-        plasmid['length'] = len(plasmid['sequence'])
+    #plasmids = calc_features(plasmids.values(), inc_types_per_plasmid)
+    values = ((plasmid, inc_types_per_plasmid) for plasmid in plasmids.values())
+    with mp.Pool(cfg.threads) as pool:
+        plasmids_summary = pool.starmap(calc_features, values)
 
-        # set gc_content
-        plasmid['gc_content'] = gc_content(plasmid['sequence'])
-
-        # set individual INC_types
-        plasmid['inc_types'] = inc_types_per_plasmid.get(plasmid['id'], [])
-
-        # gene prediction (pyrodigal)
-        plasmid['cds'] = gene_prediction(plasmid['sequence'])
-
-        cfg.verboseprint(f"Plasmid: {plasmid['id']:20} Length: {plasmid['length']:7} GC: {plasmid['gc_content']:.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
-        log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
+    for plasmid in plasmids_summary:
+        plasmids[plasmid['id']] = plasmid
 
     # update json
     print('Writing JSON...')
     tio.export_json(existing_data, db_path)
+
+
+def calc_features(plasmid, inc_types_per_plasmid):
+
+    # set length
+    plasmid['length'] = len(plasmid['sequence'])
+
+    # set gc_content
+    plasmid['gc_content'] = gc_content(plasmid['sequence'])
+
+    # set individual INC_types
+    plasmid['inc_types'] = inc_types_per_plasmid.get(plasmid['id'], [])
+
+    # gene prediction (pyrodigal)
+    plasmid['cds'] = gene_prediction(plasmid['sequence'])
+
+    cfg.verboseprint(f"Plasmid: {plasmid['id']:20} Length: {plasmid['length']:7} GC: {plasmid['gc_content']:.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
+    log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
+
+    return plasmid
 
 
 def gc_content(sequence):
