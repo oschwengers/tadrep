@@ -137,13 +137,17 @@ def setup_extraction(args):
 
 
 def setup_characterize(args):
+
     if(args.database):
-        database_path = tu.check_file_permission(args.database, 'database')
-        json_path = output_path.joinpath('db.json')
-        shutil.copyfile(database_path, json_path)
-        log.debug('Copied file from %s to %s', database_path, json_path)
+        json_path = tu.check_file_permission(args.database, 'database')
+        target_path = output_path.joinpath('db.json')
+        shutil.copyfile(json_path, target_path)
+        verboseprint(f'Imported JSON from {json_path}')
+        log.debug('Copied file from %s to %s', json_path, target_path)
+
     if(args.inc_types):
         inc_types_path = tu.check_file_permission(args.inc_types, 'inc-types')
         target_path = output_path.joinpath('inc-types.fasta')
         shutil.copyfile(inc_types_path, target_path)
+        verboseprint(f'Imported inc-types from {inc_types_path}')
         log.debug('Copied file from %s to %s', inc_types_path, target_path)
