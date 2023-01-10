@@ -88,9 +88,9 @@ def export_json(data, json_path):
 
 def load_data(json_path):
     if json_path.is_file():
-        log.info('%s existing', json_path)
+        log.debug('%s existing', json_path)
         plasmid_dict = import_json(json_path)
     else:
-        log.info('%s NOT existing', json_path)
+        log.debug('%s NOT existing', json_path)
         plasmid_dict = {}
     return plasmid_dict
