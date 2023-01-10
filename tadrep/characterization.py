@@ -20,9 +20,12 @@ def characterize():
     plasmids = existing_data.get('plasmids', {})
 
     # check if data is available
-    if(not existing_data or not plasmids):
+    if(not existing_data):
         log.error('Failed to load data from %s', db_path)
         sys.exit(f'ERROR: Failed to load data from {db_path}!')
+    if(not plasmids):
+        log.error('Failed to load Plasmids from %s', db_path)
+        sys.exit(f'ERROR: Failed to load Plasmids from {db_path}! Maybe file is empty?')
 
     # write multifasta
     fasta_path = cfg.output_path.joinpath('db.fasta')
@@ -31,7 +34,7 @@ def characterize():
     # search inc_types for all plamids
     inc_types_per_plasmid = search_inc_types(fasta_path)
 
-    #plasmids = calc_features(plasmids.values(), inc_types_per_plasmid)
+    # create pool for multiprocessing
     values = ((plasmid, inc_types_per_plasmid) for plasmid in plasmids.values())
     with mp.Pool(cfg.threads) as pool:
         plasmids_summary = pool.starmap(calc_features, values)
