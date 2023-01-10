@@ -138,6 +138,7 @@ def main():
         log.info('TSV file: name=%s, path=%s', tsv_output_path.stem, tsv_output_path)
         du.create_tsv(fasta_tmp_path, tsv_output_path)
 
+        print('Create JSON file...')
         json_path = db_output_path.joinpath(f'{db_name}.json')
         log.info('JSON file: name=%s, path=%s', json_path.stem, json_path)
         db_plasmids = tio.import_sequences(fasta_tmp_path, sequence=True)

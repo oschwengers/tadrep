@@ -57,28 +57,28 @@ def main():
     verboseprint(f'\t# threads: {cfg.threads}')
 
     if(args.subcommand == "extraction"):
-        verboseprint('\nExtraction started...')
+        print('\nExtraction started...')
         cfg.setup_extraction(args)
         te.extract()
 
     elif(args.subcommand == "characterization"):
-        verboseprint('\nCharacterization started...')
+        print('\nCharacterization started...')
         cfg.setup_characterize(args)
         tc.characterize()
 
     elif(args.subcommand == "clustering"):
-        verboseprint('\nClustering started...')
+        print('\nClustering started...')
         tcl.cluster()
 
     elif(args.subcommand == "detection"):
         cfg.setup_detection(args)
-        verboseprint(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
+        print(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
 
         verboseprint('\nDetection and reconstruction started ...')
         td.detect_and_reconstruct()
 
     elif(args.subcommand == "visualization"):
-        verboseprint('\nVisualization started...')
+        print('\nVisualization started...')
         tv.create_plots()
 
     # remove tmp dir
