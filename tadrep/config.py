@@ -138,8 +138,8 @@ def setup_extraction(args):
 
 def setup_characterize(args):
 
-    if(args.database):
-        json_path = tu.check_file_permission(args.database, 'database')
+    if(args.json):
+        json_path = tu.check_file_permission(args.json, 'database')
         target_path = output_path.joinpath('db.json')
         shutil.copyfile(json_path, target_path)
         verboseprint(f'Imported JSON from {json_path}')
