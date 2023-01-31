@@ -26,21 +26,21 @@ CONTIG_HEAD_MODIFIER = 200                                                  # Mo
 def create_plots():
     json_file = cfg.output_path.joinpath('plasmids.json')
     log.info('detected json-file=%s', json_file)
-    
+
     plasmids = tio.import_json(json_file)
     log.debug('import file=%s', json_file)
     for plasmid_id in plasmids.keys():
         for draft_genome in plasmids[plasmid_id]['found_in'].keys():
             log.debug('plotting plasmid=%s, genome=%s, hits=%i', plasmid_id, draft_genome, len(plasmids[plasmid_id]['found_in'][draft_genome]))
-            plot_file_path = cfg.output_path.joinpath(f"{draft_genome}-{plasmids[plasmid_id]['reference']}.pdf")
+            plot_file_path = cfg.output_path.joinpath(f"{draft_genome}-{plasmids[plasmid_id]['old_id']}.pdf")
             create_plasmid_figure(plasmids[plasmid_id], plasmids[plasmid_id]['found_in'][draft_genome], json_file.stem, plot_file_path)
 
 
 def create_plasmid_figure(plasmid, plasmid_hits, file_name, output_path):
     plasmid_head_length = int(plasmid['length'] / PLASMID_HEAD_MODIFIER)
-    log.info('create graphic: plasmid=%s, head length=%i, output_path=%s', plasmid['id'], plasmid_head_length, output_path)
+    log.info('create graphic: plasmid=%s, head length=%i, output_path=%s', plasmid['old_id'], plasmid_head_length, output_path)
 
-    plasmid_track = create_part_config(plasmid['id'], 0, plasmid['length'], label=True, head_length=plasmid_head_length)
+    plasmid_track = create_part_config(plasmid['old_id'], 0, plasmid['length'], label=True, head_length=plasmid_head_length)
     combined_tracks, num_contig_tracks = create_contig_tracks(sorted(plasmid_hits, key=lambda k: k['reference_plasmid_start']), plasmid['length'])
 
     figure, grid = plot_setup(num_contig_tracks + 1, 2)
