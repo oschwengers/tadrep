@@ -1,6 +1,5 @@
 import tadrep.config as cfg
 import tadrep.io as tio
-import tadrep.visuals as tv
 import tadrep.blast as tb
 import tadrep.plasmids as tp
 
@@ -19,24 +18,17 @@ def detect_and_reconstruct():
     # - write multi Fasta file
     ############################################################################
 
-    db_path = cfg.output_path.joinpath('db.json')
-    db_data = tio.load_data(db_path)
-
-    db_plasmids = db_data.get('plasmids', {})
-    db_cluster = db_data.get('cluster', [])
-
-    if(not db_data):
-        log.debug("No data in %s", db_path)
-        sys.exit(f"ERROR: No data available in {db_path}")
+    db_plasmids = cfg.db_data.get('plasmids', {})
+    db_cluster = cfg.db_data.get('cluster', [])
 
     if(not db_plasmids):
-        log.debug("No plasmids in %s !", db_path)
-        sys.exit(f"ERROR: No plasmids in database {db_path}!")
-    
+        log.debug("No plasmids in %s !", cfg.db_path)
+        sys.exit(f"ERROR: No plasmids in database {cfg.db_path}!")
+
     if(not db_cluster):
-        log.debug("No Clusters in %s!", db_path)
-        sys.exit(f"ERROR: No cluster in database {db_path}")
-    
+        log.debug("No Clusters in %s!", cfg.db_path)
+        sys.exit(f"ERROR: No cluster in database {cfg.db_path}")
+
     log.info("Loaded %d cluster with %d plasmids", len(db_cluster), len(db_plasmids.keys()))
     cfg.verboseprint("Loaded data:")
     cfg.verboseprint(f"\t{len(db_cluster)} cluster")
@@ -47,10 +39,11 @@ def detect_and_reconstruct():
     for cluster in db_cluster:
         rep_id = cluster['representative']
         reference_plasmids[rep_id] = db_plasmids[rep_id]
-    
-    # write multifasta for blast search
-    fasta_path = cfg.output_path.joinpath("db.fasta")
-    tio.export_sequences(reference_plasmids.values(), fasta_path)
+
+    if(not cfg.blastdb_path):
+        # write multifasta for blast search
+        fasta_path = cfg.output_path.joinpath("db.fasta")
+        tio.export_sequences(reference_plasmids.values(), fasta_path)
 
 
     ############################################################################
@@ -121,7 +114,7 @@ def pooling(genome, reference_plasmids, index):
         for plasmid in detected_plasmids:
 
             plasmid_contigs_sorted = tp.reconstruct_plasmid(plasmid, contigs)
-            
+
             prefix = f"{cfg.prefix}-{sample}-{plasmid['reference']}" if cfg.prefix else f"{sample}-{plasmid['reference']}"
             plasmid_contigs_path = cfg.output_path.joinpath(f'{prefix}-contigs.fna')
             plasmid_pseudosequence_path = cfg.output_path.joinpath(f'{prefix}-pseudo.fna')
@@ -159,7 +152,7 @@ def write_cohort_table(plasmid_dict):
             plasmid_order.append(plasmid_dict[plasmid])
             fh.write(f'\t{plasmid}')
         fh.write('\n')
-        
+
         transposed_plasmid_order = np.array(plasmid_order).T.tolist()  # transpose information for easier writing
         for num_genome, genome in enumerate(cfg.genome_path):  # mark which plasmid was found for each draft genome
             sample = genome.stem
