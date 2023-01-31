@@ -104,6 +104,7 @@ def setup_detection(args):
         sys.exit(f"ERROR: No data available in {db_path}")
 
     blastdb_path = db_data.get('db_path', '')
+    log.debug("BlastDB path = %s", blastdb_path)
 
     # workflow configuration
     global min_contig_coverage, min_contig_identity, min_plasmid_coverage, min_plasmid_identity, gap_sequence_length

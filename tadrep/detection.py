@@ -35,14 +35,19 @@ def detect_and_reconstruct():
     cfg.verboseprint(f"\t{len(db_cluster)} cluster")
     cfg.verboseprint(f"\t{len(db_plasmids.keys())} plasmids total")
 
-    reference_plasmids = {}
+    representative_ids = []
     lookup_plasmid_ids = {}
 
     for cluster in db_cluster:
         rep_id = cluster['representative']
-        reference_plasmids[rep_id] = db_plasmids[rep_id]
+        representative_ids.append(rep_id)
         if(cfg.blastdb_path):
             lookup_plasmid_ids[db_plasmids[rep_id]['old_id']] = rep_id
+
+    reference_plasmids = {id: db_plasmids[id] for id in representative_ids}
+
+    cfg.verboseprint(f"Found {len(representative_ids)} representative plasmid(s)")
+    log.info("Found %d representative plasmid(s)", len(representative_ids))
 
     if(not cfg.blastdb_path):
         # write multifasta for blast search
@@ -58,7 +63,7 @@ def detect_and_reconstruct():
     plasmid_string_summary = []
     plasmid_detected = {}
 
-    verboseprint('Analyze genome sequences...')
+    cfg.verboseprint('Analyze genome sequences...')
     values = ((genome_path, reference_plasmids, genome_index, lookup_plasmid_ids) for genome_index, genome_path in enumerate(cfg.genome_path))
     with mp.Pool(cfg.threads) as pool:
         genomes_summary = pool.starmap(pooling, values)
