@@ -1,9 +1,8 @@
 import logging
 import sys
+import multiprocessing as mp
 
 import pyrodigal
-
-import multiprocessing as mp
 
 import tadrep.io as tio
 import tadrep.config as cfg
@@ -36,7 +35,7 @@ def characterize():
 
     # create pool for multiprocessing
     values = ((plasmid, inc_types_per_plasmid) for plasmid in plasmids.values())
-    with mp.Pool(cfg.threads) as pool:
+    with mp.Pool(cfg.threads, maxtasksperchild=100) as pool:
         plasmids_summary = pool.starmap(calc_features, values)
 
     for plasmid in plasmids_summary:
@@ -61,7 +60,7 @@ def calc_features(plasmid, inc_types_per_plasmid):
     # gene prediction (pyrodigal)
     plasmid['cds'] = gene_prediction(plasmid['sequence'])
 
-    cfg.verboseprint(f"Plasmid: {plasmid['id']:20} Length: {plasmid['length']:7} GC: {plasmid['gc_content']:.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
+    cfg.verboseprint(f"Plasmid: {plasmid['id']:7} Length: {plasmid['length']:8} GC: {plasmid['gc_content']:.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
     log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
 
     return plasmid
@@ -111,7 +110,7 @@ def search_inc_types(db_path):
                 'strand': '+' if cols[4] == 'plus' else '-',
                 'identity': float(cols[5]) / 100,
                 'coverage': float(cols[6]) / 100,
-                'bitscore': int(cols[7])
+                'bitscore': int(float(cols[7]))
             }
             plasmid_id = cols[1]
             if(hit['coverage'] >= 0.6):
