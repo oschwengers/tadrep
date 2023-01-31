@@ -11,12 +11,13 @@ log = logging.getLogger('BLAST')
 # Setup and run blastn search
 ############################################################################
 def search_contigs(genome_path, blast_output_path):
-    db_target_path = cfg.output_path.joinpath("db.fasta")
+    db_target = '-db' if cfg.blastdb_path else '-subject'
+    db_target_path = cfg.blastdb_path if cfg.blastdb_path else cfg.output_path.joinpath("db.fasta")
 
     cmd_blast = [
         'blastn',
         '-query', str(genome_path),
-        '-subject', str(db_target_path),
+        db_target, str(db_target_path),
         '-culling_limit', '1',
         '-evalue', '1E-5',
         '-num_threads', str(cfg.blast_threads),
@@ -58,12 +59,12 @@ def search_contigs(genome_path, blast_output_path):
 ############################################################################
 # Parse and filter contig hits
 ############################################################################
-def filter_contig_hits(genome, raw_hits, reference_plasmids):
+def filter_contig_hits(genome, raw_hits, reference_plasmids, lookup_plasmid_ids):
     filtered_hits = 0
     filtered_hits_per_ref_plasmid = {}
     edge_hits_per_ref_plasmid = {}
     for hit in raw_hits:
-        reference_plasmid_id = hit['reference_plasmid_id']
+        reference_plasmid_id = lookup_plasmid_ids[hit['reference_plasmid_id']] if cfg.blastdb_path else hit['reference_plasmid_id']
         if(hit['perc_identity'] >= cfg.min_contig_identity):
             reference_plasmid = reference_plasmids[reference_plasmid_id]
             if(hit['reference_plasmid_start'] == 1 or hit['reference_plasmid_end'] == reference_plasmid['length']):  # hit at plasmid edge either 5' or 3', store for combined coverage check
