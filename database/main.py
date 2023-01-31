@@ -152,7 +152,9 @@ def main():
             json_plasmids[plasmid_count] = plasmid
 
             plasmid_count += 1
-        db_data = {'plasmids': json_plasmids}
+        db_data = {
+            'plasmids': json_plasmids,
+            'db_path': str(db_file_name)}
         tio.export_json(db_data, json_path)
 
         print(f'Database successfully created\nDatabase path: {db_output_path}')
