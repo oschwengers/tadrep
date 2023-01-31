@@ -7,6 +7,7 @@ import shutil
 from pathlib import Path
 
 import tadrep.utils as tu
+import tadrep.io as tio
 
 
 log = logging.getLogger('CONFIG')
@@ -26,6 +27,9 @@ prefix = None
 # Input
 genome_path = []
 summary_path = None
+db_path = None
+db_data = None
+blastdb_path = None
 
 # workflow configuration
 min_contig_coverage = None
@@ -79,7 +83,7 @@ def setup(args):
 
 def setup_detection(args):
     # input / output path configurations
-    global genome_path, summary_path
+    global genome_path, summary_path, db_path, db_data, blastdb_path
 
     if(not args.genome):
         log.error('genome file not provided!')
@@ -89,6 +93,17 @@ def setup_detection(args):
 
     summary_path = output_path.joinpath('summary.tsv')
     log.info('summary_path=%s', summary_path)
+
+    db_path = output_path.joinpath('db.json')
+    log.info('db_path=%s', db_path)
+
+    db_data = tio.load_data(db_path)
+
+    if(not db_data):
+        log.debug("No data in %s", db_path)
+        sys.exit(f"ERROR: No data available in {db_path}")
+
+    blastdb_path = db_data.get('db_path', '')
 
     # workflow configuration
     global min_contig_coverage, min_contig_identity, min_plasmid_coverage, min_plasmid_identity, gap_sequence_length
