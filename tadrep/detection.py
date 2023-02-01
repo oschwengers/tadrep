@@ -19,32 +19,30 @@ def detect_and_reconstruct():
     # - write multi Fasta file
     ############################################################################
 
-    db_plasmids = cfg.db_data.get('plasmids', {})
-    db_cluster = cfg.db_data.get('cluster', [])
-
-    if(not db_plasmids):
+    if(not cfg.db_data.get('plasmids', {})):
         log.debug("No plasmids in %s !", cfg.db_path)
         sys.exit(f"ERROR: No plasmids in database {cfg.db_path}!")
 
-    if(not db_cluster):
+    if(not cfg.db_data.get('cluster', [])):
         log.debug("No Clusters in %s!", cfg.db_path)
         sys.exit(f"ERROR: No cluster in database {cfg.db_path}")
 
-    log.info("Loaded %d cluster with %d plasmids", len(db_cluster), len(db_plasmids.keys()))
+    log.info("Loaded %d cluster with %d plasmids", len(cfg.db_data['cluster']), len(cfg.db_data['plasmids'].keys()))
     cfg.verboseprint("Loaded data:")
-    cfg.verboseprint(f"\t{len(db_cluster)} cluster")
-    cfg.verboseprint(f"\t{len(db_plasmids.keys())} plasmids total")
+    cfg.verboseprint(f"\t{len(cfg.db_data['cluster'])} cluster")
+    cfg.verboseprint(f"\t{len(cfg.db_data['plasmids'].keys())} plasmids total")
 
     representative_ids = []
     lookup_plasmid_ids = {}
 
-    for cluster in db_cluster:
+    # Get representatives from JSON file
+    for cluster in cfg.db_data['cluster']:
         rep_id = cluster['representative']
         representative_ids.append(rep_id)
         if(cfg.blastdb_path):
-            lookup_plasmid_ids[db_plasmids[rep_id]['old_id']] = rep_id
+            lookup_plasmid_ids[cfg.db_data['plasmids'][rep_id]['old_id']] = rep_id      # lookuptable for old_id(plasmid id from file) and new id (given by tadrep)
 
-    reference_plasmids = {id: db_plasmids[id] for id in representative_ids}
+    reference_plasmids = {id: cfg.db_data['plasmids'][id] for id in representative_ids}
 
     cfg.verboseprint(f"Found {len(representative_ids)} representative plasmid(s)")
     log.info("Found %d representative plasmid(s)", len(representative_ids))
@@ -75,7 +73,7 @@ def detect_and_reconstruct():
                 plasmid_detected[plasmid_id] = {k: plasmid[k] for k in ['id', 'reference', 'length']}
                 plasmid_detected[plasmid_id]['found_in'] = {}
             plasmid_detected[plasmid_id]['found_in'][plasmid['genome']] = plasmid['hits']
-            plasmid_detected[plasmid_id]['old_id'] = db_plasmids[plasmid_id]['old_id']
+            plasmid_detected[plasmid_id]['old_id'] = cfg.db_data['plasmids'][plasmid_id]['old_id']
 
             # Create string for plasmid summary
             plasmid_string_summary.append(f"{plasmid['genome']}\t{plasmid['reference']}\t{plasmid['coverage']:.3f}\t{plasmid['identity']:.3f}\t{len(plasmid['hits'])}\t{','.join([hit['contig_id'] for hit in plasmid['hits']])}\n")
