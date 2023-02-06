@@ -59,12 +59,12 @@ def search_contigs(genome_path, blast_output_path):
 ############################################################################
 # Parse and filter contig hits
 ############################################################################
-def filter_contig_hits(genome, raw_hits, reference_plasmids, lookup_plasmid_ids):
+def filter_contig_hits(genome, raw_hits, reference_plasmids):
     filtered_hits = 0
     filtered_hits_per_ref_plasmid = {}
     edge_hits_per_ref_plasmid = {}
     for hit in raw_hits:
-        reference_plasmid_id = lookup_plasmid_ids[hit['reference_plasmid_id']] if cfg.blastdb_path else hit['reference_plasmid_id']
+        reference_plasmid_id = hit['reference_plasmid_id']
         if(hit['perc_identity'] >= cfg.min_contig_identity):
             reference_plasmid = reference_plasmids[reference_plasmid_id]
             if(hit['reference_plasmid_start'] == 1 or hit['reference_plasmid_end'] == reference_plasmid['length']):  # hit at plasmid edge either 5' or 3', store for combined coverage check

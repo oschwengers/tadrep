@@ -142,16 +142,12 @@ def main():
         json_path = db_output_path.joinpath(f'{db_name}.json')
         log.info('JSON file: name=%s, path=%s', json_path.stem, json_path)
         db_plasmids = tio.import_sequences(fasta_tmp_path, sequence=True)
-        plasmid_count = 1
         json_plasmids = {}
 
         for plasmid in db_plasmids.values():
             plasmid['file'] = db_name
-            plasmid['old_id'] = plasmid['id']
-            plasmid['id'] = str(plasmid_count)
-            json_plasmids[plasmid_count] = plasmid
+            json_plasmids[plasmid['id']] = plasmid
 
-            plasmid_count += 1
         db_data = {
             'plasmids': json_plasmids,
             'db_path': str(db_file_name)}
