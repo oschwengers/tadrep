@@ -60,7 +60,7 @@ def calc_features(plasmid, inc_types_per_plasmid):
     # gene prediction (pyrodigal)
     plasmid['cds'] = gene_prediction(plasmid['sequence'])
 
-    cfg.verboseprint(f"Plasmid: {plasmid['id']:7} Length: {plasmid['length']:8} GC: {plasmid['gc_content']:.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
+    cfg.verboseprint(f"Plasmid: {plasmid['id']:10} Length: {plasmid['length']:8} GC: {plasmid['gc_content']:3.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
     log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
 
     return plasmid
@@ -80,7 +80,8 @@ def gc_content(sequence):
 
 def search_inc_types(db_path):
     """Search for incompatibility motifs."""
-    if(not db_path.is_file()):
+    inc_types = cfg.output_path.joinpath('inc-types.fasta')
+    if(not inc_types.is_file()):
         log.debug("Inc_types reference not found!")
         sys.exit("ERROR: Inc_types reference not found! Please import with '--inc-types' param!")
 
@@ -88,7 +89,7 @@ def search_inc_types(db_path):
 
     inc_types_cmd = [
         'blastn',
-        '-query', str(cfg.output_path.joinpath('inc-types.fasta')),
+        '-query', str(inc_types),
         '-subject', str(db_path),
         '-num_threads', str(cfg.threads),
         '-perc_identity', '90',

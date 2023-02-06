@@ -20,7 +20,6 @@ def extract():
     log.info('Loaded %d previously extracted plasmids from file %s', number_of_plasmids, json_output_path)
 
     new_plasmids = {}
-    number_of_plasmids += 1
 
     # load sequences
     for input_file in cfg.files_to_extract:
@@ -49,11 +48,7 @@ def extract():
         log.info('File: %s, plasmids detected: %d', input_file.name, len(plasmids))
         for plasmid in plasmids.values():
             plasmid['file'] = input_file.name
-            plasmid['old_id'] = plasmid['id']
-            plasmid['id'] = str(number_of_plasmids)
-
-            new_plasmids[number_of_plasmids] = plasmid
-            number_of_plasmids += 1
+            new_plasmids[plasmid['id']] = plasmid
 
     # update existing_plasmid_dict
     plasmid_dict.update(new_plasmids)

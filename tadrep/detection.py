@@ -33,14 +33,11 @@ def detect_and_reconstruct():
     cfg.verboseprint(f"\t{len(cfg.db_data['plasmids'].keys())} plasmids total")
 
     representative_ids = []
-    lookup_plasmid_ids = {}
 
     # Get representatives from JSON file
     for cluster in cfg.db_data['cluster']:
         rep_id = cluster['representative']
         representative_ids.append(rep_id)
-        if(cfg.blastdb_path):
-            lookup_plasmid_ids[cfg.db_data['plasmids'][rep_id]['old_id']] = rep_id      # lookuptable for old_id(plasmid id from file) and new id (given by tadrep)
 
     reference_plasmids = {id: cfg.db_data['plasmids'][id] for id in representative_ids}
 
@@ -62,7 +59,7 @@ def detect_and_reconstruct():
     plasmid_detected = {}
 
     cfg.verboseprint('Analyze genome sequences...')
-    values = ((genome_path, reference_plasmids, genome_index, lookup_plasmid_ids) for genome_index, genome_path in enumerate(cfg.genome_path))
+    values = ((genome_path, reference_plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
     with mp.Pool(cfg.threads) as pool:
         genomes_summary = pool.starmap(pooling, values)
 
@@ -73,7 +70,7 @@ def detect_and_reconstruct():
                 plasmid_detected[plasmid_id] = {k: plasmid[k] for k in ['id', 'reference', 'length']}
                 plasmid_detected[plasmid_id]['found_in'] = {}
             plasmid_detected[plasmid_id]['found_in'][plasmid['genome']] = plasmid['hits']
-            plasmid_detected[plasmid_id]['old_id'] = cfg.db_data['plasmids'][plasmid_id]['old_id']
+            plasmid_detected[plasmid_id]['id'] = cfg.db_data['plasmids'][plasmid_id]['id']
 
             # Create string for plasmid summary
             plasmid_string_summary.append(f"{plasmid['genome']}\t{plasmid['reference']}\t{plasmid['coverage']:.3f}\t{plasmid['identity']:.3f}\t{len(plasmid['hits'])}\t{','.join([hit['contig_id'] for hit in plasmid['hits']])}\n")
@@ -96,7 +93,7 @@ def detect_and_reconstruct():
         json_path = cfg.output_path.joinpath("plasmids.json")
         tio.export_json(plasmid_detected, json_path)
 
-def pooling(genome, reference_plasmids, index, lookup_plasmid_ids):
+def pooling(genome, reference_plasmids, index):
     log = logging.getLogger('PROCESS')
 
     # Import draft genome contigs
@@ -110,7 +107,7 @@ def pooling(genome, reference_plasmids, index, lookup_plasmid_ids):
     sample = genome.stem
     blast_output_path = cfg.tmp_path.joinpath(f'{sample}-{index}-blastn.tsv')
     hits = tb.search_contigs(genome, blast_output_path)  # plasmid raw hits
-    filtered_hits = tb.filter_contig_hits(sample, hits, reference_plasmids, lookup_plasmid_ids)  # plasmid hits filtered by coverage and identity
+    filtered_hits = tb.filter_contig_hits(sample, hits, reference_plasmids)  # plasmid hits filtered by coverage and identity
     detected_plasmids = tp.detect_reference_plasmids(sample, filtered_hits, reference_plasmids)  # detect reference plasmids above cov/id thresholds
 
     # Write output files
