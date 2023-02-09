@@ -43,7 +43,7 @@ def parse_arguments():
     subparsers = parser.add_subparsers(dest='subcommand')
 
     # extraction parser
-    extraction_parser = subparsers.add_parser('extraction', help='Extract unique plasmid sequences')
+    extraction_parser = subparsers.add_parser('extract', help='Extract unique plasmid sequences')
 
     arg_group_io = extraction_parser.add_argument_group('Input')
     arg_group_io.add_argument('--type', '-t', action='store', default='genome', choices=['genome', 'plasmid', 'draft'], help='Type of input files')
@@ -52,14 +52,14 @@ def parse_arguments():
     arg_group_io.add_argument('--discard-longest', '-d', action='store', type=int, default=1, help='Discard n longest sequences in output')
 
     # characterization parser
-    characterization_parser = subparsers.add_parser('characterization', help='Identify plasmids with GC content, Inc types, conjugation genes')
+    characterization_parser = subparsers.add_parser('characterize', help='Identify plasmids with GC content, Inc types, conjugation genes')
     
     arg_group_char = characterization_parser.add_argument_group('Input')
     arg_group_char.add_argument('--json', action='store', default=None, dest='json', help='Import json file from a given database path into working directory')
     arg_group_char.add_argument('--inc-types', action='store', default=None, help='Import inc-types from given path into working directory')
 
     # clustering parser
-    clustering_parser = subparsers.add_parser('clustering', help='Cluster related plasmids')
+    clustering_parser = subparsers.add_parser('cluster', help='Cluster related plasmids')
     
     arg_group_parameters = clustering_parser.add_argument_group('Parameter')
     arg_group_parameters.add_argument('--min-coverage', action='store', type=int, default=90, choices=(1,101), metavar='[1-100]', dest='min_coverage', help='Minimal plasmid coverage (default = 90%%)')
@@ -67,7 +67,7 @@ def parse_arguments():
 
 
     # detection parser
-    detection_parser = subparsers.add_parser('detection', help='Detect and reconstruct plasmids in draft genomes')
+    detection_parser = subparsers.add_parser('detect', help='Detect and reconstruct plasmids in draft genomes')
 
     arg_group_io = detection_parser.add_argument_group('Input / Output')
     arg_group_io.add_argument('--genome', '-g', action='store', default=None, nargs="+", help='Draft genome path')
@@ -80,7 +80,7 @@ def parse_arguments():
     arg_group_parameters.add_argument('--gap-sequence-length', action='store', type=is_positive, default=10, dest='gap_sequence_length', help="Gap sequence N length (default = 10)")
 
     # visualization parser
-    visualization_parser = subparsers.add_parser('visualization', help='Visualize plasmid coverage of contigs')
+    visualization_parser = subparsers.add_parser('visualize', help='Visualize plasmid coverage of contigs')
     
     arg_group_plot = visualization_parser.add_argument_group('Plot parameter')
     arg_group_plot.add_argument('--height', action='store', default=0.5,  help='Height per track')
