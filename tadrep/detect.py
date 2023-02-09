@@ -9,7 +9,6 @@ import sys
 import multiprocessing as mp
 
 log = logging.getLogger('DETECTION')
-verboseprint = print if cfg.verbose else lambda *a, **k: None
 
 
 def detect_and_reconstruct():
