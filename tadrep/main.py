@@ -7,10 +7,10 @@ from pathlib import Path
 import tadrep
 import tadrep.config as cfg
 import tadrep.utils as tu
-import tadrep.extraction as te
-import tadrep.clustering as tcl
-import tadrep.characterization as tc
-import tadrep.detection as td
+import tadrep.extract as te
+import tadrep.cluster as tcl
+import tadrep.characterize as tc
+import tadrep.detect as td
 import tadrep.visuals as tv
 
 
