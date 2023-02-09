@@ -48,13 +48,12 @@ def main():
     ############################################################################
     cfg.setup(args)  # check parameters and prepare global configuration
 
-    verboseprint = print if cfg.verbose else lambda *a, **k: None
-    verboseprint(f'TaDReP v{tadrep.__version__}')
-    verboseprint('Options and arguments:')
-    verboseprint(f'\toutput: {cfg.output_path}')
-    verboseprint(f'\tprefix: {cfg.prefix}')
-    verboseprint(f'\ttmp directory: {cfg.tmp_path}')
-    verboseprint(f'\t# threads: {cfg.threads}')
+    cfg.verboseprint(f'TaDReP v{tadrep.__version__}')
+    cfg.verboseprint('Options and arguments:')
+    cfg.verboseprint(f'\toutput: {cfg.output_path}')
+    cfg.verboseprint(f'\tprefix: {cfg.prefix}')
+    cfg.verboseprint(f'\ttmp directory: {cfg.tmp_path}')
+    cfg.verboseprint(f'\t# threads: {cfg.threads}')
 
     if(args.subcommand == "extract"):
         print('\nExtraction started...')
@@ -74,7 +73,7 @@ def main():
         cfg.setup_detection(args)
         print(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
 
-        verboseprint('\nDetection and reconstruction started ...')
+        print('\nDetection and reconstruction started ...')
         td.detect_and_reconstruct()
 
     elif(args.subcommand == "visualize"):
