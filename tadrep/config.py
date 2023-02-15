@@ -59,11 +59,10 @@ size_ratio = 1.0
 
 labelsize = 15
 labelrotation = 45
-labelvpos = 'strand'
 labelhpos = 'center'
 labelha = 'left'
 
-ignore_ratio = 1
+omit_ratio = 1
 
 def setup(args):
     """Test environment and build a runtime configuration."""
@@ -197,15 +196,15 @@ def setup_visualize(args):
     log.info('plotstyle: %s, labelcolor: %s, facecolor: %s, linewdith: %f, arrow_shaft_ratio: %f, size_ratio: %f',
     plotstyle, labelcolor, facecolor, linewidth, arrow_shaft_ratio, size_ratio)
 
-    global labelsize, labelrotation, labelvpos, labelhpos, labelha
+    global labelsize, labelrotation, labelhpos, labelha
     labelsize = args.labelsize
     labelrotation = args.labelrotation
-    labelvpos = args.labelvpos
     labelhpos = args.labelhpos
     labelha = args.labelha
-    log.info('labelsize: %d, labelrotation: %d, labelvpos: %s, labelhpos: %s, labelha: %s',
-    labelsize, labelrotation, labelvpos, labelhpos, labelha)
+    log.info('labelsize: %d, labelrotation: %d, labelhpos: %s, labelha: %s',
+    labelsize, labelrotation, labelhpos, labelha)
 
-    global ignore_ratio
-    ignore_ratio = args.ignore_ratio
-    log.info('ignore_ratio: %d', ignore_ratio)
+    global omit_ratio
+    omit_ratio = args.ignore_ratio
+    log.info('omit_ratio: %d', omit_ratio)
+
