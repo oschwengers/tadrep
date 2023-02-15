@@ -5,6 +5,7 @@ from pygenomeviz import GenomeViz
 import tadrep.config as cfg
 import tadrep.io as tio
 
+logging.getLogger('matplotlib.font_manager').disabled = True
 log = logging.getLogger('VISUALIZE')
 
 
