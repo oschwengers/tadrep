@@ -97,7 +97,7 @@ def parse_arguments():
     arg_group_label.add_argument('--labelha', action='store', default='left', dest='labelha', choices=['left', 'center', 'right'], help='Contig label horizontal alignment')
 
     arg_group_omit = visualization_parser.add_argument_group('Omit')
-    arg_group_omit.add_argument('--omit_ratio', action='store', default=1, type=int, choices=range(0, 101), dest='omit_ratio', help='Omit contigs shorter than X percent of plasmid length from plot')
+    arg_group_omit.add_argument('--omit_ratio', action='store', default=1, type=int, choices=range(0, 101), metavar='[0-100]', dest='omit_ratio', help='Omit contigs shorter than X percent of plasmid length from plot')
 
     return parser.parse_args()
 
