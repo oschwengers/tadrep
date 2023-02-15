@@ -205,6 +205,6 @@ def setup_visualize(args):
     labelsize, labelrotation, labelhpos, labelha)
 
     global omit_ratio
-    omit_ratio = args.ignore_ratio
+    omit_ratio = args.omit_ratio
     log.info('omit_ratio: %d', omit_ratio)
 
