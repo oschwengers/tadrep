@@ -78,6 +78,7 @@ def main():
 
     elif(args.subcommand == "visualize"):
         print('\nVisualization started...')
+        cfg.setup_visualize(args)
         tv2.plot()
 
     # remove tmp dir
