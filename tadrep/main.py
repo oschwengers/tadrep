@@ -11,8 +11,7 @@ import tadrep.extract as te
 import tadrep.cluster as tcl
 import tadrep.characterize as tc
 import tadrep.detect as td
-#import tadrep.visuals as tv
-import tadrep.visualize as tv2
+import tadrep.visualize as tv
 
 def main():
     args = tu.parse_arguments()
@@ -79,7 +78,7 @@ def main():
     elif(args.subcommand == "visualize"):
         print('\nVisualization started...')
         cfg.setup_visualize(args)
-        tv2.plot()
+        tv.plot()
 
     # remove tmp dir
     shutil.rmtree(str(cfg.tmp_path))
