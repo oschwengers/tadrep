@@ -40,9 +40,11 @@ def create_figure(plasmid_id, plasmid_length, hits, output_path):
     gv = GenomeViz(tick_style='axis')
     track = gv.add_feature_track(plasmid_id, plasmid_length)
     min_size = int(plasmid_length * (IGNORE_RATIO / 100))
+    log.info('Skipping contigs shorter than: %s', min_size)
+    
     for hit in hits:
         if(hit['length'] < min_size):
-            print(hit['length'], " < ", min_size)
+            log.info('Skipped contig %s, length: %d', hit['contig_id'], hit['length'])
             continue
         strand = 1 if hit['strand'] == '+' else -1
         track.add_feature(hit['reference_plasmid_start'], hit['reference_plasmid_end'], strand, label=hit['contig_id'],
