@@ -11,10 +11,13 @@ log = logging.getLogger('VISUALIZE')
 
 def plot():
 
-    db_path = cfg.output_path.joinpath('plasmids.json')
+    db_path = cfg.output_path.joinpath('db.json')
     db_data = tio.load_data(db_path)
 
-    for plasmid in db_data.values():
+    for plasmid in db_data['plasmids'].values():
+        found_in = plasmid.get('found_in', {})
+        if( not found_in):
+            continue
         for draft_genome in plasmid["found_in"].keys():
             hits = plasmid['found_in'][draft_genome]
             cfg.verboseprint(f'Plasmid ID: {plasmid["id"]}, Draft genome: {draft_genome}, Hits: {len(hits)}')

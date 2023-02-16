@@ -69,7 +69,6 @@ def detect_and_reconstruct():
                 plasmid_detected[plasmid_id] = {k: plasmid[k] for k in ['id', 'reference', 'length']}
                 plasmid_detected[plasmid_id]['found_in'] = {}
             plasmid_detected[plasmid_id]['found_in'][plasmid['genome']] = plasmid['hits']
-            plasmid_detected[plasmid_id]['id'] = cfg.db_data['plasmids'][plasmid_id]['id']
 
             # Create string for plasmid summary
             plasmid_string_summary.append(f"{plasmid['genome']}\t{plasmid['reference']}\t{plasmid['coverage']:.3f}\t{plasmid['identity']:.3f}\t{len(plasmid['hits'])}\t{','.join([hit['contig_id'] for hit in plasmid['hits']])}\n")
@@ -90,8 +89,11 @@ def detect_and_reconstruct():
         write_plasmids_info(plasmid_dict, reference_plasmids)
 
     if(plasmid_detected):
-        json_path = cfg.output_path.joinpath("plasmids.json")
-        tio.export_json(plasmid_detected, json_path)
+        for plasmid_id, found_in in plasmid_detected.items():
+            cfg.db_data['plasmids'][plasmid_id]['found_in'] = found_in['found_in']
+        
+        tio.export_json(cfg.db_data, cfg.db_path)
+
 
 def pooling(genome, reference_plasmids, index):
     log = logging.getLogger('PROCESS')
