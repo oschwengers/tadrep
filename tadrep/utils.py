@@ -42,6 +42,9 @@ def parse_arguments():
     # add subparser
     subparsers = parser.add_subparsers(dest='subcommand')
 
+    # setup parser
+    setup_parser = subparsers.add_parser('setup', help='Download and prepare inc-types')
+
     # extraction parser
     extraction_parser = subparsers.add_parser('extract', help='Extract unique plasmid sequences')
 

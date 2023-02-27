@@ -7,6 +7,7 @@ from pathlib import Path
 import tadrep
 import tadrep.config as cfg
 import tadrep.utils as tu
+import tadrep.setup as ts
 import tadrep.extract as te
 import tadrep.cluster as tcl
 import tadrep.characterize as tc
@@ -53,6 +54,11 @@ def main():
     cfg.verboseprint(f'\tprefix: {cfg.prefix}')
     cfg.verboseprint(f'\ttmp directory: {cfg.tmp_path}')
     cfg.verboseprint(f'\t# threads: {cfg.threads}')
+
+    if(args.subcommand == 'setup'):
+        print('\nSetup started...')
+        ts.download_inc_reference()
+
 
     if(args.subcommand == "extract"):
         print('\nExtraction started...')
