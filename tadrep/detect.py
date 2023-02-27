@@ -89,8 +89,8 @@ def detect_and_reconstruct():
         write_plasmids_info(plasmid_dict, reference_plasmids)
 
     if(plasmid_detected):
-        for plasmid_id, found_in in plasmid_detected.items():
-            cfg.db_data['plasmids'][plasmid_id]['found_in'] = found_in['found_in']
+        for plasmid_id, plasmid_data in plasmid_detected.items():
+            cfg.db_data['plasmids'][plasmid_id]['found_in'] = plasmid_data['found_in']
         
         tio.export_json(cfg.db_data, cfg.db_path)
 
