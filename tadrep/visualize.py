@@ -43,3 +43,7 @@ def create_figure(plasmid_id, plasmid_length, hits, output_path):
 
     fig = gv.plotfig()
     fig.savefig(output_path, dpi=600, format='pdf')
+
+
+def get_gradient_colour(plasmid_coverage):
+    pass
