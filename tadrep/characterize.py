@@ -83,7 +83,7 @@ def search_inc_types(db_path):
     inc_types = cfg.output_path.joinpath('inc-types.fasta')
     if(not inc_types.is_file()):
         log.debug("Inc_types reference not found!")
-        sys.exit("ERROR: Inc_types reference not found! Please import with '--inc-types' param!")
+        sys.exit("ERROR: Inc_types reference not found! Please import with '--inc-types PATH_TO_FASTA' or download it with subcommand setup!")
 
     tmp_output_path = cfg.output_path.joinpath('db.inc.blast.out')
 
