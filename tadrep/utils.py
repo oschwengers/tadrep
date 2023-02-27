@@ -83,7 +83,7 @@ def parse_arguments():
     visualization_parser = subparsers.add_parser('visualize', help='Visualize plasmid coverage of contigs')
     
     arg_group_plot = visualization_parser.add_argument_group('Style')
-    arg_group_plot.add_argument('--plotstyle', action='store', default='arrow', dest='plotstyle', choices=['bigarrow', 'arrow', 'bigbox', 'box', 'bigrbox', 'rbox'], help='Contig representation in plot')
+    arg_group_plot.add_argument('--plotstyle', action='store', default='box', dest='plotstyle', choices=['bigarrow', 'arrow', 'bigbox', 'box', 'bigrbox', 'rbox'], help='Contig representation in plot')
     arg_group_plot.add_argument('--labelcolor', action='store', default='black', dest='labelcolor', help='Contig label color')
     arg_group_plot.add_argument('--facecolor', action='store', default='orange', dest='facecolor', help='Contig color')
     arg_group_plot.add_argument('--linewidth', action='store', default=0.0, type=float, dest='linewidth', help='Contig edge linewidth')
