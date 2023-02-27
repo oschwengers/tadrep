@@ -37,8 +37,10 @@ def create_figure(plasmid_id, plasmid_length, hits, output_path):
             log.info('Skipped contig %s, length: %d', hit['contig_id'], hit['length'])
             continue
         strand = 1 if hit['strand'] == '+' else -1
+        contig_colour = get_gradient_colour(hit['perc_identity'])
+        log.debug('contig: %s, plasmid_start: %d, plasmid_end: %d, identity: %f, colour: %f', hit['contig_id'], hit['reference_plasmid_start'], hit['reference_plasmid_end'], hit['perc_identity'], contig_colour)
         track.add_feature(hit['reference_plasmid_start'], hit['reference_plasmid_end'], strand, label=hit['contig_id'],
-         plotstyle=cfg.plotstyle, labelsize=cfg.labelsize, labelcolor=cfg.labelcolor, facecolor=cfg.facecolor, linewidth=cfg.linewidth, 
+         plotstyle=cfg.plotstyle, labelsize=cfg.labelsize, labelcolor=cfg.labelcolor, facecolor=str(contig_colour), linewidth=cfg.linewidth, 
          labelrotation=cfg.labelrotation, labelhpos=cfg.labelhpos, labelha=cfg.labelha, arrow_shaft_ratio=cfg.arrow_shaft_ratio, size_ratio=cfg.size_ratio)
 
     fig = gv.plotfig()
@@ -46,4 +48,9 @@ def create_figure(plasmid_id, plasmid_length, hits, output_path):
 
 
 def get_gradient_colour(plasmid_coverage):
-    pass
+    colour = 1.0
+    for interval in range(cfg.interval_number + 1):
+        if(1.0 - interval * cfg.interval_size <= plasmid_coverage):
+            colour = interval / cfg.interval_number
+            break
+    return colour
