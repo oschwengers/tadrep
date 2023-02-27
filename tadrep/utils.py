@@ -85,16 +85,19 @@ def parse_arguments():
     arg_group_plot = visualization_parser.add_argument_group('Style')
     arg_group_plot.add_argument('--plotstyle', action='store', default='box', dest='plotstyle', choices=['bigarrow', 'arrow', 'bigbox', 'box', 'bigrbox', 'rbox'], help='Contig representation in plot')
     arg_group_plot.add_argument('--labelcolor', action='store', default='black', dest='labelcolor', help='Contig label color')
-    arg_group_plot.add_argument('--facecolor', action='store', default='orange', dest='facecolor', help='Contig color')
     arg_group_plot.add_argument('--linewidth', action='store', default=0.0, type=float, dest='linewidth', help='Contig edge linewidth')
-    arg_group_plot.add_argument('--arrow_shaft_ratio', action='store', default=0.5, type=float, dest='arrow_shaft_ratio', help='Size ratio between arrow head and shaft')
-    arg_group_plot.add_argument('--size_ratio', action='store', default=1.0, type=float, dest='size_ratio', help='Contig size ratio to track')
+    arg_group_plot.add_argument('--arrow-shaft-ratio', action='store', default=0.5, type=float, dest='arrow_shaft_ratio', help='Size ratio between arrow head and shaft')
+    arg_group_plot.add_argument('--size-ratio', action='store', default=1.0, type=float, dest='size_ratio', help='Contig size ratio to track')
 
     arg_group_label = visualization_parser.add_argument_group('Label')
     arg_group_label.add_argument('--labelsize', action='store', default=15, type=int, dest='labelsize', help='Contig label size')
     arg_group_label.add_argument('--labelrotation', action='store', default=45, type=int, dest='labelrotation', help='Contig label rotation')
     arg_group_label.add_argument('--labelhpos', action='store', default='center', dest='labelhpos', choices=['left', 'center', 'right'], help='Contig label horizontal position')
     arg_group_label.add_argument('--labelha', action='store', default='left', dest='labelha', choices=['left', 'center', 'right'], help='Contig label horizontal alignment')
+
+    arg_group_gradient = visualization_parser.add_argument_group('Gradient')
+    arg_group_gradient.add_argument('--interval-start', action='store', type=float, default=80, metavar='[0-100]', dest='interval_start', help='Percentage where gradient should stop')
+    arg_group_gradient.add_argument('--number-of-intervals', action='store', type=int, default=10, choices=range(1, 101), metavar='[1-100]', dest='interval_number', help='Number of gradient intervals')
 
     arg_group_omit = visualization_parser.add_argument_group('Omit')
     arg_group_omit.add_argument('--omit_ratio', action='store', default=1, type=int, choices=range(0, 101), metavar='[0-100]', dest='omit_ratio', help='Omit contigs shorter than X percent of plasmid length from plot')

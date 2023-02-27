@@ -52,10 +52,13 @@ header = None
 # visualize setup
 plotstyle = 'arrow'
 labelcolor = 'black'
-facecolor = 'orange'
 linewidth = 0.0
 arrow_shaft_ratio = 0.5
 size_ratio = 1.0
+
+interval_start = 0.8
+interval_number = 10
+interval_size = 0.1
 
 labelsize = 15
 labelrotation = 45
@@ -186,15 +189,14 @@ def setup_characterize(args):
 
 def setup_visualize(args):
 
-    global plotstyle, labelcolor, facecolor, linewidth, arrow_shaft_ratio, size_ratio
+    global plotstyle, labelcolor, linewidth, arrow_shaft_ratio, size_ratio
     plotstyle = args.plotstyle
     labelcolor = args.labelcolor
-    facecolor = args.facecolor
     linewidth = args.linewidth
     arrow_shaft_ratio = args.arrow_shaft_ratio
     size_ratio = args.size_ratio
-    log.info('plotstyle: %s, labelcolor: %s, facecolor: %s, linewdith: %f, arrow_shaft_ratio: %f, size_ratio: %f',
-    plotstyle, labelcolor, facecolor, linewidth, arrow_shaft_ratio, size_ratio)
+    log.info('plotstyle: %s, labelcolor: %s, linewdith: %f, arrow_shaft_ratio: %f, size_ratio: %f',
+    plotstyle, labelcolor, linewidth, arrow_shaft_ratio, size_ratio)
 
     global labelsize, labelrotation, labelhpos, labelha
     labelsize = args.labelsize
@@ -203,6 +205,12 @@ def setup_visualize(args):
     labelha = args.labelha
     log.info('labelsize: %d, labelrotation: %d, labelhpos: %s, labelha: %s',
     labelsize, labelrotation, labelhpos, labelha)
+
+    global interval_start, interval_number, interval_size
+    interval_start = args.interval_start / 100
+    interval_number = args.interval_number
+    interval_size = (1.0 - interval_start) / interval_number
+    log.info('Interval: start: %f, count: %d, size: %f', interval_start, interval_number, interval_size)
 
     global omit_ratio
     omit_ratio = args.omit_ratio
