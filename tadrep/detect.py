@@ -1,6 +1,5 @@
 import tadrep.config as cfg
 import tadrep.io as tio
-import tadrep.visuals as tv
 import tadrep.blast as tb
 import tadrep.plasmids as tp
 
@@ -10,38 +9,44 @@ import sys
 import multiprocessing as mp
 
 log = logging.getLogger('DETECTION')
-verboseprint = print if cfg.verbose else lambda *a, **k: None
+
 
 def detect_and_reconstruct():
 
     ############################################################################
     # Import plasmid sequences
-    # - parse contigs in Fasta file
+    # - write multi Fasta file
     ############################################################################
-    if(cfg.plasmids_path):
-        try:
-            verboseprint('\nimport plasmids sequences...')
-            reference_plasmids = tio.import_sequences(cfg.plasmids_path, sequence=True)
-            log.info('imported reference plasmids: sequences=%i, file=%s', len(reference_plasmids), cfg.plasmids_path)
-            for ref_plasmid in sorted(reference_plasmids.values(), key=lambda k: k['length']):
-                size = ref_plasmid['length']
-                seq = ref_plasmid['sequence']
-                gc = (seq.count('G') + seq.count('C')) / (size - seq.count('N'))
-                verboseprint(f"\t{ref_plasmid['id']}: {size:,} bp, {(gc*100):0.1f} % GC")
-            verboseprint(f'\n\ttotal: {len(reference_plasmids)}')
-        except ValueError:
-            log.error('wrong reference plasmids file format!', exc_info=True)
-            sys.exit('ERROR: wrong reference plasmids file format!')
-    else:
-        try:
-            verboseprint('\nload reference plasmids database...')
-            reference_plasmids = tio.import_tsv(cfg.database_path)
-            log.info('imported reference plasmids: sequence=%i, file=%s', len(reference_plasmids), cfg.database_path)
-            verboseprint(f'\timported: {len(reference_plasmids)}')
-        except:
-            log.error('wrong database path!', exc_info=True)
-            sys.exit('ERROR: wrong database path!')
-    
+
+    if(not cfg.db_data.get('plasmids', {})):
+        log.debug("No plasmids in %s !", cfg.db_path)
+        sys.exit(f"ERROR: No plasmids in database {cfg.db_path}!")
+
+    if(not cfg.db_data.get('cluster', [])):
+        log.debug("No Clusters in %s!", cfg.db_path)
+        sys.exit(f"ERROR: No cluster in database {cfg.db_path}")
+
+    log.info("Loaded %d cluster with %d plasmids", len(cfg.db_data['cluster']), len(cfg.db_data['plasmids'].keys()))
+    cfg.verboseprint("Loaded data:")
+    cfg.verboseprint(f"\t{len(cfg.db_data['cluster'])} cluster")
+    cfg.verboseprint(f"\t{len(cfg.db_data['plasmids'].keys())} plasmids total")
+
+    representative_ids = []
+
+    # Get representatives from JSON file
+    for cluster in cfg.db_data['cluster']:
+        rep_id = cluster['representative']
+        representative_ids.append(rep_id)
+
+    reference_plasmids = {id: cfg.db_data['plasmids'][id] for id in representative_ids}
+
+    cfg.verboseprint(f"Found {len(representative_ids)} representative plasmid(s)")
+    log.info("Found %d representative plasmid(s)", len(representative_ids))
+
+    if(not cfg.blastdb_path):
+        # write multifasta for blast search
+        fasta_path = cfg.output_path.joinpath("db.fasta")
+        tio.export_sequences(reference_plasmids.values(), fasta_path)
 
     ############################################################################
     # Prepare summary output file
@@ -52,7 +57,7 @@ def detect_and_reconstruct():
     plasmid_string_summary = []
     plasmid_detected = {}
 
-    verboseprint('Analyze genome sequences...')
+    cfg.verboseprint('Analyze genome sequences...')
     values = ((genome_path, reference_plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
     with mp.Pool(cfg.threads) as pool:
         genomes_summary = pool.starmap(pooling, values)
@@ -64,6 +69,7 @@ def detect_and_reconstruct():
                 plasmid_detected[plasmid_id] = {k: plasmid[k] for k in ['id', 'reference', 'length']}
                 plasmid_detected[plasmid_id]['found_in'] = {}
             plasmid_detected[plasmid_id]['found_in'][plasmid['genome']] = plasmid['hits']
+            plasmid_detected[plasmid_id]['id'] = cfg.db_data['plasmids'][plasmid_id]['id']
 
             # Create string for plasmid summary
             plasmid_string_summary.append(f"{plasmid['genome']}\t{plasmid['reference']}\t{plasmid['coverage']:.3f}\t{plasmid['identity']:.3f}\t{len(plasmid['hits'])}\t{','.join([hit['contig_id'] for hit in plasmid['hits']])}\n")
@@ -81,9 +87,10 @@ def detect_and_reconstruct():
 
     if(plasmid_dict):
         write_cohort_table(plasmid_dict)
+        write_plasmids_info(plasmid_dict, reference_plasmids)
 
     if(plasmid_detected):
-        json_path = cfg.output_path.joinpath(f"plasmids.json")
+        json_path = cfg.output_path.joinpath("plasmids.json")
         tio.export_json(plasmid_detected, json_path)
 
 def pooling(genome, reference_plasmids, index):
@@ -106,12 +113,12 @@ def pooling(genome, reference_plasmids, index):
     # Write output files
     sample_summary_path = cfg.output_path.joinpath(f'{sample}-summary.tsv')
     with sample_summary_path.open('w') as ssp:
-        ssp.write(f"plasmid\tcontig\tcontig start\tcontig end\tcontig length\tcoverage[%]\tidentity[%]\talignment length\tstrand\tplasmid start\tplasmid end\tplasmid length\n")
+        ssp.write("plasmid\tcontig\tcontig start\tcontig end\tcontig length\tcoverage[%]\tidentity[%]\talignment length\tstrand\tplasmid start\tplasmid end\tplasmid length\n")
 
         for plasmid in detected_plasmids:
 
             plasmid_contigs_sorted = tp.reconstruct_plasmid(plasmid, contigs)
-            
+
             prefix = f"{cfg.prefix}-{sample}-{plasmid['reference']}" if cfg.prefix else f"{sample}-{plasmid['reference']}"
             plasmid_contigs_path = cfg.output_path.joinpath(f'{prefix}-contigs.fna')
             plasmid_pseudosequence_path = cfg.output_path.joinpath(f'{prefix}-pseudo.fna')
@@ -149,7 +156,7 @@ def write_cohort_table(plasmid_dict):
             plasmid_order.append(plasmid_dict[plasmid])
             fh.write(f'\t{plasmid}')
         fh.write('\n')
-        
+
         transposed_plasmid_order = np.array(plasmid_order).T.tolist()  # transpose information for easier writing
         for num_genome, genome in enumerate(cfg.genome_path):  # mark which plasmid was found for each draft genome
             sample = genome.stem
@@ -157,3 +164,11 @@ def write_cohort_table(plasmid_dict):
             for plasmid in transposed_plasmid_order[num_genome]:
                 fh.write(f'\t{"X" if plasmid else "-"}')
             fh.write('\n')
+
+
+def write_plasmids_info(plasmid_dict, reference_plasmids):
+    plasmid_info_path = cfg.output_path.joinpath('plasmids.info')
+    with plasmid_info_path.open('w') as fh:
+        fh.write(f'{"Plasmid":10} {"Length":>7} {"GC":>4} {"CDS":>5} {"INC_Types":>3}\n')
+        for plasmid_id in plasmid_dict.keys():
+            fh.write(f'{reference_plasmids[plasmid_id]["id"]:10} {reference_plasmids[plasmid_id]["length"]:>7} {reference_plasmids[plasmid_id]["gc_content"]:>4.2} {len(reference_plasmids[plasmid_id]["cds"]):>5} {len(reference_plasmids[plasmid_id]["inc_types"]):>3}\n')

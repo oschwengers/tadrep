@@ -2,10 +2,12 @@ import logging
 import multiprocessing as mp
 import sys
 import tempfile
+import shutil
 
 from pathlib import Path
 
 import tadrep.utils as tu
+import tadrep.io as tio
 
 
 log = logging.getLogger('CONFIG')
@@ -23,10 +25,11 @@ prefix = None
 
 # detection setup
 # Input
-plasmids_path = None
 genome_path = []
-database_path = None
 summary_path = None
+db_path = None
+db_data = None
+blastdb_path = None
 
 # workflow configuration
 min_contig_coverage = None
@@ -80,7 +83,7 @@ def setup(args):
 
 def setup_detection(args):
     # input / output path configurations
-    global genome_path, plasmids_path, summary_path, database_path
+    global genome_path, summary_path, db_path, db_data, blastdb_path
 
     if(not args.genome):
         log.error('genome file not provided!')
@@ -88,19 +91,20 @@ def setup_detection(args):
 
     genome_path = [tu.check_file_permission(file, 'genome') for file in args.genome]
 
-    if(args.plasmids):
-        plasmids_path = tu.check_file_permission(args.plasmids, 'plasmids')
-    elif(args.db):
-        database_path = tu.check_db_directory(args.db)
-        log.info('database path=%s', database_path)
-    else:
-        log.error('no plasmid file or database provided!')
-        sys.exit('ERROR: neither plasmid file nor database provided!')
-
-    log.info('plasmids-path=%s', plasmids_path)
-
     summary_path = output_path.joinpath('summary.tsv')
     log.info('summary_path=%s', summary_path)
+
+    db_path = output_path.joinpath('db.json')
+    log.info('db_path=%s', db_path)
+
+    db_data = tio.load_data(db_path)
+
+    if(not db_data):
+        log.debug("No data in %s", db_path)
+        sys.exit(f"ERROR: No data available in {db_path}")
+
+    blastdb_path = db_data.get('db_path', '')
+    log.debug("BlastDB path = %s", blastdb_path)
 
     # workflow configuration
     global min_contig_coverage, min_contig_identity, min_plasmid_coverage, min_plasmid_identity, gap_sequence_length
@@ -149,4 +153,17 @@ def setup_extraction(args):
 
 
 def setup_characterize(args):
-    pass
+
+    if(args.json):
+        json_path = tu.check_file_permission(args.json, 'database')
+        target_path = output_path.joinpath('db.json')
+        shutil.copyfile(json_path, target_path)
+        verboseprint(f'Imported JSON from {json_path}')
+        log.debug('Copied file from %s to %s', json_path, target_path)
+
+    if(args.inc_types):
+        inc_types_path = tu.check_file_permission(args.inc_types, 'inc-types')
+        target_path = output_path.joinpath('inc-types.fasta')
+        shutil.copyfile(inc_types_path, target_path)
+        verboseprint(f'Imported inc-types from {inc_types_path}')
+        log.debug('Copied file from %s to %s', inc_types_path, target_path)

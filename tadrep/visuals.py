@@ -26,13 +26,13 @@ CONTIG_HEAD_MODIFIER = 200                                                  # Mo
 def create_plots():
     json_file = cfg.output_path.joinpath('plasmids.json')
     log.info('detected json-file=%s', json_file)
-    
+
     plasmids = tio.import_json(json_file)
     log.debug('import file=%s', json_file)
     for plasmid_id in plasmids.keys():
         for draft_genome in plasmids[plasmid_id]['found_in'].keys():
             log.debug('plotting plasmid=%s, genome=%s, hits=%i', plasmid_id, draft_genome, len(plasmids[plasmid_id]['found_in'][draft_genome]))
-            plot_file_path = cfg.output_path.joinpath(f"{draft_genome}-{plasmids[plasmid_id]['reference']}.pdf")
+            plot_file_path = cfg.output_path.joinpath(f"{draft_genome}-{plasmids[plasmid_id]['id']}.pdf")
             create_plasmid_figure(plasmids[plasmid_id], plasmids[plasmid_id]['found_in'][draft_genome], json_file.stem, plot_file_path)
 
 

@@ -7,10 +7,10 @@ from pathlib import Path
 import tadrep
 import tadrep.config as cfg
 import tadrep.utils as tu
-import tadrep.extraction as te
-import tadrep.clustering as tcl
-import tadrep.characterization as tc
-import tadrep.detection as td
+import tadrep.extract as te
+import tadrep.cluster as tcl
+import tadrep.characterize as tc
+import tadrep.detect as td
 import tadrep.visuals as tv
 
 
@@ -48,39 +48,36 @@ def main():
     ############################################################################
     cfg.setup(args)  # check parameters and prepare global configuration
 
-    verboseprint = print if cfg.verbose else lambda *a, **k: None
-    verboseprint(f'TaDReP v{tadrep.__version__}')
-    verboseprint('Options and arguments:')
-    verboseprint(f'\toutput: {cfg.output_path}')
-    verboseprint(f'\tprefix: {cfg.prefix}')
-    verboseprint(f'\ttmp directory: {cfg.tmp_path}')
-    verboseprint(f'\t# threads: {cfg.threads}')
+    cfg.verboseprint(f'TaDReP v{tadrep.__version__}')
+    cfg.verboseprint('Options and arguments:')
+    cfg.verboseprint(f'\toutput: {cfg.output_path}')
+    cfg.verboseprint(f'\tprefix: {cfg.prefix}')
+    cfg.verboseprint(f'\ttmp directory: {cfg.tmp_path}')
+    cfg.verboseprint(f'\t# threads: {cfg.threads}')
 
-    if(args.subcommand == "extraction"):
-        verboseprint('\nExtraction started...')
+    if(args.subcommand == "extract"):
+        print('\nExtraction started...')
         cfg.setup_extraction(args)
         te.extract()
 
-    elif(args.subcommand == "characterization"):
-        verboseprint('\nCharacterization started...')
-        
+    elif(args.subcommand == "characterize"):
+        print('\nCharacterization started...')
+        cfg.setup_characterize(args)
         tc.characterize()
 
-    elif(args.subcommand == "clustering"):
-        verboseprint('\nClustering started...')
+    elif(args.subcommand == "cluster"):
+        print('\nClustering started...')
         tcl.cluster()
 
-    elif(args.subcommand == "detection"):
+    elif(args.subcommand == "detect"):
         cfg.setup_detection(args)
-        verboseprint(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
-        verboseprint(f'\tplasmid(s): {cfg.plasmids_path}')
-        verboseprint(f'\tdatabase path: {cfg.database_path}')
+        print(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
 
-        verboseprint('\nDetection and reconstruction started ...')
+        print('\nDetection and reconstruction started ...')
         td.detect_and_reconstruct()
 
-    elif(args.subcommand == "visualization"):
-        verboseprint('\nVisualization started...')
+    elif(args.subcommand == "visualize"):
+        print('\nVisualization started...')
         tv.create_plots()
 
     # remove tmp dir

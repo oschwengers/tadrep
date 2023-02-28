@@ -11,8 +11,8 @@ log = logging.getLogger('BLAST')
 # Setup and run blastn search
 ############################################################################
 def search_contigs(genome_path, blast_output_path):
-    db_target = '-subject' if cfg.plasmids_path else '-db'
-    db_target_path = cfg.plasmids_path if cfg.plasmids_path else cfg.database_path.joinpath('db')
+    db_target = '-db' if cfg.blastdb_path else '-subject'
+    db_target_path = cfg.blastdb_path if cfg.blastdb_path else cfg.output_path.joinpath("db.fasta")
 
     cmd_blast = [
         'blastn',
@@ -33,9 +33,6 @@ def search_contigs(genome_path, blast_output_path):
         for line in fh:
             # cols = line.strip().split('\t')
             (qseqid, qstart, qend, qlen, sseqid, sstart, send, length, nident, sstrand, evalue, bitscore) = line.strip().split('\t')
-            if(cfg.database_path):
-                if('|' in sseqid):
-                    sseqid = sseqid.split('|')[1]
             hit = {
                 'contig_id': qseqid,
                 'contig_start': int(qstart),

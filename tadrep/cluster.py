@@ -22,6 +22,7 @@ def cluster():
         }
         cluster.append(new_cluster)
 
+    db_data['cluster'] = cluster
     # find cluster representative
     
     # write json
