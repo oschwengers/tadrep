@@ -7,8 +7,6 @@ import sys
 
 from pathlib import Path
 
-from matplotlib.pyplot import title
-
 import tadrep
 
 
@@ -65,6 +63,7 @@ def parse_arguments():
     clustering_parser = subparsers.add_parser('cluster', help='Cluster related plasmids')
     
     arg_group_parameters = clustering_parser.add_argument_group('Parameter')
+    arg_group_parameters.add_argument('--skip', '-s', action='store_true', help='Skips clustering, one group for each plasmid')
     arg_group_parameters.add_argument('--min-coverage', action='store', type=int, default=90, choices=(1,101), metavar='[1-100]', dest='min_coverage', help='Minimal plasmid coverage (default = 90%%)')
     arg_group_parameters.add_argument('--min-identity', action='store', type=int, default=90, choices=(1,101), metavar='[1-100]', dest='min_coverage', help='Minimal plasmid identity (default = 90%%)')
 
