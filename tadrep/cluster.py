@@ -14,15 +14,16 @@ def cluster_plasmids():
     cluster = db_data.get('cluster', [])
     # define method / criteria for clustering
 
-    # build clusters
-    for plasmid in plasmids.values():
-        new_cluster = {
-            'representative': plasmid['id'],
-            'members': [plasmid['id']]
-        }
-        cluster.append(new_cluster)
+    if(cfg.skip_cluster):
+        # build clusters
+        for plasmid in plasmids.values():
+            new_cluster = {
+                'representative': plasmid['id'],
+                'members': [plasmid['id']]
+            }
+            cluster.append(new_cluster)
 
-    db_data['cluster'] = cluster
+        db_data['cluster'] = cluster
     # find cluster representative
     
     # write json
