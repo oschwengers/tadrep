@@ -23,6 +23,19 @@ output_path = None
 tmp_path = None
 prefix = None
 
+# extraction setup
+# Input
+files_to_extract = None
+discard = 1
+file_type = None
+header = None
+
+# characterize setup
+db_local_path = None
+
+# cluster setup
+skip_cluster = False
+
 # detection setup
 # Input
 genome_path = []
@@ -41,13 +54,6 @@ gap_sequence_length = None
 # multithreading
 lock = None
 blast_threads = None
-
-# extraction setup
-# Input
-files_to_extract = None
-discard = 1
-file_type = None
-header = None
 
 # visualize setup
 plotstyle = 'arrow'
@@ -124,20 +130,30 @@ def setup_extract(args):
 
 
 def setup_characterize(args):
+    global db_local_path
 
     if(args.database):
-        json_path = tu.check_file_permission(args.database, 'database')
-        target_path = output_path.joinpath('db.json')
-        shutil.copyfile(json_path, target_path)
-        verboseprint(f'Imported JSON from {json_path}')
-        log.debug('Copied file from %s to %s', json_path, target_path)
+        db_global_path = tu.check_file_permission(args.database, 'database')
+        db_local_path = output_path.joinpath('db.json')
+        shutil.copyfile(db_global_path, db_local_path)
+        verboseprint(f'Imported JSON from {db_global_path}')
+        log.debug('Copied file from %s to %s', db_global_path, db_local_path)
 
     if(args.inc_types):
         inc_types_path = tu.check_file_permission(args.inc_types, 'inc-types')
-        target_path = output_path.joinpath('inc-types.fasta')
-        shutil.copyfile(inc_types_path, target_path)
+        db_local_path = output_path.joinpath('inc-types.fasta')
+        shutil.copyfile(inc_types_path, db_local_path)
         verboseprint(f'Imported inc-types from {inc_types_path}')
-        log.debug('Copied file from %s to %s', inc_types_path, target_path)
+        log.debug('Copied file from %s to %s', inc_types_path, db_local_path)
+
+
+def setup_cluster(args):
+    global skip_cluster
+
+    if(args.skip):
+        skip_cluster = True
+        verboseprint(f'Skipping clustering')
+    log.info('skip_clusters=%s', skip_cluster)
 
 
 def setup_detect(args):
