@@ -62,7 +62,7 @@ def main():
 
     if(args.subcommand == "extract"):
         print('\nExtraction started...')
-        cfg.setup_extraction(args)
+        cfg.setup_extract(args)
         te.extract()
 
     elif(args.subcommand == "characterize"):
@@ -75,7 +75,7 @@ def main():
         tcl.cluster()
 
     elif(args.subcommand == "detect"):
-        cfg.setup_detection(args)
+        cfg.setup_detect(args)
         print(f"\tgenome(s): {', '.join([genome.name for genome in cfg.genome_path])}")
 
         print('\nDetection and reconstruction started ...')
