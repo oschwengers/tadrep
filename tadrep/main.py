@@ -72,6 +72,7 @@ def main():
 
     elif(args.subcommand == "cluster"):
         print('\nClustering started...')
+        cfg.setup_cluster(args)
         tcl.cluster_plasmids()
 
     elif(args.subcommand == "detect"):
