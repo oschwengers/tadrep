@@ -99,7 +99,48 @@ def setup(args):
     log.info('prefix=%s', prefix)
 
 
-def setup_detection(args):
+def setup_extract(args):
+    global files_to_extract, discard, file_type, header
+
+    if(not args.files):
+        log.error('No files provided!')
+        sys.exit('ERROR: No input file was provided!')
+
+    files_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.files]
+
+    discard = args.discard_longest
+    if(discard < 0):
+        log.error('Can not drop negative files!')
+        sys.exit('ERROR: Can not drop negative files!')
+
+    file_type = args.type
+    header = args.header
+    if(file_type == 'draft' and not header):
+        log.debug('No custom header provided!')
+        verboseprint('Info: No custom header provided! Only searching for "complete", "circular" and "plasmid"')
+    else:
+        verboseprint(f'Searching custom header: {header}')
+        log.debug('Custom header: %s', header)
+
+
+def setup_characterize(args):
+
+    if(args.database):
+        json_path = tu.check_file_permission(args.database, 'database')
+        target_path = output_path.joinpath('db.json')
+        shutil.copyfile(json_path, target_path)
+        verboseprint(f'Imported JSON from {json_path}')
+        log.debug('Copied file from %s to %s', json_path, target_path)
+
+    if(args.inc_types):
+        inc_types_path = tu.check_file_permission(args.inc_types, 'inc-types')
+        target_path = output_path.joinpath('inc-types.fasta')
+        shutil.copyfile(inc_types_path, target_path)
+        verboseprint(f'Imported inc-types from {inc_types_path}')
+        log.debug('Copied file from %s to %s', inc_types_path, target_path)
+
+
+def setup_detect(args):
     # input / output path configurations
     global genome_path, summary_path, db_path, db_data, blastdb_path
 
@@ -146,47 +187,6 @@ def setup_detection(args):
     log.info('blast-threads=%i', blast_threads)
 
 
-def setup_extraction(args):
-    global files_to_extract, discard, file_type, header
-
-    if(not args.files):
-        log.error('No files provided!')
-        sys.exit('ERROR: No input file was provided!')
-
-    files_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.files]
-
-    discard = args.discard_longest
-    if(discard < 0):
-        log.error('Can not drop negative files!')
-        sys.exit('ERROR: Can not drop negative files!')
-
-    file_type = args.type
-    header = args.header
-    if(file_type == 'draft' and not header):
-        log.debug('No custom header provided!')
-        verboseprint('Info: No custom header provided! Only searching for "complete", "circular" and "plasmid"')
-    else:
-        verboseprint(f'Searching custom header: {header}')
-        log.debug('Custom header: %s', header)
-
-
-def setup_characterize(args):
-
-    if(args.json):
-        json_path = tu.check_file_permission(args.json, 'database')
-        target_path = output_path.joinpath('db.json')
-        shutil.copyfile(json_path, target_path)
-        verboseprint(f'Imported JSON from {json_path}')
-        log.debug('Copied file from %s to %s', json_path, target_path)
-
-    if(args.inc_types):
-        inc_types_path = tu.check_file_permission(args.inc_types, 'inc-types')
-        target_path = output_path.joinpath('inc-types.fasta')
-        shutil.copyfile(inc_types_path, target_path)
-        verboseprint(f'Imported inc-types from {inc_types_path}')
-        log.debug('Copied file from %s to %s', inc_types_path, target_path)
-
-
 def setup_visualize(args):
 
     global plotstyle, labelcolor, linewidth, arrow_shaft_ratio, size_ratio
@@ -215,4 +215,3 @@ def setup_visualize(args):
     global omit_ratio
     omit_ratio = args.omit_ratio
     log.info('omit_ratio: %d', omit_ratio)
-
