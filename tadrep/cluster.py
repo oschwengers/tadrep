@@ -5,7 +5,7 @@ import tadrep.config as cfg
 
 log = logging.getLogger('CLUSTER')
 
-def cluster():
+def cluster_plasmids():
     # load json
     db_path = cfg.output_path.joinpath('db.json')
     db_data = tio.load_data(db_path)
