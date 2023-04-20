@@ -58,7 +58,7 @@ def parse_arguments():
     characterization_parser = subparsers.add_parser('characterize', help='Identify plasmids with GC content, Inc types, conjugation genes')
     
     arg_group_char = characterization_parser.add_argument_group('Input')
-    arg_group_char.add_argument('--json', action='store', default=None, dest='json', help='Import json file from a given database path into working directory')
+    arg_group_char.add_argument('--db', action='store', default=None, dest='database', help='Import json file from a given database path into working directory')
     arg_group_char.add_argument('--inc-types', action='store', default=None, help='Import inc-types from given path into working directory')
 
     # clustering parser
