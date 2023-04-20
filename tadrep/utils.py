@@ -38,7 +38,7 @@ def parse_arguments():
     arg_group_gio.add_argument('--prefix', action='store', default=None, type=not_empty, help='Prefix for all output files (default = None)')
 
     # add subparser
-    subparsers = parser.add_subparsers(dest='subcommand')
+    subparsers = parser.add_subparsers(dest='subcommand', title='Submodules', required=True, metavar='Submodules')
 
     # setup parser
     setup_parser = subparsers.add_parser('setup', help='Download and prepare inc-types')
