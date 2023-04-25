@@ -1,12 +1,12 @@
+import logging
+import sys
+import multiprocessing as mp
+import numpy as np
+
 import tadrep.config as cfg
 import tadrep.io as tio
 import tadrep.blast as tb
 import tadrep.plasmids as tp
-
-import numpy as np
-import logging
-import sys
-import multiprocessing as mp
 
 log = logging.getLogger('DETECTION')
 
@@ -96,14 +96,14 @@ def detect_and_reconstruct():
 
 
 def pooling(genome, reference_plasmids, index):
-    log = logging.getLogger('PROCESS')
+    log_pool = logging.getLogger('PROCESS')
 
     # Import draft genome contigs
     try:
         contigs = tio.import_sequences(genome, sequence=True)
-        log.info('imported genome contigs: genome=%s, # contigs=%i', genome, len(contigs))
+        log_pool.info('imported genome contigs: genome=%s, # contigs=%i', genome, len(contigs))
     except ValueError:
-        log.error('wrong genome file format!', exc_info=True)
+        log_pool.error('wrong genome file format!', exc_info=True)
         sys.exit('ERROR: wrong genome file format!')
 
     sample = genome.stem
@@ -132,7 +132,7 @@ def pooling(genome, reference_plasmids, index):
                 ssp.write(f"{plasmid['reference']}\t{hit['contig_id']}\t{hit['contig_start']}\t{hit['contig_end']}\t{hit['contig_length']}\t{hit['coverage']:.3f}\t{hit['perc_identity']:.3f}\t{hit['length']}\t{hit['strand']}\t{hit['reference_plasmid_start']}\t{hit['reference_plasmid_end']}\t{plasmid['length']}\n")
 
     cfg.lock.acquire()
-    log.debug('lock acquired: genome=%s, index=%s', sample, index)
+    log_pool.debug('lock acquired: genome=%s, index=%s', sample, index)
     print(f'\n\nGenome: {sample}, contigs: {len(contigs)}, detected plasmids: {len(detected_plasmids)}')
     for plasmid in detected_plasmids:
         # Create console output
@@ -144,7 +144,7 @@ def pooling(genome, reference_plasmids, index):
                 print(f"\t{hit['contig_id']:^18} {hit['length']:>11} {contig['length']:>14} {hit['contig_start']:>13} {hit['contig_end']:>13} {hit['strand']:^13} {hit['reference_plasmid_start']:>9} {hit['reference_plasmid_end']:>12} {(hit['length'] / contig['length'] * 100):>13.1f} {hit['perc_identity'] * 100:>12.1f}")
         else:
             print(f"{sample}\t{plasmid['id']}\t{plasmid['length']}\t{len(plasmid['hits'])}\t{plasmid['coverage']:f}\t{plasmid['identity']:f}\t{','.join(contig['contig_id'] for contig in plasmid['hits'])}")
-    log.debug('lock released: genome=%s, index=%s', sample, index)
+    log_pool.debug('lock released: genome=%s, index=%s', sample, index)
     cfg.lock.release()
 
     return index, detected_plasmids

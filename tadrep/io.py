@@ -1,8 +1,6 @@
 import logging
 import json
 
-from pathlib import Path
-
 from Bio import SeqIO
 from xopen import xopen
 
