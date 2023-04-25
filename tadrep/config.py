@@ -152,7 +152,7 @@ def setup_cluster(args):
 
     if(args.skip):
         skip_cluster = True
-        verboseprint(f'Skipping clustering')
+        verboseprint('Skipping clustering')
     log.info('skip_clusters=%s', skip_cluster)
 
 
