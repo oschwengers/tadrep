@@ -88,6 +88,60 @@ A short summary of plasmids and which genomes were matched is also provided.
 ---
 # Usage
 
+## Database
+
+TaDReP provides an easy way to download and transform public plasmid databases (PLSDB / RefSeq) into a BLASTDB or create a custom database from local files.
+
+TaDReP_DB creates a subdirectory in user specified output directory with all necessary BLASTDB files.
+```bash
+usage: TaDReP_DB [--type {refseq,plsdb,custom}] [--output OUTPUT] [--files [FILES ...]] [--database DATABASE] [--help] [--verbose] [--force]
+
+Download and create database for TaDReP
+
+Input / Output:
+  --type {refseq,plsdb,custom}
+                        External DB to import (default = 'refseq')
+  --output OUTPUT, -o OUTPUT
+                        Output directory for database files (default = current working directory)
+  --files [FILES ...]   Fasta files to create custom database
+  --database DATABASE, -db DATABASE
+                        Database path to update
+
+General:
+  --help, -h            Show this help message and exit
+  --verbose, -v         Print verbose information
+  --force, -f           Force download and new setup of database
+```
+
+### Examples
+Create refseq database in directory databases:
+```bash
+tadrep_db -v --type refseq -o databases
+```
+
+Create PLSDB database in directory databases:
+```bash
+tadrep_db -v --type plsdb -o databases
+```
+
+Create custom database in directory databases:
+```bash
+tadrep_db -v --type custom -o databases --files plasmids.fna
+```
+
+Using these three examples in succession creates following folder structure:
+```
+└── databases
+   ├── custom
+   ├── plsdb
+   └── refseq
+```
+
+---
+---
+
+## Main
+
 TaDReP is split up into six different submodules to provide easier usage.
 
 ```bash
@@ -218,7 +272,7 @@ tadrep -v -o showcase characterize
 
 If you set up a database you can import it into the working directory `showcase` with the `--db` parameter:
 ```bash
-tadrep -v -o showcase characterize --db database/plsdb/db.json --inc-types /inc-types/inc-types.fasta
+tadrep -v -o showcase characterize --db databases/plsdb/db.json --inc-types /inc-types/inc-types.fasta
 ```
 
 ---
