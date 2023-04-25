@@ -23,9 +23,9 @@ def download_database(tmp_path):
                     log.info('decompressing file: destination=%s', tmp_path)
                     shutil.copyfileobj(fh_in, fh_out)
         log.info('copying file finished')
-    except urllib.error.URLError:
-        log.debug('URLError occurred! Could not resolve %s, error=%s', PLSDB_URL)
+    except urllib.error.URLError as url_error:
+        log.debug('URLError occurred! Could not resolve %s, error=%s', PLSDB_URL, url_error)
         sys.exit(f'ERROR: Could not resolve {PLSDB_URL}')
     except OSError:
         log.error('could not write file')
-        sys.exit(f'ERROR: Could not write file')
+        sys.exit('ERROR: Could not write file')

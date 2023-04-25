@@ -39,7 +39,7 @@ def create_tsv(fasta_path, tsv_output_path):
     plasmids = tio.import_sequences(fasta_path)
     with tsv_output_path.open('w') as fh_out:
         for plasmid_id, plasmid in plasmids.items():
-            fh_out.write(f"{plasmid['id']}\t{plasmid['description']}\t{plasmid['length']}\n")
+            fh_out.write(f"{plasmid_id}\t{plasmid['description']}\t{plasmid['length']}\n")
 
 
 def create_blast_db(output_path, fasta_tmp_path, tmp_path):
