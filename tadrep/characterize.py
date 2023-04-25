@@ -37,11 +37,8 @@ def characterize():
     with mp.Pool(cfg.threads, maxtasksperchild=100) as pool:
         plasmids_summary = pool.starmap(calc_features, values)
 
-    plasmids = {}
     for plasmid in plasmids_summary:
-        plasmids[plasmid['id']] = plasmid
-
-    db_data['plasmids'] = plasmids
+        db_data['plasmids'][plasmid['id']] = plasmid
 
     # update json
     print('Writing JSON...')
@@ -87,7 +84,7 @@ def search_inc_types(db_path):
         log.debug("Inc_types reference not found!")
         sys.exit("ERROR: Inc_types reference not found! Please import with '--inc-types PATH_TO_FASTA' or download it with subcommand setup!")
 
-    tmp_output_path = cfg.output_path.joinpath('db.inc.blast.out')
+    tmp_output_path = cfg.tmp_path.joinpath('db.inc.blast.out')
 
     inc_types_cmd = [
         'blastn',
@@ -103,7 +100,7 @@ def search_inc_types(db_path):
     tu.run_cmd(inc_types_cmd, cfg.output_path)
 
     hits_per_plasmid = {}
-    with tmp_output_path.open() as fh:
+    with tmp_output_path.open('r') as fh:
         for line in fh:
             cols = line.rstrip().split('\t')
             hit = {
