@@ -11,13 +11,11 @@ log = logging.getLogger('BLAST')
 # Setup and run blastn search
 ############################################################################
 def search_contigs(genome_path, blast_output_path):
-    db_target = '-db' if cfg.blastdb_path else '-subject'
-    db_target_path = cfg.blastdb_path if cfg.blastdb_path else cfg.output_path.joinpath("db.fasta")
 
     cmd_blast = [
         'blastn',
         '-query', str(genome_path),
-        db_target, str(db_target_path),
+        '-db', str(cfg.output_path.joinpath('reference_db/db')),
         '-culling_limit', '1',
         '-evalue', '1E-5',
         '-num_threads', str(cfg.blast_threads),

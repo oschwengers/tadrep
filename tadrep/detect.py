@@ -43,11 +43,6 @@ def detect_and_reconstruct():
     cfg.verboseprint(f"Found {len(representative_ids)} representative plasmid(s)")
     log.info("Found %d representative plasmid(s)", len(representative_ids))
 
-    if(not cfg.blastdb_path):
-        # write multifasta for blast search
-        fasta_path = cfg.output_path.joinpath("db.fasta")
-        tio.export_sequences(reference_plasmids.values(), fasta_path)
-
     ############################################################################
     # Prepare summary output file
     # - create file
