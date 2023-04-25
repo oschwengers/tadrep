@@ -42,7 +42,6 @@ genome_path = []
 summary_path = None
 db_path = None
 db_data = None
-blastdb_path = None
 
 # workflow configuration
 min_contig_coverage = None
@@ -158,7 +157,7 @@ def setup_cluster(args):
 
 def setup_detect(args):
     # input / output path configurations
-    global genome_path, summary_path, db_path, db_data, blastdb_path
+    global genome_path, summary_path, db_path, db_data
 
     if(not args.genome):
         log.error('genome file not provided!')
@@ -177,9 +176,6 @@ def setup_detect(args):
     if(not db_data):
         log.debug("No data in %s", db_path)
         sys.exit(f"ERROR: No data available in {db_path}")
-
-    blastdb_path = db_data.get('db_path', '')
-    log.debug("BlastDB path = %s", blastdb_path)
 
     # workflow configuration
     global min_contig_coverage, min_contig_identity, min_plasmid_coverage, min_plasmid_identity, gap_sequence_length

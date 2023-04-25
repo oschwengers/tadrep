@@ -15,35 +15,37 @@ log = logging.getLogger('CHARACTERIZE')
 def characterize():
     # load json from output path
     db_path = cfg.output_path.joinpath('db.json')
-    existing_data = tio.load_data(db_path)
-    plasmids = existing_data.get('plasmids', {})
+    db_data = tio.load_data(db_path)
 
     # check if data is available
-    if(not existing_data):
+    if(not db_data):
         log.error('Failed to load data from %s', db_path)
         sys.exit(f'ERROR: Failed to load data from {db_path}!')
-    if(not plasmids):
+    if(not db_data.get('plasmids', {})):
         log.error('Failed to load Plasmids from %s', db_path)
         sys.exit(f'ERROR: Failed to load Plasmids from {db_path}! Maybe file is empty?')
 
     # write multifasta
-    fasta_path = cfg.output_path.joinpath('db.fasta')
-    tio.export_sequences(plasmids.values(), fasta_path)
+    fasta_path = cfg.tmp_path.joinpath('db.fasta')
+    tio.export_sequences(db_data['plasmids'].values(), fasta_path)
 
-    # search inc_types for all plamids
+    # search inc_types for all plasmids
     inc_types_per_plasmid = search_inc_types(fasta_path)
 
     # create pool for multiprocessing
-    values = ((plasmid, inc_types_per_plasmid) for plasmid in plasmids.values())
+    values = ((plasmid, inc_types_per_plasmid) for plasmid in db_data['plasmids'].values())
     with mp.Pool(cfg.threads, maxtasksperchild=100) as pool:
         plasmids_summary = pool.starmap(calc_features, values)
 
+    plasmids = {}
     for plasmid in plasmids_summary:
         plasmids[plasmid['id']] = plasmid
 
+    db_data['plasmids'] = plasmids
+
     # update json
     print('Writing JSON...')
-    tio.export_json(existing_data, db_path)
+    tio.export_json(db_data, db_path)
 
 
 def calc_features(plasmid, inc_types_per_plasmid):

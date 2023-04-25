@@ -10,13 +10,13 @@ log = logging.getLogger('EXTRACT')
 def extract():
     # get existing json existing_plasmid_dict
     json_output_path = cfg.output_path.joinpath('db.json')
-    existing_data = tio.load_data(json_output_path)
-    plasmid_dict = existing_data.get('plasmids', {})      # are previous sequences available
-    file_list = existing_data.get('files', [])              # which files were already extracted from
+    db_data = tio.load_data(json_output_path)
+    plasmid_dict = db_data.get('plasmids', {})      # are previous sequences available
+    file_list = db_data.get('files', [])              # which files were already extracted from
     
     # update plasmid count
-    number_of_plasmids = max([int(id) for id in plasmid_dict.keys()], default=0)
-    cfg.verboseprint(f'Loaded {number_of_plasmids} previously extracted plasmids!')
+    number_of_plasmids = len(plasmid_dict.keys())
+    cfg.verboseprint(f'Loaded {number_of_plasmids} previously extracted plasmids')
     log.info('Loaded %d previously extracted plasmids from file %s', number_of_plasmids, json_output_path)
 
     new_plasmids = {}
@@ -34,7 +34,6 @@ def extract():
 
         # import sequence
         plasmids = tio.import_sequences(input_file, sequence=True)
-        cfg.verboseprint(f'File: {input_file.name}, sequences: {len(plasmids)}')
         log.info('File: %s, sequences: %d', input_file.name, len(plasmids))
 
         # call genome/draft/plasmid methods
@@ -52,13 +51,14 @@ def extract():
 
     # update existing_plasmid_dict
     plasmid_dict.update(new_plasmids)
-    cfg.verboseprint(f'Total plasmids detected: {len(plasmid_dict)}')
-    log.info('Total plasmids detected: %d', len(plasmid_dict))
+    cfg.verboseprint(f'New plasmids extracted: {len(new_plasmids)}')
+    cfg.verboseprint(f'Total plasmids extracted: {len(plasmid_dict)}')
+    log.info('Total plasmids extracted: %d', len(plasmid_dict))
     
     # export to json
-    existing_data['plasmids'] = plasmid_dict
-    existing_data['files'] = file_list
-    tio.export_json(existing_data, json_output_path)
+    db_data['plasmids'] = plasmid_dict
+    db_data['files'] = file_list
+    tio.export_json(db_data, json_output_path)
 
 
 def search_headers(seq_dict):
