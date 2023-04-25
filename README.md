@@ -78,6 +78,12 @@ Furthermore, for each reconstructed plasmid, the reference plasmid backbone and 
 - `<genome>-<plasmid>.pdf`: visualization of aligned contigs against the detected reference plasmid
 
 If multiple genomes were provided, TaDReP also provides a presence/absence matrix of all detected plasmids for convenient cohort analyses.
+A short summary of plasmids and which genomes were matched is also provided.
+
+- `plasmids.info`: plasmid characterization summary
+- `plasmids.tsv`: presence/absence table of detected plasmids
+- `summary.tsv`: short summary of matched contigs through all genomes
+- `tadrep.log`: log-file for debugging
 
 ---
 # Usage
@@ -95,7 +101,7 @@ General:
   --threads THREADS, -t THREADS
                         Number of threads to use (default = number of available CPUs)
   --tmp-dir TMP_DIR     Temporary directory to store blast hits
-  --version             "show program's version number and exit"
+  --version             show program's version number and exit
 
 General Input / Output:
   --output OUTPUT, -o OUTPUT
@@ -119,7 +125,7 @@ GitHub https://github.com/oschwengers/tadrep
 
 ---
 ## Setup
----
+
 
 The setup module ist currently used to download and modify plasmid incompatibility groups, required to characterize plasmids.
 
@@ -131,7 +137,7 @@ tadrep -v -o inc-types setup
 
 ---
 ## Extract
----
+
 
 Extract reference plasmid sequences from complete genomes, draft genomes or plasmid files in fasta format.
 Type 'genome' extracts all but the longest sequence, which can be adjusted by setting '--discard_longest'.
@@ -156,24 +162,24 @@ Input:
 
 ### Examples
 
-Extract all sequences from file `plasmids.fna` into folder `showcase` but ignore the two longest.
+Extract all sequences from file `plasmids.fna` into folder `showcase` but ignore the two longest:
 ```bash
 tadrep -v -o showcase extract --type genome --discard-longest 2 --files plasmids.fna
 ```
 
-Extract all sequences from file `plasmids.fna` where `header` contains `pl` into folder `showcase`.
+Extract all sequences from file `plasmids.fna` where `header` contains `pl` into folder `showcase`:
 ```bash
 tadrep -v -o showcase extract --type draft --header "pl" --files plasmids.fna
 ```
 
-Extract all sequences from file `plasmids.fna` into folder `showcase`.
+Extract all sequences from file `plasmids.fna` into folder `showcase`:
 ```bash
 tadrep -v -o showcase extract --type plasmid --files plasmids.fna
 ```
 
 ---
 ## Characterize
----
+
 
 All plasmids are characterized by following features:
 
@@ -217,7 +223,7 @@ tadrep -v -o showcase characterize --db database/plsdb/db.json --inc-types /inc-
 
 ---
 ## Cluster
----
+
 
 This module aims to group plasmids with similar features together.
 This is planned for a future release, currently the only option is to skip clustering, where each plasmid is put in its own individual group.
@@ -239,7 +245,8 @@ tadrep -v -o showcase cluster --skip
 
 ---
 ## Detect
----
+
+
 ```bash
 usage: TaDReP detect [-h] [--genome GENOME [GENOME ...]] [--min-contig-coverage [1-100]] [--min-contig-identity [1-100]] [--min-plasmid-coverage [1-100]] [--min-plasmid-identity [1-100]]
                      [--gap-sequence-length GAP_SEQUENCE_LENGTH]
@@ -266,9 +273,36 @@ Annotation:
 
 ### Examples
 
+Detect reference plasmids from directory `showcase` in file `draft.fna` with default settings:
+```bash
+tadrep -v -o showcase detect --genome draft.fna
+```
+
+Detect reference plasmids from directory `showcase` in file `draft.fna`;
+
+`75%` of `contig length` has to be covered by a match;
+
+ `Combined contig matches` have to cover at least `95%` of `reference plasmid` length:
+
+```bash
+tadrep -v -o showcase detect --genome draft.fna --min-contig-coverage 75 --min-plasmid-coverage 95
+```
+
+Detect reference plasmids from directory `showcase` in file `draft.fna`;
+
+`Contig sequence` of a match has to be at least `80%` identical to reference plasmid;
+
+`Combined contig matches` have to sum up to at least `95%` identity of `reference plasmid` sequence:
+```bash
+tadrep -v -o showcase detect --genome draft.fna --min-contig-identity 80 --min-plasmid-identity 95
+```
+Note: `--min-contig-coverage` / `--min-plasmid-identity` and `--min-contig-identity` / `--min-plasmid-coverage` can be combined as well.
+
+
 ---
 ## Visualize
----
+
+
 ```bash
 usage: TaDReP visualize [-h] [--plotstyle {bigarrow,arrow,bigbox,box,bigrbox,rbox}] [--labelcolor LABELCOLOR] [--linewidth LINEWIDTH] [--arrow-shaft-ratio ARROW_SHAFT_RATIO] [--size-ratio SIZE_RATIO]
                         [--labelsize LABELSIZE] [--labelrotation LABELROTATION] [--labelhpos {left,center,right}] [--labelha {left,center,right}] [--interval-start [0-100]] [--number-of-intervals [1-100]]
@@ -310,6 +344,21 @@ Omit:
 ```
 
 ### Examples
+
+Visualize results from detection in directory `showcase` with default settings:
+```bash
+tadrep -v -o showcase visualize
+```
+
+Visualize results from detection in directory `showcase`;
+
+`Brightest colour` of gradient starts at `95.5%` sequence identity (darkest colour is always 100% identity);
+
+`Surround` contig blocks with `1px` line:
+
+```bash
+tadrep -v -o showcase visualize --interval-start 95.5 --linewidth 1
+```
 
 ---
 ---
