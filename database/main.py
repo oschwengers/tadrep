@@ -2,7 +2,6 @@ import logging
 import shutil
 import sys
 import tempfile
-import re
 
 from pathlib import Path
 
@@ -25,7 +24,7 @@ def main():
             output_path.mkdir(parents=True, exist_ok=True)
         output_path = output_path.resolve()
     except:
-        sys.exit(f'ERROR: could not resolve output directory!')
+        sys.exit('ERROR: could not resolve output directory!')
 
     logging.basicConfig(
         filename=str(output_path.joinpath('tadrepdb.log')),
