@@ -122,19 +122,9 @@ def main():
                     with file.open('r') as fh_in:
                         fh_out.write(fh_in.read())
 
-    print('Create blast database...')
-    db_file_name = db_output_path.joinpath('db')
-    log.info('database files: name=%s', db_file_name)
-    du.create_blast_db(db_file_name, fasta_tmp_path, tmp_path)
-
-
-    tsv_output_path = db_output_path.joinpath('db.tsv')
-    log.info('TSV file: name=%s, path=%s', tsv_output_path.stem, tsv_output_path)
-    du.create_tsv(fasta_tmp_path, tsv_output_path)
-
-    print('Create JSON file...')
+    print('Create JSON database...')
     json_path = db_output_path.joinpath(f'{db_name}.json')
-    log.info('JSON file: name=%s, path=%s', json_path.stem, json_path)
+    log.info('JSON database: name=%s, path=%s', json_path.stem, json_path)
     db_plasmids = tio.import_sequences(fasta_tmp_path, sequence=True)
     json_plasmids = {}
 
@@ -143,8 +133,8 @@ def main():
         json_plasmids[plasmid['id']] = plasmid
 
     db_data = {
-        'plasmids': json_plasmids,
-        'db_path': str(db_file_name)}
+        'plasmids': json_plasmids
+        }
     tio.export_json(db_data, json_path)
 
     print(f'Database successfully created\nDatabase path: {db_output_path}')
