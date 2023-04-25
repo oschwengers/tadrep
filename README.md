@@ -11,9 +11,10 @@ TaDReP is a tool for the rapid and targeted detection and reconstruction of plas
 
 - [Description](#description)
 - [Installation](#installation)
-- [Examples](#examples)
 - [Input & Output](#input-and-output)
 - [Usage](#usage)
+  * [Database](#database)
+  * [Main](#main)
   * [Setup](#setup)
   * [Extract](#extract)
   * [Characterize](#characterize)
@@ -46,19 +47,6 @@ $ python3 -m pip install --user tadrep
 
 TaDRep requires [Blast+](https://blast.ncbi.nlm.nih.gov) which must be installed & executable.
 
-## Examples
-
-Simple:
-
-```bash
-$ tadrep --genome test/data/draft.fna --plasmids test/data/plasmids.fna
-```
-
-Expert: verbose output writing results to *results* directory using 8 threads, a min per contig sequence identity of 75% and a gap sequence length (multiple `N`) of 100.:
-
-```bash
-$ tadrep --genome test/data/draft.fna --db refseq -v --min-contig-identity 75 --gap-sequence-length 100 --output results --threads THREADS 8
-```
 
 ## Input and Output
 
@@ -90,9 +78,12 @@ A short summary of plasmids and which genomes were matched is also provided.
 
 ## Database
 
-TaDReP provides an easy way to download and transform public plasmid databases (PLSDB / RefSeq) into a BLASTDB or create a custom database from local files.
+TaDReP provides an easy way to download and transform public plasmid databases (PLSDB / RefSeq) into a BLASTDB or create a custom database from local files. 
+Files used for custom database creation need to be in (zipped) fasta format.
 
 TaDReP_DB creates a subdirectory in user specified output directory with all necessary BLASTDB files.
+
+If you created a database, you can skip the extract step and start with the [characterization](#characterize).
 ```bash
 usage: TaDReP_DB [--type {refseq,plsdb,custom}] [--output OUTPUT] [--files [FILES ...]] [--database DATABASE] [--help] [--verbose] [--force]
 
