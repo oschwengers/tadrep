@@ -42,8 +42,6 @@ def main():
 
     selected_db = args.type
     log.info('selected database: %s', selected_db)
-    input_files = args.files
-    log.info('provided files: %s', input_files)
 
     tmp_path = Path(tempfile.mkdtemp())
     log.info('tmp-path=%s', tmp_path)
@@ -80,15 +78,8 @@ def main():
     print('Database creation starting...')
     if(selected_db == du.REFSEQ):
         dr.download_database(fasta_tmp_path)
-    elif(selected_db == du.PLSDB):
-        dp.download_database(fasta_tmp_path)
     else:
-        print('Combining files...')
-        with fasta_tmp_path.open('w+') as fh_out:
-            for file in input_files:
-                log.info('write file: file=%s', file)
-                with file.open('r') as fh_in:
-                    fh_out.write(fh_in.read())
+        dp.download_database(fasta_tmp_path)
 
     print('Create JSON database...')
     json_path = db_output_path.joinpath(f'{db_name}.json')
