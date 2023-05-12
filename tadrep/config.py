@@ -207,7 +207,7 @@ def setup_visualize(args):
     line_width = args.line_width
     arrow_shaft_ratio = args.arrow_shaft_ratio
     size_ratio = args.size_ratio
-    log.info('plotstyle: %s, labelcolor: %s, linewdith: %f, arrow_shaft_ratio: %f, size_ratio: %f',
+    log.info('plot_style: %s, label_color: %s, line_width: %f, arrow_shaft_ratio: %f, size_ratio: %f',
     plot_style, label_color, line_width, arrow_shaft_ratio, size_ratio)
 
     global label_size, label_rotation, label_hpos, label_ha
@@ -215,7 +215,7 @@ def setup_visualize(args):
     label_rotation = args.label_rotation
     label_hpos = args.label_hpos
     label_ha = args.label_ha
-    log.info('labelsize: %d, labelrotation: %d, labelhpos: %s, labelha: %s',
+    log.info('label_size: %d, label_rotation: %d, label_hpos: %s, label_ha: %s',
     label_size, label_rotation, label_hpos, label_ha)
 
     global interval_start, interval_number, interval_size
