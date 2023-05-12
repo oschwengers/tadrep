@@ -16,7 +16,7 @@ def extract():
     
     # update plasmid count
     number_of_plasmids = len(plasmid_dict.keys())
-    cfg.verboseprint(f'Loaded {number_of_plasmids} previously extracted plasmids')
+    cfg.verbose_print(f'Loaded {number_of_plasmids} previously extracted plasmids')
     log.info('Loaded %d previously extracted plasmids from file %s', number_of_plasmids, json_output_path)
 
     new_plasmids = {}
@@ -25,7 +25,7 @@ def extract():
     for input_file in cfg.files_to_extract:
         # check if file was already extracted
         if(str(input_file) in file_list):
-            cfg.verboseprint(f'Skipping {input_file.name}, already extracted from!')
+            cfg.verbose_print(f'Skipping {input_file.name}, already extracted from!')
             log.info('Skipping %s, already extracted from!', input_file)
             continue
     
@@ -43,7 +43,7 @@ def extract():
             plasmids = search_headers(plasmids)
         
         # add file name and new id to plasmids
-        cfg.verboseprint(f'File: {input_file.name}, detected plasmids: {len(plasmids)}')
+        cfg.verbose_print(f'File: {input_file.name}, detected plasmids: {len(plasmids)}')
         log.info('File: %s, plasmids detected: %d', input_file.name, len(plasmids))
         for plasmid in plasmids.values():
             plasmid['file'] = input_file.name
@@ -51,8 +51,8 @@ def extract():
 
     # update existing_plasmid_dict
     plasmid_dict.update(new_plasmids)
-    cfg.verboseprint(f'New plasmids extracted: {len(new_plasmids)}')
-    cfg.verboseprint(f'Total plasmids extracted: {len(plasmid_dict)}')
+    cfg.verbose_print(f'New plasmids extracted: {len(new_plasmids)}')
+    cfg.verbose_print(f'Total plasmids extracted: {len(plasmid_dict)}')
     log.info('Total plasmids extracted: %d', len(plasmid_dict))
     
     # export to json
@@ -82,7 +82,7 @@ def search_headers(seq_dict):
 
 def filter_longest(seq_dict):
     log.info('Discard %d longest sequences from %d entries', cfg.discard, len(seq_dict))
-    cfg.verboseprint(f'Discard {cfg.discard} longest sequences from {len(seq_dict)} entries')
+    cfg.verbose_print(f'Discard {cfg.discard} longest sequences from {len(seq_dict)} entries')
 
     # Error if discard too high
     if(cfg.discard > len(seq_dict)):

@@ -27,9 +27,9 @@ def detect_and_reconstruct():
         sys.exit(f"ERROR: No cluster in database {cfg.db_path}")
 
     log.info("Loaded %d cluster with %d plasmids", len(cfg.db_data['cluster']), len(cfg.db_data['plasmids'].keys()))
-    cfg.verboseprint("Loaded data:")
-    cfg.verboseprint(f"\t{len(cfg.db_data['cluster'])} cluster")
-    cfg.verboseprint(f"\t{len(cfg.db_data['plasmids'].keys())} plasmids total")
+    cfg.verbose_print("Loaded data:")
+    cfg.verbose_print(f"\t{len(cfg.db_data['cluster'])} cluster")
+    cfg.verbose_print(f"\t{len(cfg.db_data['plasmids'].keys())} plasmids total")
 
     representative_ids = []
 
@@ -42,7 +42,7 @@ def detect_and_reconstruct():
     necessary_keys = ['id', 'length', 'gc_content', 'inc_types', 'cds']
     reference_plasmids = {id: {key: cfg.db_data['plasmids'][id][key] for key in necessary_keys} for id in representative_ids}
 
-    cfg.verboseprint(f"Found {len(representative_ids)} representative plasmid(s)")
+    cfg.verbose_print(f"Found {len(representative_ids)} representative plasmid(s)")
     log.info("Found %d representative plasmid(s)", len(representative_ids))
 
     ############################################################################
@@ -54,7 +54,7 @@ def detect_and_reconstruct():
     plasmid_string_summary = []
     plasmid_detected = {}
 
-    cfg.verboseprint('Analyze genome sequences...')
+    cfg.verbose_print('Analyze genome sequences...')
     values = ((genome_path, reference_plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
     with mp.Pool(cfg.threads) as pool:
         genomes_summary = pool.starmap(pooling, values)
