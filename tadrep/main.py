@@ -48,12 +48,12 @@ def main():
     ############################################################################
     cfg.setup(args)  # check parameters and prepare global configuration
 
-    cfg.verboseprint(f'TaDReP v{tadrep.__version__}')
-    cfg.verboseprint('Options and arguments:')
-    cfg.verboseprint(f'\toutput: {cfg.output_path}')
-    cfg.verboseprint(f'\tprefix: {cfg.prefix}')
-    cfg.verboseprint(f'\ttmp directory: {cfg.tmp_path}')
-    cfg.verboseprint(f'\t# threads: {cfg.threads}')
+    cfg.verbose_print(f'TaDReP v{tadrep.__version__}')
+    cfg.verbose_print('Options and arguments:')
+    cfg.verbose_print(f'\toutput: {cfg.output_path}')
+    cfg.verbose_print(f'\tprefix: {cfg.prefix}')
+    cfg.verbose_print(f'\ttmp directory: {cfg.tmp_path}')
+    cfg.verbose_print(f'\t# threads: {cfg.threads}')
 
     if(args.subcommand == 'setup'):
         print('\nSetup started...')

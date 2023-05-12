@@ -16,7 +16,7 @@ log = logging.getLogger('CONFIG')
 # runtime configurations
 threads = None
 verbose = None
-verboseprint = None
+verbose_print = None
 
 # input / output configuration
 output_path = None
@@ -55,9 +55,9 @@ lock = None
 blast_threads = None
 
 # visualize setup
-plotstyle = 'arrow'
-labelcolor = 'black'
-linewidth = 0.0
+plot_style = 'arrow'
+label_color = 'black'
+line_width = 0.0
 arrow_shaft_ratio = 0.5
 size_ratio = 1.0
 
@@ -65,10 +65,10 @@ interval_start = 0.8
 interval_number = 10
 interval_size = 0.1
 
-labelsize = 15
-labelrotation = 45
-labelhpos = 'center'
-labelha = 'left'
+label_size = 15
+label_rotation = 45
+label_hpos = 'center'
+label_ha = 'left'
 
 omit_ratio = 1
 
@@ -76,12 +76,12 @@ def setup(args):
     """Test environment and build a runtime configuration."""
 
     # runtime configurations
-    global threads, verbose, verboseprint
+    global threads, verbose, verbose_print
     threads = args.threads
     log.info('threads=%i', threads)
     verbose = args.verbose
     log.info('verbose=%s', verbose)
-    verboseprint = print if verbose else lambda *a, **k: None
+    verbose_print = print if verbose else lambda *a, **k: None
 
     # input / output path configurations
     global tmp_path, output_path, prefix
@@ -122,9 +122,9 @@ def setup_extract(args):
     header = args.header
     if(file_type == 'draft' and not header):
         log.debug('No custom header provided!')
-        verboseprint('Info: No custom header provided! Only searching for "complete", "circular" and "plasmid"')
+        verbose_print('Info: No custom header provided! Only searching for "complete", "circular" and "plasmid"')
     else:
-        verboseprint(f'Searching custom header: {header}')
+        verbose_print(f'Searching custom header: {header}')
         log.debug('Custom header: %s', header)
 
 
@@ -135,14 +135,14 @@ def setup_characterize(args):
         db_global_path = tu.check_file_permission(args.database, 'database')
         db_local_path = output_path.joinpath('db.json')
         shutil.copyfile(db_global_path, db_local_path)
-        verboseprint(f'Imported JSON from {db_global_path}')
+        verbose_print(f'Imported JSON from {db_global_path}')
         log.debug('Copied file from %s to %s', db_global_path, db_local_path)
 
     if(args.inc_types):
         inc_types_path = tu.check_file_permission(args.inc_types, 'inc-types')
         db_local_path = output_path.joinpath('inc-types.fasta')
         shutil.copyfile(inc_types_path, db_local_path)
-        verboseprint(f'Imported inc-types from {inc_types_path}')
+        verbose_print(f'Imported inc-types from {inc_types_path}')
         log.debug('Copied file from %s to %s', inc_types_path, db_local_path)
 
 
@@ -151,7 +151,7 @@ def setup_cluster(args):
 
     if(args.skip):
         skip_cluster = True
-        verboseprint('Skipping clustering')
+        verbose_print('Skipping clustering')
     log.info('skip_clusters=%s', skip_cluster)
 
 
@@ -201,22 +201,22 @@ def setup_detect(args):
 
 def setup_visualize(args):
 
-    global plotstyle, labelcolor, linewidth, arrow_shaft_ratio, size_ratio
-    plotstyle = args.plotstyle
-    labelcolor = args.labelcolor
-    linewidth = args.linewidth
+    global plot_style, label_color, line_width, arrow_shaft_ratio, size_ratio
+    plot_style = args.plotstyle
+    label_color = args.labelcolor
+    line_width = args.linewidth
     arrow_shaft_ratio = args.arrow_shaft_ratio
     size_ratio = args.size_ratio
     log.info('plotstyle: %s, labelcolor: %s, linewdith: %f, arrow_shaft_ratio: %f, size_ratio: %f',
-    plotstyle, labelcolor, linewidth, arrow_shaft_ratio, size_ratio)
+    plot_style, label_color, line_width, arrow_shaft_ratio, size_ratio)
 
-    global labelsize, labelrotation, labelhpos, labelha
-    labelsize = args.labelsize
-    labelrotation = args.labelrotation
-    labelhpos = args.labelhpos
-    labelha = args.labelha
+    global label_size, label_rotation, label_hpos, label_ha
+    label_size = args.labelsize
+    label_rotation = args.labelrotation
+    label_hpos = args.labelhpos
+    label_ha = args.labelha
     log.info('labelsize: %d, labelrotation: %d, labelhpos: %s, labelha: %s',
-    labelsize, labelrotation, labelhpos, labelha)
+    label_size, label_rotation, label_hpos, label_ha)
 
     global interval_start, interval_number, interval_size
     interval_start = args.interval_start / 100

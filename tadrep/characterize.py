@@ -59,7 +59,7 @@ def calc_features(plasmid, inc_types_per_plasmid):
     # gene prediction (pyrodigal)
     plasmid['cds'] = gene_prediction(plasmid['sequence'])
 
-    cfg.verboseprint(f"Plasmid: {plasmid['id']:10} Length: {plasmid['length']:8} GC: {plasmid['gc_content']:3.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
+    cfg.verbose_print(f"Plasmid: {plasmid['id']:10} Length: {plasmid['length']:8} GC: {plasmid['gc_content']:3.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
     log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
 
     return plasmid

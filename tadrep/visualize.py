@@ -20,7 +20,7 @@ def plot():
             continue
         for draft_genome in plasmid["found_in"].keys():
             hits = plasmid['found_in'][draft_genome]
-            cfg.verboseprint(f'Plasmid ID: {plasmid["id"]}, Draft genome: {draft_genome}, Hits: {len(hits)}')
+            cfg.verbose_print(f'Plasmid ID: {plasmid["id"]}, Draft genome: {draft_genome}, Hits: {len(hits)}')
             log.info('plasmid: %s, genome: %s, contig-hits: %d', plasmid['id'], draft_genome, len(hits))
             output_path = cfg.output_path.joinpath(f'{draft_genome}-{plasmid["id"]}.pdf')
             create_figure(plasmid['id'], plasmid['length'], hits, output_path)
@@ -40,8 +40,8 @@ def create_figure(plasmid_id, plasmid_length, hits, output_path):
         contig_colour = get_gradient_colour(hit['perc_identity'])
         log.debug('contig: %s, plasmid_start: %d, plasmid_end: %d, identity: %f, colour: %f', hit['contig_id'], hit['reference_plasmid_start'], hit['reference_plasmid_end'], hit['perc_identity'], contig_colour)
         track.add_feature(hit['reference_plasmid_start'], hit['reference_plasmid_end'], strand, label=hit['contig_id'],
-         plotstyle=cfg.plotstyle, labelsize=cfg.labelsize, labelcolor=cfg.labelcolor, facecolor=str(contig_colour), linewidth=cfg.linewidth, 
-         labelrotation=cfg.labelrotation, labelhpos=cfg.labelhpos, labelha=cfg.labelha, arrow_shaft_ratio=cfg.arrow_shaft_ratio, size_ratio=cfg.size_ratio)
+         plotstyle=cfg.plot_style, labelsize=cfg.label_size, labelcolor=cfg.label_color, facecolor=str(contig_colour), linewidth=cfg.line_width, 
+         labelrotation=cfg.label_rotation, labelhpos=cfg.label_hpos, labelha=cfg.label_ha, arrow_shaft_ratio=cfg.arrow_shaft_ratio, size_ratio=cfg.size_ratio)
 
     fig = gv.plotfig()
     fig.savefig(output_path, dpi=600, format='pdf')

@@ -43,7 +43,7 @@ def prepare_blastdb(db_data):
 
     reference_plasmids = {id: db_data['plasmids'][id] for id in representative_ids}
 
-    cfg.verboseprint(f"Found {len(representative_ids)} representative plasmid(s)")
+    cfg.verbose_print(f"Found {len(representative_ids)} representative plasmid(s)")
     log.info("Found %d representative plasmid(s)", len(representative_ids))
 
     # write multifasta for blast search
