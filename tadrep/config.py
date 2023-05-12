@@ -202,19 +202,19 @@ def setup_detect(args):
 def setup_visualize(args):
 
     global plot_style, label_color, line_width, arrow_shaft_ratio, size_ratio
-    plot_style = args.plotstyle
-    label_color = args.labelcolor
-    line_width = args.linewidth
+    plot_style = args.plot_style
+    label_color = args.label_color
+    line_width = args.line_width
     arrow_shaft_ratio = args.arrow_shaft_ratio
     size_ratio = args.size_ratio
     log.info('plotstyle: %s, labelcolor: %s, linewdith: %f, arrow_shaft_ratio: %f, size_ratio: %f',
     plot_style, label_color, line_width, arrow_shaft_ratio, size_ratio)
 
     global label_size, label_rotation, label_hpos, label_ha
-    label_size = args.labelsize
-    label_rotation = args.labelrotation
-    label_hpos = args.labelhpos
-    label_ha = args.labelha
+    label_size = args.label_size
+    label_rotation = args.label_rotation
+    label_hpos = args.label_hpos
+    label_ha = args.label_ha
     log.info('labelsize: %d, labelrotation: %d, labelhpos: %s, labelha: %s',
     label_size, label_rotation, label_hpos, label_ha)
 
