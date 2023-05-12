@@ -6,6 +6,7 @@ import tadrep.utils as tu
 
 log = logging.getLogger('SETUP')
 
+description_pattern = re.compile('^>([a-zA-Z0-9()]+)_([0-9]+)_(.*)_(.*)$')
 
 def download_inc_reference():
 
@@ -37,7 +38,7 @@ def download_inc_reference():
                     # if line is header
                     if(line.startswith('>')):
                         # check if pattern
-                        if(re.search('^>([a-zA-Z0-9()]+)_([0-9]+)_(.*)_(.*)$', line)):
+                        if(description_pattern.match(line)):
                             inc_types.write(line.split('_')[0])
                         else:
                             inc_types.write(line)
