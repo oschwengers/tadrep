@@ -161,7 +161,7 @@ def write_cohort_table(plasmid_dict):
             sample = genome.stem
             fh.write(f'{sample}')
             for plasmid in transposed_plasmid_order[num_genome]:
-                fh.write(f'\t{"X" if plasmid else "-"}')
+                fh.write(f'\t{"1" if plasmid else "0"}')
             fh.write('\n')
 
 
@@ -170,4 +170,4 @@ def write_plasmids_info(plasmid_dict, reference_plasmids):
     with plasmid_info_path.open('w') as fh:
         fh.write(f'{"Plasmid":10} {"Length":>7} {"GC":>4} {"CDS":>5} {"INC_Types":>3}\n')
         for plasmid_id in plasmid_dict.keys():
-            fh.write(f'{reference_plasmids[plasmid_id]["id"]:10} {reference_plasmids[plasmid_id]["length"]:>7} {reference_plasmids[plasmid_id]["gc_content"]:>4.2} {len(reference_plasmids[plasmid_id]["cds"]):>5} {len(reference_plasmids[plasmid_id]["inc_types"]):>3}\n')
+            fh.write(f'{reference_plasmids[plasmid_id]["id"]:10} {reference_plasmids[plasmid_id]["length"]:>7} {reference_plasmids[plasmid_id]["gc_content"]:>4.2} {len(reference_plasmids[plasmid_id]["cds"]):>5} {", ".join([ inc_type["type"] for inc_type in reference_plasmids[plasmid_id]["inc_types"].values()]):>}\n')
