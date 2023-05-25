@@ -13,6 +13,7 @@ import tadrep.cluster as tcl
 import tadrep.characterize as tc
 import tadrep.detect as td
 import tadrep.visualize as tv
+import database.main as dm
 
 def main():
     args = tu.parse_arguments()
@@ -55,10 +56,13 @@ def main():
     cfg.verbose_print(f'\ttmp directory: {cfg.tmp_path}')
     cfg.verbose_print(f'\t# threads: {cfg.threads}')
 
+    if(args.subcommand == 'database'):
+        cfg.setup_database(args)
+        dm.create_database()
+
     if(args.subcommand == 'setup'):
         print('\nSetup started...')
         ts.download_inc_reference()
-
 
     if(args.subcommand == "extract"):
         print('\nExtraction started...')

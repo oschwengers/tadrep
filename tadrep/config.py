@@ -23,6 +23,10 @@ output_path = None
 tmp_path = None
 prefix = None
 
+# database setup
+force = False
+db_type = 'refseq'
+
 # extraction setup
 # Input
 files_to_extract = None
@@ -102,6 +106,15 @@ def setup(args):
         prefix = args.prefix
     log.info('output-path=%s', output_path)
     log.info('prefix=%s', prefix)
+
+
+def setup_database(args):
+    global force, db_type
+
+    force = args.force
+    log.info('force = %s', force)
+    db_type = args.type
+    log.info('db_type = %s', db_type)
 
 
 def setup_extract(args):
