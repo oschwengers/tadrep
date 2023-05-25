@@ -170,4 +170,5 @@ def write_plasmids_info(plasmid_dict, reference_plasmids):
     with plasmid_info_path.open('w') as fh:
         fh.write(f'{"Plasmid":10} {"Length":>7} {"GC":>4} {"CDS":>5} {"INC_Types":>3}\n')
         for plasmid_id in plasmid_dict.keys():
-            fh.write(f'{reference_plasmids[plasmid_id]["id"]:10} {reference_plasmids[plasmid_id]["length"]:>7} {reference_plasmids[plasmid_id]["gc_content"]:>4.2} {len(reference_plasmids[plasmid_id]["cds"]):>5} {", ".join([ inc_type["type"] for inc_type in reference_plasmids[plasmid_id]["inc_types"].values()]):>}\n')
+            plasmid_inc_types = ", ".join([ inc_type["type"] for inc_type in reference_plasmids[plasmid_id]["inc_types"].values()]) if len(reference_plasmids[plasmid_id]["inc_types"]) > 0 else "-"
+            fh.write(f'{reference_plasmids[plasmid_id]["id"]:10} {reference_plasmids[plasmid_id]["length"]:>7} {reference_plasmids[plasmid_id]["gc_content"]:>4.2} {len(reference_plasmids[plasmid_id]["cds"]):>5} {plasmid_inc_types:>}\n')
