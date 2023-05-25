@@ -2,7 +2,6 @@ import logging
 import shutil
 import sys
 
-import tadrep
 import tadrep.io as tio
 import tadrep.config as cfg
 import database.refseq as dr
