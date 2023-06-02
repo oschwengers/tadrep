@@ -51,11 +51,10 @@ TaDRep requires [Blast+](https://blast.ncbi.nlm.nih.gov) which must be installed
 
 ### Input
 
-TaDReP accepts bacterial draft genome assemblies in (zipped) fasta format. Complete reference plasmid sequences are provided either as a multi Fasta file or a custom database. For the latter, please read the [database](#database) section below.
+TaDReP accepts bacterial draft genome assemblies in (zipped) fasta format. Complete reference plasmid sequences are created either by downloading a public plasmid database (RefSeq / PLSDB) or extracting them from local files. For the latter, please read the [extract](#extract) section below.
 
 ### Output
 
-Per draft genome
 For each draft genome TaDReP writes a TSV summary file providing all detected reference plasmids and aligned genome contigs. For each reference plasmid that was detected in a draft assembly, ordered and rearranged contigs are exported as mere contigs and as a single pseudomolecule sequence combining contigs separated by multiple `N`.
 Furthermore, for each reconstructed plasmid, the reference plasmid backbone and all contig alignments are visualized as `PDF`.
 
