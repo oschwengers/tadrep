@@ -282,6 +282,14 @@ tadrep -v -o showcase cluster --skip
 ---
 ## Detect
 
+The detection maps contigs of bacterial draft genomes onto the reference plasmid using BLAST+.
+
+Each match is evaluated by coverage and identity of mapped plasmid section and can be individualy adjusted by using `--min-contig-identity` and `--min-contig-coverage`.
+If multiple contigs match a plasmid and the combined coverage and identity exceed a certain threshold, the combination of contigs is saved.
+
+Each detected plasmid is reconstructed as a pseudo sequence, where matching contigs are linked by a sequence of multiple 'N'.
+
+Information about reconstructed plasmids and which draft genome they were found in is combined in a summary and a presence-absence table.
 
 ```bash
 usage: TaDReP detect [-h] [--genome GENOME [GENOME ...]] [--min-contig-coverage [1-100]] [--min-contig-identity [1-100]] [--min-plasmid-coverage [1-100]] [--min-plasmid-identity [1-100]]
