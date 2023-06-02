@@ -51,7 +51,7 @@ def calc_features(plasmid, inc_types_per_plasmid):
     plasmid['length'] = len(plasmid['sequence'])
 
     # set gc_content
-    plasmid['gc_content'] = gc_content(plasmid['sequence'])
+    plasmid['gc_content'] = calc_gc_content(plasmid['sequence'])
 
     # set individual INC_types
     plasmid['inc_types'] = inc_types_per_plasmid.get(plasmid['id'], [])
@@ -65,7 +65,7 @@ def calc_features(plasmid, inc_types_per_plasmid):
     return plasmid
 
 
-def gc_content(sequence):
+def calc_gc_content(sequence):
     # count C and G occurences
     c_content = sequence.count('C')
     g_content = sequence.count('G')

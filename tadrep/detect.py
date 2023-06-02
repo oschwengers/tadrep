@@ -57,7 +57,7 @@ def detect_and_reconstruct():
     cfg.verbose_print('Analyze genome sequences...')
     values = ((genome_path, reference_plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
     with mp.Pool(cfg.threads) as pool:
-        genomes_summary = pool.starmap(pooling, values)
+        genomes_summary = pool.starmap(detect_plasmids, values)
 
     for genome_index, plasmid_summary in genomes_summary:
         for plasmid in plasmid_summary:
@@ -92,7 +92,7 @@ def detect_and_reconstruct():
         tio.export_json(cfg.db_data, cfg.db_path)
 
 
-def pooling(genome, reference_plasmids, index):
+def detect_plasmids(genome, reference_plasmids, index):
     log_pool = logging.getLogger('PROCESS')
 
     # Import draft genome contigs
