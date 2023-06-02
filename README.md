@@ -261,7 +261,6 @@ tadrep -v -o showcase characterize --db databases/plsdb/db.json --inc-types /inc
 ---
 ## Cluster
 
-
 This module aims to group plasmids with similar features.
 This is planned for a future release, currently the only option is to skip clustering, where each plasmid is separated in its own individual group.
 
@@ -339,6 +338,12 @@ Note: `--min-contig-coverage` / `--min-plasmid-identity` and `--min-contig-ident
 ---
 ## Visualize
 
+Visualize matching contigs from draft genomes for each detected plasmid.
+
+By default, contigs are represented by boxes, either on top or bottom of the plasmid center line. The position of the boxes represents a match on either forward or backward strand respectively.
+
+A colour gradient is used to indicate the identity between contig and plasmid section, a brighter colorization implies smaller sequence identity.
+The start of this gradient, where it is the brightest, can be individually set with the `--interval-start` parameter.
 
 ```bash
 usage: TaDReP visualize [-h] [--plotstyle {bigarrow,arrow,bigbox,box,bigrbox,rbox}] [--labelcolor LABELCOLOR] [--linewidth LINEWIDTH] [--arrow-shaft-ratio ARROW_SHAFT_RATIO] [--size-ratio SIZE_RATIO]
