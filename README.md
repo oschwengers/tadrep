@@ -74,69 +74,12 @@ A short summary of plasmids and which genomes were matched is also provided.
 - `tadrep.log`: log-file for debugging
 
 ---
-# Usage
+## Usage
 
-## Database
-
-TaDReP provides an easy way to download and transform public plasmid databases (PLSDB / RefSeq) into a BLASTDB or create a custom database from local files. 
-Files used for custom database creation need to be in (zipped) fasta format.
-
-TaDReP_DB creates a subdirectory in user specified output directory with all necessary BLASTDB files.
-
-If you created a database, you can skip the extract step and start with the [characterization](#characterize).
-```bash
-usage: TaDReP_DB [--type {refseq,plsdb,custom}] [--output OUTPUT] [--files [FILES ...]] [--database DATABASE] [--help] [--verbose] [--force]
-
-Download and create database for TaDReP
-
-Input / Output:
-  --type {refseq,plsdb,custom}
-                        External DB to import (default = 'refseq')
-  --output OUTPUT, -o OUTPUT
-                        Output directory for database files (default = current working directory)
-  --files [FILES ...]   Fasta files to create custom database
-  --database DATABASE, -db DATABASE
-                        Database path to update
-
-General:
-  --help, -h            Show this help message and exit
-  --verbose, -v         Print verbose information
-  --force, -f           Force download and new setup of database
-```
-
-### Examples
-Create refseq database in directory databases:
-```bash
-tadrep_db -v --type refseq -o databases
-```
-
-Create PLSDB database in directory databases:
-```bash
-tadrep_db -v --type plsdb -o databases
-```
-
-Create custom database in directory databases:
-```bash
-tadrep_db -v --type custom -o databases --files plasmids.fna
-```
-
-Using these three examples in succession creates following folder structure:
-```
-└── databases
-   ├── custom
-   ├── plsdb
-   └── refseq
-```
-
----
----
-
-## Main
-
-TaDReP is split up into six different submodules to provide easier usage.
+TaDReP is split up into seven different submodules to provide easier usage.
 
 ```bash
-usage: TaDReP [--help] [--verbose] [--threads THREADS] [--tmp-dir TMP_DIR] [--version] [--output OUTPUT] [--prefix PREFIX] {setup,extract,characterize,cluster,detect,visualize} ...
+usage: TaDReP [--help] [--verbose] [--threads THREADS] [--tmp-dir TMP_DIR] [--version] [--output OUTPUT] [--prefix PREFIX]  ...
 
 Targeted Detection and Reconstruction of Plasmids
 
@@ -153,9 +96,10 @@ General Input / Output:
                         Output directory (default = current working directory)
   --prefix PREFIX       Prefix for all output files (default = None)
 
-Modules:
-  {setup,extract,characterize,cluster,detect,visualize}
+Submodules:
+  
     setup               Download and prepare inc-types
+    database            Download and create database for TaDReP
     extract             Extract unique plasmid sequences
     characterize        Identify plasmids with GC content, Inc types, conjugation genes
     cluster             Cluster related plasmids
@@ -181,13 +125,61 @@ tadrep -v -o inc-types setup
 ```
 
 ---
+## Database
+
+TaDReP provides an easy way to download and transform public plasmid databases (PLSDB / RefSeq) into a reference plasmid file.
+This creates a subdirectory in user specified output directory with a json reference.
+
+If you downloaded a database, you can skip the extract step and start with the [characterization](#characterize).
+
+```bash
+usage: TaDReP database [-h] [--type {refseq,plsdb}] [--force]
+
+options:
+  -h, --help            show this help message and exit
+
+Input / Output:
+  --type {refseq,plsdb}
+                        External DB to import (default = 'refseq')
+  --force, -f           Force download and new setup of database
+```
+
+### Examples
+Create refseq database in directory databases:
+```bash
+tadrep -v -o databases database --type refseq
+```
+
+Create PLSDB database in directory databases:
+```bash
+tadrep -v -o databases database --type plsdb
+```
+
+Overwrite existing refseq files with newly downloaded data.
+```bash
+tadrep -v -o databases database --type refseq -f
+```
+
+Using these examples in succession creates following folder structure:
+```
+└── databases
+   ├── plsdb
+   └── refseq
+```
+
+---
 ## Extract
 
 
 Extract reference plasmid sequences from complete genomes, draft genomes or plasmid files in fasta format.
+
 Type 'genome' extracts all but the longest sequence, which can be adjusted by setting '--discard_longest'.
+
 Type 'draft' in combination with '--header' provides a possibility to extract only sequences with specific header contents.
+
 Type 'plasmid' extracts all sequences from a given file without any filtering.
+
+If you extracted references, you can skip the database step and start with the [characterization](#characterize).
 
 ```bash
 usage: TaDReP extract [-h] [--type {genome,plasmid,draft}] [--header HEADER] [--files FILES [FILES ...]] [--discard-longest DISCARD_LONGEST]
@@ -231,7 +223,7 @@ All plasmids are characterized by following features:
 - Length
 - GC - content
 - Incompatibility types
-- coding sequences
+- Coding sequences
 
 This module provides means to copy reference databases from different folders and to import incompatibility types downloaded by [tadrep setup](#setup).
 
@@ -261,7 +253,7 @@ If inc-types is already present inside the working directory, the parameter `--i
 tadrep -v -o showcase characterize
 ```
 
-If you set up a database you can import it into the working directory `showcase` with the `--db` parameter:
+If you downloaded a database you can import it into the working directory `showcase` with the `--db` parameter:
 ```bash
 tadrep -v -o showcase characterize --db databases/plsdb/db.json --inc-types /inc-types/inc-types.fasta
 ```
@@ -270,8 +262,8 @@ tadrep -v -o showcase characterize --db databases/plsdb/db.json --inc-types /inc
 ## Cluster
 
 
-This module aims to group plasmids with similar features together.
-This is planned for a future release, currently the only option is to skip clustering, where each plasmid is put in its own individual group.
+This module aims to group plasmids with similar features.
+This is planned for a future release, currently the only option is to skip clustering, where each plasmid is separated in its own individual group.
 
 ```bash
 usage: TaDReP cluster [-h] [--skip]
