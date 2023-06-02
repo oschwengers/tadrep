@@ -40,15 +40,15 @@ def parse_arguments():
     # add subparser
     subparsers = parser.add_subparsers(dest='subcommand', title='Submodules', required=True, metavar='Submodules')
 
+    # setup parser
+    setup_parser = subparsers.add_parser('setup', help='Download and prepare inc-types')
+
     # database parser
     db_parser = subparsers.add_parser('database', help='Download and create database for TaDReP')
 
     arg_group_io = db_parser.add_argument_group('Input / Output')
     arg_group_io.add_argument('--type', action='store', default='refseq', choices=['refseq', 'plsdb'], type=str.lower, help="External DB to import (default = 'refseq')")
     arg_group_io.add_argument('--force', '-f', action='store_true', help='Force download and new setup of database')
-
-    # setup parser
-    setup_parser = subparsers.add_parser('setup', help='Download and prepare inc-types')
 
     # extraction parser
     extraction_parser = subparsers.add_parser('extract', help='Extract unique plasmid sequences')
