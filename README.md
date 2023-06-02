@@ -173,7 +173,7 @@ Using these examples in succession creates following folder structure:
 
 Extract reference plasmid sequences from complete genomes, draft genomes or plasmid files in fasta format.
 
-Type 'genome' extracts all but the longest sequence, which can be adjusted by setting '--discard_longest'.
+Type 'genome' extracts all but the longest sequence, which can be adjusted by setting '--discard-longest'.
 
 Type 'draft' in combination with '--header' provides a possibility to extract only sequences with specific header contents.
 
@@ -243,9 +243,9 @@ Input:
 
 ### Examples
 
-Characterize plasmids in working directory `showcase` and import inc-types from `/inc-types` folder:
+Characterize plasmids in working directory `showcase` and import inc-types from `inc-types` folder:
 ```bash
-tadrep -v -o showcase characterize --inc-types /inc-types/inc-types.fasta
+tadrep -v -o showcase characterize --inc-types inc-types/inc-types.fasta
 ```
 
 If inc-types is already present inside the working directory, the parameter `--inc-types` can be omitted:
@@ -255,7 +255,7 @@ tadrep -v -o showcase characterize
 
 If you downloaded a database you can import it into the working directory `showcase` with the `--db` parameter:
 ```bash
-tadrep -v -o showcase characterize --db databases/plsdb/db.json --inc-types /inc-types/inc-types.fasta
+tadrep -v -o showcase characterize --db databases/plsdb/plsdb.json --inc-types inc-types/inc-types.fasta
 ```
 
 ---
