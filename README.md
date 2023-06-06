@@ -72,6 +72,11 @@ A short summary of plasmids and which genomes were matched is also provided.
 - `tadrep.log`: log-file for debugging
 
 ---
+## Overview
+
+![TaDReP overview](./images/tadrep.png)
+
+---
 ## Usage
 
 TaDReP is split up into seven different submodules to provide easier usage.
