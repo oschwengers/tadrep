@@ -12,6 +12,7 @@ TaDReP is a tool for the rapid and targeted detection and reconstruction of plas
 - [Description](#description)
 - [Installation](#installation)
 - [Input & Output](#input-and-output)
+- [Overview](#overview)
 - [Usage](#usage)
   * [Setup](#setup)
   * [Database](#database)
