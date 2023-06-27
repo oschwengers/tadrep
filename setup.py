@@ -32,8 +32,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'tadrep=tadrep.main:main',
-            'tadrep_db=database.main:main'
+            'tadrep=tadrep.main:main'
         ]
     },
     classifiers=[

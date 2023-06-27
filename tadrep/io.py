@@ -1,6 +1,5 @@
 import logging
-
-from pathlib import Path
+import json
 
 from Bio import SeqIO
 from xopen import xopen
@@ -70,3 +69,26 @@ def import_tsv(database_path):
             log.debug('imported: id=%s, description=%s, length=%i', plasmid['id'], plasmid['description'], plasmid['length'])
     log.info('imported: # plasmids=%i', len(plasmids))
     return plasmids
+
+
+def import_json(json_path):
+    with open(json_path, 'r') as fh:
+        data = json.load(fh)
+    log.info('imported json: # sequences=%i', len(data))
+    return data
+
+
+def export_json(data, json_path):
+    log.info('write json: path=%s, # sequences=%i', json_path, len(data))
+    with open(json_path, 'w') as fh:
+        json.dump(data, fh)
+
+
+def load_data(json_path):
+    if json_path.is_file():
+        log.debug('%s existing', json_path)
+        plasmid_dict = import_json(json_path)
+    else:
+        log.debug('%s NOT existing', json_path)
+        plasmid_dict = {}
+    return plasmid_dict

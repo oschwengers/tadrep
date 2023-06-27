@@ -8,7 +8,8 @@ dependencies:
   - xopen>=1.1.0
   - blast>=2.12.0
   - matplotlib>=1.4
+  - pygenomeviz>=0.3.2
   - pip=21.0.1
   - pip:
       - attrs==20.3.0
-      - dnaplotlib==1.0
+      - pyrodigal>=2.1.0

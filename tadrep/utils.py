@@ -26,26 +26,88 @@ def parse_arguments():
         add_help=False
     )
 
-    arg_group_io = parser.add_argument_group('Input / Output')
-    arg_group_io.add_argument('--genome', '-g', action='store', default=None, nargs="+", help='Draft genome path')
-    arg_group_io.add_argument('--plasmids', '-p', action='store', default=None, help='Plasmids path')
-    arg_group_io.add_argument('--db', action='store', default=None, help='Directory which contains blast database')
-    arg_group_io.add_argument('--output', '-o', action='store', default=os.getcwd(), help='Output directory (default = current working directory)')
-    arg_group_io.add_argument('--prefix', action='store', default=None, type=not_empty, help='Prefix for all output files (default = None)')
-    
-    arg_group_parameters = parser.add_argument_group('Annotation')
-    arg_group_parameters.add_argument('--min-contig-coverage', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_coverage', help="Minimal contig coverage (default = 90%%)")
-    arg_group_parameters.add_argument('--min-contig-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_identity', help="Maximal contig identity (default = 90%%)")
-    arg_group_parameters.add_argument('--min-plasmid-coverage', action='store', type=int, default=80, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_coverage', help="Minimal plasmid coverage (default = 80%%)")
-    arg_group_parameters.add_argument('--min-plasmid-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_identity', help="Minimal plasmid identity (default = 90%%)")
-    arg_group_parameters.add_argument('--gap-sequence-length', action='store', type=is_positive, default=10, dest='gap_sequence_length', help="Gap sequence N length (default = 10)")
-
     arg_group_general = parser.add_argument_group('General')
     arg_group_general.add_argument('--help', '-h', action='help', help='Show this help message and exit')
     arg_group_general.add_argument('--verbose', '-v', action='store_true', help='Print verbose information')
     arg_group_general.add_argument('--threads', '-t', action='store', type=is_positive, default=mp.cpu_count(), help='Number of threads to use (default = number of available CPUs)')
     arg_group_general.add_argument('--tmp-dir', action='store', default=None, help='Temporary directory to store blast hits')
     arg_group_general.add_argument('--version', action='version', version='%(prog)s ' + tadrep.__version__)
+
+    arg_group_gio = parser.add_argument_group('General Input / Output')
+    arg_group_gio.add_argument('--output', '-o', action='store', default=os.getcwd(), help='Output directory (default = current working directory)')
+    arg_group_gio.add_argument('--prefix', action='store', default=None, type=not_empty, help='Prefix for all output files (default = None)')
+
+    # add subparser
+    subparsers = parser.add_subparsers(dest='subcommand', title='Submodules', required=True, metavar='')
+
+    # setup parser
+    setup_parser = subparsers.add_parser('setup', help='Download and prepare inc-types')
+
+    # database parser
+    db_parser = subparsers.add_parser('database', help='Download and create database for TaDReP')
+
+    arg_group_io = db_parser.add_argument_group('Input / Output')
+    arg_group_io.add_argument('--type', action='store', default='refseq', choices=['refseq', 'plsdb'], type=str.lower, help="External DB to import (default = 'refseq')")
+    arg_group_io.add_argument('--force', '-f', action='store_true', help='Force download and new setup of database')
+
+    # extraction parser
+    extraction_parser = subparsers.add_parser('extract', help='Extract unique plasmid sequences')
+
+    arg_group_io = extraction_parser.add_argument_group('Input')
+    arg_group_io.add_argument('--type', '-t', action='store', default='genome', choices=['genome', 'plasmid', 'draft'], help='Type of input files')
+    arg_group_io.add_argument('--header', action='store', default=None, help='Template for header description inside input files: e.g.: header: ">pl1234" --> --header "pl"')
+    arg_group_io.add_argument('--files', '-f', action='store', default=None, nargs="+", help='File path')
+    arg_group_io.add_argument('--discard-longest', '-d', action='store', type=int, default=1, help='Discard n longest sequences in output')
+
+    # characterization parser
+    characterization_parser = subparsers.add_parser('characterize', help='Identify plasmids with GC content, Inc types, conjugation genes')
+    
+    arg_group_char = characterization_parser.add_argument_group('Input')
+    arg_group_char.add_argument('--db', action='store', default=None, dest='database', help='Import json file from a given database path into working directory')
+    arg_group_char.add_argument('--inc-types', action='store', default=None, help='Import inc-types from given path into working directory')
+
+    # clustering parser
+    clustering_parser = subparsers.add_parser('cluster', help='Cluster related plasmids')
+    
+    arg_group_parameters = clustering_parser.add_argument_group('Parameter')
+    arg_group_parameters.add_argument('--skip', '-s', action='store_true', help='Skips clustering, one group for each plasmid')
+
+    # detection parser
+    detection_parser = subparsers.add_parser('detect', help='Detect and reconstruct plasmids in draft genomes')
+
+    arg_group_io = detection_parser.add_argument_group('Input / Output')
+    arg_group_io.add_argument('--genome', '-g', action='store', default=None, nargs="+", help='Draft genome path')
+
+    arg_group_parameters = detection_parser.add_argument_group('Annotation')
+    arg_group_parameters.add_argument('--min-contig-coverage', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_coverage', help="Minimal contig coverage (default = 90%%)")
+    arg_group_parameters.add_argument('--min-contig-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_identity', help="Maximal contig identity (default = 90%%)")
+    arg_group_parameters.add_argument('--min-plasmid-coverage', action='store', type=int, default=80, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_coverage', help="Minimal plasmid coverage (default = 80%%)")
+    arg_group_parameters.add_argument('--min-plasmid-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_identity', help="Minimal plasmid identity (default = 90%%)")
+    arg_group_parameters.add_argument('--gap-sequence-length', action='store', type=is_positive, default=10, dest='gap_sequence_length', help="Gap sequence N length (default = 10)")
+
+    # visualization parser
+    visualization_parser = subparsers.add_parser('visualize', help='Visualize plasmid coverage of contigs')
+    
+    arg_group_plot = visualization_parser.add_argument_group('Style')
+    arg_group_plot.add_argument('--plot-style', action='store', default='box', dest='plot_style', choices=['bigarrow', 'arrow', 'bigbox', 'box', 'bigrbox', 'rbox'], help='Contig representation in plot (default = "box")')
+    arg_group_plot.add_argument('--label-color', action='store', default='black', dest='label_color', help='Contig label color (default = "black")')
+    arg_group_plot.add_argument('--line-width', action='store', default=0.0, type=float, dest='line_width', help='Contig edge linewidth (default = 0)')
+    arg_group_plot.add_argument('--arrow-shaft-ratio', action='store', default=0.5, type=float, dest='arrow_shaft_ratio', help='Size ratio between arrow head and shaft (default = 0.5)')
+    arg_group_plot.add_argument('--size-ratio', action='store', default=1.0, type=float, dest='size_ratio', help='Contig size ratio to track (default = 1.0)')
+
+    arg_group_label = visualization_parser.add_argument_group('Label')
+    arg_group_label.add_argument('--label-size', action='store', default=15, type=int, dest='label_size', help='Contig label size (default = 15)')
+    arg_group_label.add_argument('--label-rotation', action='store', default=45, type=int, dest='label_rotation', help='Contig label rotation (default = 45)')
+    arg_group_label.add_argument('--label-hpos', action='store', default='center', dest='label_hpos', choices=['left', 'center', 'right'], help='Contig label horizontal position (default = "center")')
+    arg_group_label.add_argument('--label-ha', action='store', default='left', dest='label_ha', choices=['left', 'center', 'right'], help='Contig label horizontal alignment (default = "left")')
+
+    arg_group_gradient = visualization_parser.add_argument_group('Gradient')
+    arg_group_gradient.add_argument('--interval-start', action='store', type=float, default=80, metavar='[0-100]', dest='interval_start', help='Percentage where gradient should stop (default = 80%%)')
+    arg_group_gradient.add_argument('--number-of-intervals', action='store', type=int, default=10, choices=range(1, 101), metavar='[1-100]', dest='interval_number', help='Number of gradient intervals (default = 10)')
+
+    arg_group_omit = visualization_parser.add_argument_group('Omit')
+    arg_group_omit.add_argument('--omit-ratio', action='store', default=1, type=int, choices=range(0, 101), metavar='[0-100]', dest='omit_ratio', help='Omit contigs shorter than X percent of plasmid length from plot  (default = 1%%)')
+
     return parser.parse_args()
 
 
