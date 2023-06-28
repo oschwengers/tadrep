@@ -168,7 +168,7 @@ def write_cohort_table(plasmid_dict):
 def write_plasmids_info(plasmid_dict, reference_plasmids):
     plasmid_info_path = cfg.output_path.joinpath('plasmids.info.tsv')
     with plasmid_info_path.open('w') as fh:
-        fh.write('Plasmid\tRepresentative\tLength\tGC\tCDS\tINC_Types')
+        fh.write('Plasmid\tRepresentative\tLength\tGC\tCDS\tINC_Types\n')
         for plasmid_id in plasmid_dict.keys():
             plasmid_inc_types = ', '.join([inc_type['type'] for inc_type in reference_plasmids[plasmid_id]['inc_types']]) if len(reference_plasmids[plasmid_id]["inc_types"]) > 0 else "-"
             fh.write(f"{reference_plasmids[plasmid_id]['id']}\t{reference_plasmids[plasmid_id]['representative']}\t{reference_plasmids[plasmid_id]['length']}\t{reference_plasmids[plasmid_id]['gc_content']}\t{len(reference_plasmids[plasmid_id]['cds'])}\t{plasmid_inc_types:>}\n")
