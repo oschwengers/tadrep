@@ -33,19 +33,24 @@ def extract():
         file_list.append(str(input_file))
 
         # import sequence
-        plasmids = tio.import_sequences(input_file, sequence=True)
-        log.info('File: %s, sequences: %d', input_file.name, len(plasmids))
+        imported_sequences = tio.import_sequences(input_file, sequence=True)
+        imported_sequences = imported_sequences.values()
+        log.info('File: %s, sequences: %d', input_file.name, len(imported_sequences))
 
         # call genome/draft/plasmid methods
+        extracted_plasmids = []
         if(cfg.file_type == 'genome'):
-            plasmids = filter_longest(plasmids)
+            extracted_plasmids = filter_longest(imported_sequences)
         elif(cfg.file_type == 'draft'):
-            plasmids = search_headers(plasmids)
+            extracted_plasmids = filter_by_header(imported_sequences)
+            extracted_plasmids = [plasmid for plasmid in extracted_plasmids if plasmid['length'] <= cfg.max_length]  # apply length filter
+        else:  # plasmid
+            extracted_plasmids = imported_sequences
         
         # add file name and new id to plasmids
-        cfg.verbose_print(f'File: {input_file.name}, detected plasmids: {len(plasmids)}')
-        log.info('File: %s, plasmids detected: %d', input_file.name, len(plasmids))
-        for plasmid in plasmids.values():
+        cfg.verbose_print(f'File: {input_file.name}, detected plasmids: {len(extracted_plasmids)}')
+        log.info('File: %s, plasmids detected: %d', input_file.name, len(extracted_plasmids))
+        for plasmid in extracted_plasmids:
             plasmid['file'] = input_file.name
             new_plasmids[plasmid['id']] = plasmid
 
@@ -61,39 +66,34 @@ def extract():
     tio.export_json(db_data, json_output_path)
 
 
-def search_headers(seq_dict):
-    filtered_dict = {}
+def filter_by_header(sequences):
     # search headers for 'plasmid' 'complete', 'circular=true' or custom string
     description_headers = ['plasmid', 'complete', 'circular=true']
 
-    for seq_id, sequence in seq_dict.items():
+    filtered_sequences = []
+    for sequence in sequences:
         # test if id contains custom string
         if(cfg.header):
             if(cfg.header in sequence['id']):
-                filtered_dict[seq_id] = sequence
+                filtered_sequences.append(sequence)
         else:
             # test description for predefined headers
             if(any(description in sequence['description'].lower() for description in description_headers)):
-                filtered_dict[seq_id] = sequence
+                filtered_sequences.append(sequence)
 
-    return filtered_dict
+    return filtered_sequences
 
 
-def filter_longest(seq_dict):
-    log.info('Discard %d longest sequences from %d entries', cfg.discard, len(seq_dict))
-    cfg.verbose_print(f'Discard {cfg.discard} longest sequences from {len(seq_dict)} entries')
+def filter_longest(plasmids):
+    log.info('Discard %d longest sequences from %d entries', cfg.discard_longest, len(plasmids))
+    cfg.verbose_print(f'Discard {cfg.discard_longest} longest sequences from {len(plasmids)} entries')
 
     # Error if discard too high
-    if(cfg.discard > len(seq_dict)):
-        log.error('Can not discard %d sequences from %d present!', cfg.discard, len(seq_dict))
+    if(cfg.discard_longest > len(plasmids)):
+        log.error('Can not discard %d sequences from %d present!', cfg.discard_longest, len(plasmids))
         sys.exit('ERROR: Can not discard more sequences than present!')
     
     # sort dict entries by length and discard longest
-    filtered_list = sorted(seq_dict.values(), key=lambda x: x['length'], reverse=True)[cfg.discard:]
+    filtered_plasmids = sorted(plasmids, key=lambda x: x['length'], reverse=True)[cfg.discard_longest:]
 
-    # rewrite list into dict
-    filtered_dict = {}
-    for entry in filtered_list:
-        filtered_dict[entry['id']] = entry
-    
-    return filtered_dict
+    return filtered_plasmids
