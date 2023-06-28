@@ -10,20 +10,18 @@ log = logging.getLogger('VISUALIZE')
 
 
 def plot():
-
     db_path = cfg.output_path.joinpath('db.json')
     db_data = tio.load_data(db_path)
 
-    for plasmid in db_data['plasmids'].values():
-        found_in = plasmid.get('found_in', {})
-        if( not found_in):
+    for cluster in db_data['clusters']:
+        detected_genomes = cluster.get('found_in', {})
+        if(len(detected_genomes) == 0):
             continue
-        for draft_genome in plasmid["found_in"].keys():
-            hits = plasmid['found_in'][draft_genome]
-            cfg.verbose_print(f'Plasmid ID: {plasmid["id"]}, Draft genome: {draft_genome}, Hits: {len(hits)}')
-            log.info('plasmid: %s, genome: %s, contig-hits: %d', plasmid['id'], draft_genome, len(hits))
-            output_path = cfg.output_path.joinpath(f'{draft_genome}-{plasmid["id"]}.pdf')
-            create_figure(plasmid['id'], plasmid['length'], hits, output_path)
+        for draft_genome, hits in cluster['found_in'].items():
+            cfg.verbose_print(f"Plasmid: {cluster['id']}, genome: {draft_genome}, hits: {len(hits)}")
+            log.info('plasmid: %s, genome: %s, contig-hits: %d', cluster['id'], draft_genome, len(hits))
+            output_path = cfg.output_path.joinpath(f"{draft_genome}-{cluster['id']}.pdf")
+            create_figure(cluster['id'], db_data['plasmids'][cluster['representative']]['length'], hits, output_path)
 
 
 def create_figure(plasmid_id, plasmid_length, hits, output_path):

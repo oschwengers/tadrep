@@ -22,17 +22,22 @@ def detect_and_reconstruct():
         log.debug("No plasmids in %s !", cfg.db_path)
         sys.exit(f"ERROR: No plasmids in database {cfg.db_path}!")
 
-    if(not cfg.db_data.get('cluster', [])):
+    if(not cfg.db_data.get('clusters', [])):
         log.debug("No Clusters in %s!", cfg.db_path)
         sys.exit(f"ERROR: No cluster in database {cfg.db_path}")
 
-    log.info("Loaded %d cluster with %d plasmids", len(cfg.db_data['cluster']), len(cfg.db_data['plasmids'].keys()))
+    log.info("Loaded %d cluster with %d plasmids", len(cfg.db_data['clusters']), len(cfg.db_data['plasmids'].keys()))
     cfg.verbose_print("Loaded data:")
-    cfg.verbose_print(f"\t{len(cfg.db_data['cluster'])} cluster")
+    cfg.verbose_print(f"\t{len(cfg.db_data['clusters'])} cluster")
     cfg.verbose_print(f"\t{len(cfg.db_data['plasmids'].keys())} plasmids total")
 
-    # Get representatives from DB
-    reference_plasmids = {id: cfg.db_data['plasmids'][id] for id in [cluster['representative'] for cluster in cfg.db_data['cluster']]}
+    # Merge clusters and representative info from DB
+    #reference_plasmids = {cluster['id']: cfg.db_data['plasmids'][cluster['representative']] for cluster in cfg.db_data['clusters']}
+    reference_plasmids = {}
+    for cluster in cfg.db_data['clusters']:
+        reference_plasmid = cfg.db_data['plasmids'][cluster['representative']].copy()
+        reference_plasmid.update(cluster)
+        reference_plasmids[cluster['id']] = reference_plasmid
     references_path = cfg.output_path.joinpath('references.fna')
     tio.export_sequences(reference_plasmids.values(), references_path)
 
@@ -48,7 +53,7 @@ def detect_and_reconstruct():
     ############################################################################
     plasmid_dict = {}
     plasmid_string_summary = []
-    plasmid_detected = {}
+    plasmids_detected = {}
 
     cfg.verbose_print('Analyze genome sequences...')
     values = ((genome_path, reference_plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
@@ -57,19 +62,19 @@ def detect_and_reconstruct():
 
     for genome_index, plasmid_summary in genomes_summary:
         for plasmid in plasmid_summary:
-            plasmid_id = plasmid['reference']
-            if(plasmid_id not in plasmid_detected):
-                plasmid_detected[plasmid_id] = {k: plasmid[k] for k in ['id', 'reference', 'length']}
-                plasmid_detected[plasmid_id]['found_in'] = {}
-            plasmid_detected[plasmid_id]['found_in'][plasmid['genome']] = plasmid['hits']
+            reference_id = plasmid['reference']
+            if(reference_id not in plasmids_detected):
+                plasmids_detected[reference_id] = {k: plasmid[k] for k in ['id', 'reference', 'length']}
+                plasmids_detected[reference_id]['found_in'] = {}
+            plasmids_detected[reference_id]['found_in'][plasmid['genome']] = plasmid['hits']
 
             # Create string for plasmid summary
             plasmid_string_summary.append(f"{plasmid['genome']}\t{plasmid['reference']}\t{plasmid['coverage']:.3f}\t{plasmid['identity']:.3f}\t{len(plasmid['hits'])}\t{','.join([hit['contig_id'] for hit in plasmid['hits']])}\n")
 
-            if(plasmid_id not in plasmid_dict):
-                plasmid_dict[plasmid_id] = [0] * len(cfg.genome_path)
-                log.info('Plasmid added: id=%s', plasmid_id)
-            plasmid_dict[plasmid_id][genome_index] = 1
+            if(reference_id not in plasmid_dict):
+                plasmid_dict[reference_id] = [0] * len(cfg.genome_path)
+                log.info('Plasmid added: id=%s', reference_id)
+            plasmid_dict[reference_id][genome_index] = 1
 
     with cfg.summary_path.open('w') as fh:
         fh.write(f'# {len(cfg.genome_path)} draft genome(s), {len(reference_plasmids)} reference plasmid(s)\n')
@@ -81,10 +86,11 @@ def detect_and_reconstruct():
         write_cohort_table(plasmid_dict)
         write_plasmids_info(plasmid_dict, reference_plasmids)
 
-    if(plasmid_detected):
-        for plasmid_id, plasmid_data in plasmid_detected.items():
-            cfg.db_data['plasmids'][plasmid_id]['found_in'] = plasmid_data['found_in']
-        
+    if(plasmids_detected):
+        for reference_id, plasmid_data in plasmids_detected.items():
+            for cluster in cfg.db_data['clusters']:
+                if cluster['id'] == reference_id:
+                    cluster['found_in'] = plasmid_data['found_in']
         tio.export_json(cfg.db_data, cfg.db_path)
 
 
@@ -111,13 +117,11 @@ def detect_plasmids(genome, reference_plasmids, index):
         ssp.write("plasmid\tcontig\tcontig start\tcontig end\tcontig length\tcoverage[%]\tidentity[%]\talignment length\tstrand\tplasmid start\tplasmid end\tplasmid length\n")
 
         for plasmid in detected_plasmids:
-
             plasmid_contigs_sorted = tp.reconstruct_plasmid(plasmid, contigs)
-
             prefix = f"{cfg.prefix}-{sample}-{plasmid['reference']}" if cfg.prefix else f"{sample}-{plasmid['reference']}"
             plasmid_contigs_path = cfg.output_path.joinpath(f'{prefix}-contigs.fna')
-            plasmid_pseudosequence_path = cfg.output_path.joinpath(f'{prefix}-pseudo.fna')
             tio.export_sequences(plasmid_contigs_sorted, plasmid_contigs_path, description=True, wrap=True)
+            plasmid_pseudosequence_path = cfg.output_path.joinpath(f'{prefix}-pseudo.fna')
             tio.export_sequences([plasmid], plasmid_pseudosequence_path, description=True, wrap=True)
 
             # Write detailed plasmid hits to sample summary file
@@ -144,7 +148,7 @@ def detect_plasmids(genome, reference_plasmids, index):
 
 
 def write_cohort_table(plasmid_dict):
-    plasmid_cohort_path = cfg.output_path.joinpath('plasmids.tsv')
+    plasmid_cohort_path = cfg.output_path.joinpath('plasmids.distribution.tsv')
     with plasmid_cohort_path.open('w') as fh:
         plasmid_order = []  # write plasmid header
         for plasmid in plasmid_dict.keys():
@@ -162,9 +166,9 @@ def write_cohort_table(plasmid_dict):
 
 
 def write_plasmids_info(plasmid_dict, reference_plasmids):
-    plasmid_info_path = cfg.output_path.joinpath('plasmids.info')
+    plasmid_info_path = cfg.output_path.joinpath('plasmids.info.tsv')
     with plasmid_info_path.open('w') as fh:
-        fh.write(f"{'Plasmid':10} {'Length':>7} {'GC':>4} {'CDS':>5} {'INC_Types':>3}\n")
+        fh.write('Plasmid\tRepresentative\tLength\tGC\tCDS\tINC_Types')
         for plasmid_id in plasmid_dict.keys():
             plasmid_inc_types = ', '.join([inc_type['type'] for inc_type in reference_plasmids[plasmid_id]['inc_types']]) if len(reference_plasmids[plasmid_id]["inc_types"]) > 0 else "-"
-            fh.write(f"{reference_plasmids[plasmid_id]['id']:10} {reference_plasmids[plasmid_id]['length']:>7} {reference_plasmids[plasmid_id]['gc_content']:>4.2} {len(reference_plasmids[plasmid_id]['cds']):>5} {plasmid_inc_types:>}\n")
+            fh.write(f"{reference_plasmids[plasmid_id]['id']}\t{reference_plasmids[plasmid_id]['representative']}\t{reference_plasmids[plasmid_id]['length']}\t{reference_plasmids[plasmid_id]['gc_content']}\t{len(reference_plasmids[plasmid_id]['cds'])}\t{plasmid_inc_types:>}\n")

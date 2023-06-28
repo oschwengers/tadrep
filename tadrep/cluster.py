@@ -38,7 +38,7 @@ def cluster_plasmids():
                 if current_cluster is not None:
                     clusters.append(current_cluster)
                 current_cluster = {
-                    'id': line[1:].split(' ')[1],  # cluster number
+                    'id': f"p{line[1:].split(' ')[1]}",  # cluster number
                     'representative': None,
                     'members': []
                 }
@@ -50,7 +50,7 @@ def cluster_plasmids():
         if current_cluster is not None:
             clusters.append(current_cluster)
 
-    db_data['cluster'] = clusters
+    db_data['clusters'] = clusters
 
     cfg.verbose_print('Detected plasmid clusters:')
     for cluster in clusters:
