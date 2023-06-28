@@ -18,7 +18,8 @@ def import_sequences(contigs_path, sequence=False):
         for record in SeqIO.parse(fh, 'fasta'):
             seq = str(record.seq).upper()
             contig = {
-                'id': record.id,
+                'id': f"{contigs_path.stem}-{record.id}",
+                'original-id': record.id,
                 'description': record.description.split(' ', maxsplit=1)[1] if ' ' in record.description else '',
                 'sequence': seq if sequence else None,
                 'length': len(seq)
@@ -81,7 +82,7 @@ def import_json(json_path):
 def export_json(data, json_path):
     log.info('write json: path=%s, # sequences=%i', json_path, len(data))
     with open(json_path, 'w') as fh:
-        json.dump(data, fh)
+        json.dump(data, fh, indent=4)
 
 
 def load_data(json_path):
