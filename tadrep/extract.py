@@ -71,10 +71,9 @@ def search_headers(seq_dict):
         if(cfg.header):
             if(cfg.header in sequence['id']):
                 filtered_dict[seq_id] = sequence
-                continue
         else:
             # test description for predefined headers
-            if(any(description in sequence['description'] for description in description_headers)):
+            if(any(description in sequence['description'].lower() for description in description_headers)):
                 filtered_dict[seq_id] = sequence
 
     return filtered_dict

@@ -29,7 +29,6 @@ def search_contigs(genome_path, blast_output_path):
     hits = []
     with blast_output_path.open('r') as fh:
         for line in fh:
-            # cols = line.strip().split('\t')
             (qseqid, qstart, qend, qlen, sseqid, sstart, send, length, nident, sstrand, evalue, bitscore) = line.strip().split('\t')
             hit = {
                 'contig_id': qseqid,

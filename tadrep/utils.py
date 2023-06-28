@@ -78,11 +78,11 @@ def parse_arguments():
     arg_group_io = detection_parser.add_argument_group('Input / Output')
     arg_group_io.add_argument('--genome', '-g', action='store', default=None, nargs="+", help='Draft genome path')
 
-    arg_group_parameters = detection_parser.add_argument_group('Annotation')
-    arg_group_parameters.add_argument('--min-contig-coverage', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_coverage', help="Minimal contig coverage (default = 90%%)")
-    arg_group_parameters.add_argument('--min-contig-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_identity', help="Maximal contig identity (default = 90%%)")
-    arg_group_parameters.add_argument('--min-plasmid-coverage', action='store', type=int, default=80, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_coverage', help="Minimal plasmid coverage (default = 80%%)")
-    arg_group_parameters.add_argument('--min-plasmid-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_identity', help="Minimal plasmid identity (default = 90%%)")
+    arg_group_parameters = detection_parser.add_argument_group('Detection')
+    arg_group_parameters.add_argument('--min-contig-coverage', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_coverage', help='Minimal contig coverage (default = 90%%)')
+    arg_group_parameters.add_argument('--min-contig-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_contig_identity', help='Maximal contig identity (default = 90%%)')
+    arg_group_parameters.add_argument('--min-plasmid-coverage', action='store', type=int, default=80, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_coverage', help='Minimal plasmid coverage (default = 80%%)')
+    arg_group_parameters.add_argument('--min-plasmid-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_plasmid_identity', help='Minimal plasmid identity (default = 90%%)')
     arg_group_parameters.add_argument('--gap-sequence-length', action='store', type=is_positive, default=10, dest='gap_sequence_length', help="Gap sequence N length (default = 10)")
 
     # visualization parser

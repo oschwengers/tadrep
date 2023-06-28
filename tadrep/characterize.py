@@ -47,10 +47,7 @@ def characterize():
 
 def calc_features(plasmid, inc_types_per_plasmid):
 
-    # set length
     plasmid['length'] = len(plasmid['sequence'])
-
-    # set gc_content
     plasmid['gc_content'] = calc_gc_content(plasmid['sequence'])
 
     # set individual INC_types
@@ -66,15 +63,7 @@ def calc_features(plasmid, inc_types_per_plasmid):
 
 
 def calc_gc_content(sequence):
-    # count C and G occurences
-    c_content = sequence.count('C')
-    g_content = sequence.count('G')
-    gc_combined = c_content + g_content
-
-    # calculate gc percentage
-    percentage = gc_combined / float(len(sequence))
-
-    return percentage
+    return (sequence.count('C') + sequence.count('G')) / float(len(sequence))
 
 
 def search_inc_types(db_path):
@@ -85,7 +74,6 @@ def search_inc_types(db_path):
         sys.exit("ERROR: Inc_types reference not found! Please import with '--inc-types PATH_TO_FASTA' or download it with subcommand setup!")
 
     tmp_output_path = cfg.tmp_path.joinpath('db.inc.blast.out')
-
     inc_types_cmd = [
         'blastn',
         '-query', str(inc_types),
@@ -96,7 +84,6 @@ def search_inc_types(db_path):
         '-outfmt', '6 qseqid sseqid sstart send sstrand pident qcovs bitscore',
         '-out', str(tmp_output_path)
     ]
-
     tu.run_cmd(inc_types_cmd, cfg.output_path)
 
     hits_per_plasmid = {}

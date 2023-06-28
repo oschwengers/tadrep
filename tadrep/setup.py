@@ -19,7 +19,6 @@ def download_inc_reference():
         return
 
     plasmidfinder_git = 'https://bitbucket.org/genomicepidemiology/plasmidfinder_db.git'
-
     print(f'Downloading {inc_types_path.name}')
     log.debug('Missing %s, cloning from %s', inc_types_path.name, plasmidfinder_git)
 
