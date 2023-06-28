@@ -30,7 +30,8 @@ db_type = 'refseq'
 # extraction setup
 # Input
 files_to_extract = None
-discard = 1
+discard_longest = 1
+max_length = None
 file_type = None
 header = None
 
@@ -118,7 +119,7 @@ def setup_database(args):
 
 
 def setup_extract(args):
-    global files_to_extract, discard, file_type, header
+    global files_to_extract, discard_longest, max_length, file_type, header
 
     if(not args.files):
         log.error('No files provided!')
@@ -126,10 +127,15 @@ def setup_extract(args):
 
     files_to_extract = [tu.check_file_permission(file, 'plasmid') for file in args.files]
 
-    discard = args.discard_longest
-    if(discard < 0):
-        log.error('Can not drop negative files!')
-        sys.exit('ERROR: Can not drop negative files!')
+    discard_longest = args.discard_longest
+    if(discard_longest < 0):
+        log.error('wrong discard-longest value!')
+        sys.exit('ERROR: Wrong parameter value for discard-ongest!')
+    
+    max_length = args.max_length
+    if(max_length < 0):
+        log.error('wrong max length value!')
+        sys.exit('ERROR: Wrong parameter value for max length!')
 
     file_type = args.type
     header = args.header

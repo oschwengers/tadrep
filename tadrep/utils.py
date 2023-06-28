@@ -57,7 +57,8 @@ def parse_arguments():
     arg_group_io.add_argument('--type', '-t', action='store', default='genome', choices=['genome', 'plasmid', 'draft'], help='Type of input files')
     arg_group_io.add_argument('--header', action='store', default=None, help='Template for header description inside input files: e.g.: header: ">pl1234" --> --header "pl"')
     arg_group_io.add_argument('--files', '-f', action='store', default=None, nargs="+", help='File path')
-    arg_group_io.add_argument('--discard-longest', '-d', action='store', type=int, default=1, help='Discard n longest sequences in output')
+    arg_group_io.add_argument('--discard-longest', '-d', action='store', type=int, default=1, dest='discard_longest', help='Discard n longest sequences in output')
+    arg_group_io.add_argument('--max-length', '-m', action='store', type=int, default=1000000, dest='max_length', help='Max sequence length (default = 1000000 bp)')
 
     # characterization parser
     characterization_parser = subparsers.add_parser('characterize', help='Identify plasmids with GC content, Inc types, conjugation genes')

@@ -185,9 +185,9 @@ Type 'plasmid' extracts all sequences from a given file without any filtering.
 If you extracted references, you can skip the database step and start with the [characterization](#characterize).
 
 ```bash
-usage: TaDReP extract [-h] [--type {genome,plasmid,draft}] [--header HEADER] [--files FILES [FILES ...]] [--discard-longest DISCARD_LONGEST]
+usage: TaDReP extract [-h] [--type {genome,plasmid,draft}] [--header HEADER] [--files FILES [FILES ...]] [--discard-longest DISCARD_LONGEST] [--max-length MAX_LENGTH]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
 
 Input:
@@ -198,26 +198,34 @@ Input:
                         File path
   --discard-longest DISCARD_LONGEST, -d DISCARD_LONGEST
                         Discard n longest sequences in output
+  --max-length MAX_LENGTH, -m MAX_LENGTH
+                        Max sequence length (default = 1000000 bp)
 ```
 
 ### Examples
 
-Extract all sequences from file `plasmids.fna` into folder `showcase` but ignore the two longest:
+Extract all sequences from file `plasmids.fna` ignoring the two longest:
 
 ```bash
-tadrep -v -o showcase extract --type genome --discard-longest 2 --files plasmids.fna
+tadrep -v --type genome --discard-longest 2 --files plasmids.fna
 ```
 
-Extract all sequences from file `plasmids.fna` where `header` contains `pl` into folder `showcase`:
+Extract all sequences from file `plasmids.fna` where `header` contains `pl`:
 
 ```bash
-tadrep -v -o showcase extract --type draft --header "pl" --files plasmids.fna
+tadrep -v --type draft --header "pl" --files plasmids.fna
 ```
 
-Extract all sequences from file `plasmids.fna` into folder `showcase`:
+Extract all potential plasmid sequences (one of 'plasmid', 'complete', 'circular=true' in header) from file `plasmids.fna` ignoring sequences longer than 500000 bp:
 
 ```bash
-tadrep -v -o showcase extract --type plasmid --files plasmids.fna
+tadrep -v --type draft --max-length 500000 --files plasmids.fna
+```
+
+Extract all sequences from file `plasmids.fna`:
+
+```bash
+tadrep -v --type plasmid --files plasmids.fna
 ```
 
 ## Characterize
