@@ -32,34 +32,19 @@ def characterize():
     # search inc_types for all plasmids
     inc_types_per_plasmid = search_inc_types(fasta_path)
 
-    # create pool for multiprocessing
-    values = ((plasmid, inc_types_per_plasmid) for plasmid in db_data['plasmids'].values())
-    with mp.Pool(cfg.threads, maxtasksperchild=100) as pool:
-        plasmids_summary = pool.starmap(calc_features, values)
+    for id, plasmid in db_data['plasmids'].items():
+        plasmid['length'] = len(plasmid['sequence'])
+        plasmid['gc_content'] = calc_gc_content(plasmid['sequence'])
+        plasmid['inc_types'] = inc_types_per_plasmid.get(plasmid['id'], [])
+        plasmid['cds'] = gene_prediction(plasmid['sequence'])  # gene prediction
 
-    for plasmid in plasmids_summary:
-        db_data['plasmids'][plasmid['id']] = plasmid
+        inc_types = ','.join([inc['type'] for inc in plasmid['inc_types']])
+        cfg.verbose_print(f"{plasmid['id']}:\tLength: {plasmid['length']:8}\tGC: {plasmid['gc_content']:3.2}\tCDS: {len(plasmid['cds']):5}\tInc Types: {inc_types}")
+        log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
 
     # update json
     print('Writing JSON...')
     tio.export_json(db_data, db_path)
-
-
-def calc_features(plasmid, inc_types_per_plasmid):
-
-    plasmid['length'] = len(plasmid['sequence'])
-    plasmid['gc_content'] = calc_gc_content(plasmid['sequence'])
-
-    # set individual INC_types
-    plasmid['inc_types'] = inc_types_per_plasmid.get(plasmid['id'], [])
-
-    # gene prediction (pyrodigal)
-    plasmid['cds'] = gene_prediction(plasmid['sequence'])
-
-    cfg.verbose_print(f"Plasmid: {plasmid['id']:10} Length: {plasmid['length']:8} GC: {plasmid['gc_content']:3.2} CDS: {len(plasmid['cds']):5} INC_Types: {len(plasmid['inc_types']):3}")
-    log.info('Plasmid: %s, len: %d, gc: %f, cds: %d, inc_types: %d', plasmid['id'], plasmid['length'], plasmid['gc_content'], len(plasmid['cds']), len(plasmid['inc_types']))
-
-    return plasmid
 
 
 def calc_gc_content(sequence):
@@ -90,6 +75,7 @@ def search_inc_types(db_path):
     with tmp_output_path.open('r') as fh:
         for line in fh:
             cols = line.rstrip().split('\t')
+            plasmid_id = cols[1]
             hit = {
                 'type': cols[0],
                 'start': int(cols[2]),
@@ -99,7 +85,6 @@ def search_inc_types(db_path):
                 'coverage': float(cols[6]) / 100,
                 'bitscore': int(float(cols[7]))
             }
-            plasmid_id = cols[1]
             if(hit['coverage'] >= 0.6):
                 hits_per_pos = hits_per_plasmid.get(plasmid_id, {})
                 hit_pos = hit['end'] if hit['strand'] == '+' else hit['start']
@@ -118,8 +103,20 @@ def search_inc_types(db_path):
                         plasmid_id, hit['type'], hit['start'], hit['end'], hit['strand']
                     )
                 hits_per_plasmid[plasmid_id] = hits_per_pos
-
-    return hits_per_plasmid
+    
+    filtered_hits_per_plasmid = {}
+    for plasmid_id, hits in hits_per_plasmid.items():  # remove potential smaller partial hits
+        hits_per_inc = {}
+        for hit in hits.values():
+            if hit['type'] in hits_per_inc:
+                former_hit = hits_per_inc[hit['type']]
+                if(hit['bitscore'] > former_hit['bitscore']):
+                    hits_per_inc[hit['type']] = hit
+            else:
+                hits_per_inc[hit['type']] = hit
+        filtered_hits_per_plasmid[plasmid_id] = list(hits_per_inc.values())
+    
+    return filtered_hits_per_plasmid
 
 
 def gene_prediction(plasmid_sequence):
