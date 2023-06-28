@@ -15,7 +15,7 @@ def search_contigs(genome_path, blast_output_path):
     cmd_blast = [
         'blastn',
         '-query', str(genome_path),
-        '-db', str(cfg.output_path.joinpath('reference_db/db')),
+        '-subject', str(cfg.output_path.joinpath('references.fna')),
         '-culling_limit', '1',
         '-evalue', '1E-5',
         '-num_threads', str(cfg.blast_threads),
@@ -31,7 +31,7 @@ def search_contigs(genome_path, blast_output_path):
         for line in fh:
             (qseqid, qstart, qend, qlen, sseqid, sstart, send, length, nident, sstrand, evalue, bitscore) = line.strip().split('\t')
             hit = {
-                'contig_id': qseqid,
+                'contig_id': f"{genome_path.stem}-{qseqid}",
                 'contig_start': int(qstart),
                 'contig_end': int(qend),
                 'contig_length': int(qlen),

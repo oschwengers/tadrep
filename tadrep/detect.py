@@ -31,19 +31,15 @@ def detect_and_reconstruct():
     cfg.verbose_print(f"\t{len(cfg.db_data['cluster'])} cluster")
     cfg.verbose_print(f"\t{len(cfg.db_data['plasmids'].keys())} plasmids total")
 
-    representative_ids = []
+    # Get representatives from DB
+    reference_plasmids = {id: cfg.db_data['plasmids'][id] for id in [cluster['representative'] for cluster in cfg.db_data['cluster']]}
+    references_path = cfg.output_path.joinpath('references.fna')
+    tio.export_sequences(reference_plasmids.values(), references_path)
 
-    # Get representatives from JSON file
-    for cluster in cfg.db_data['cluster']:
-        rep_id = cluster['representative']
-        representative_ids.append(rep_id)
+    cfg.verbose_print(f"Found {len(reference_plasmids)} representative plasmid(s)")
+    log.info("Found %d representative plasmid(s)", len(reference_plasmids))
 
-    # copy representatives with only relevant keys to save resources
-    necessary_keys = ['id', 'length', 'gc_content', 'inc_types', 'cds']
-    reference_plasmids = {id: {key: cfg.db_data['plasmids'][id][key] for key in necessary_keys} for id in representative_ids}
 
-    cfg.verbose_print(f"Found {len(representative_ids)} representative plasmid(s)")
-    log.info("Found %d representative plasmid(s)", len(representative_ids))
 
     ############################################################################
     # Prepare summary output file
