@@ -8,11 +8,11 @@ import tadrep.io as tio
 import tadrep.blast as tb
 import tadrep.plasmids as tp
 
+
 log = logging.getLogger('DETECTION')
 
 
 def detect_and_reconstruct():
-
     ############################################################################
     # Import plasmid sequences
     # - write multi Fasta file

@@ -12,6 +12,7 @@ import tadrep.io as tio
 
 log = logging.getLogger('CONFIG')
 
+
 # general setup
 # runtime configurations
 threads = None
@@ -78,6 +79,7 @@ label_hpos = 'center'
 label_ha = 'left'
 
 omit_ratio = 1
+
 
 def setup(args):
     """Test environment and build a runtime configuration."""

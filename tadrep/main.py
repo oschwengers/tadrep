@@ -15,6 +15,7 @@ import tadrep.detect as td
 import tadrep.visualize as tv
 import database.main as dm
 
+
 def main():
     args = tu.parse_arguments()
 

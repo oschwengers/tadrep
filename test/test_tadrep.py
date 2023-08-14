@@ -3,8 +3,6 @@ import shutil as sh
 from pathlib import Path
 from subprocess import run
 
-import pytest
-
 from .conftest import FILES
 
 def test_full(tmpdir):

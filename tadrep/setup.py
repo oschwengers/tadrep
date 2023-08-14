@@ -4,9 +4,11 @@ import re
 import tadrep.config as cfg
 import tadrep.utils as tu
 
+
 log = logging.getLogger('SETUP')
 
 description_pattern = re.compile('^>([a-zA-Z0-9()]+)_([0-9]+)_(.*)_(.*)$')
+
 
 def download_inc_reference():
 
