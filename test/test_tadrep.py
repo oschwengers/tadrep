@@ -12,7 +12,7 @@ def test_full(tmpdir):
     sh.copyfile(Path('test/data/db.json'), tmpdir_path.joinpath('db.json'))
     
     # all parameter OK
-    proc = run(['bin/tadrep', '--output', tmpdir_path, 'detect', '--genome', 'test/data/draft.fna'])
+    proc = run(['bin/tadrep', '-v', '--output', tmpdir_path, 'detect', '--genome', 'test/data/draft.fna'])
     assert proc.returncode == 0
     
     for file in FILES:  # all files in place and not empty
