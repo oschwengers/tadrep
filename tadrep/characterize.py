@@ -1,6 +1,5 @@
 import logging
 import sys
-import multiprocessing as mp
 
 import pyrodigal
 

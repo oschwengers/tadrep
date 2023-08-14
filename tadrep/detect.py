@@ -1,6 +1,6 @@
 import logging
 import sys
-import multiprocessing as mp
+import concurrent.futures as cf
 import numpy as np
 
 import tadrep.config as cfg
@@ -56,11 +56,13 @@ def detect_and_reconstruct():
     plasmids_detected = {}
 
     cfg.verbose_print('Analyze genome sequences...')
-    values = ((genome_path, reference_plasmids, genome_index) for genome_index, genome_path in enumerate(cfg.genome_path))
-    with mp.Pool(cfg.threads) as pool:
-        genomes_summary = pool.starmap(detect_plasmids, values)
+    futures = []
+    with cf.ThreadPoolExecutor(max_workers=cfg.threads) as pool:
+        for index, genome_path in enumerate(cfg.genome_path):
+            futures.append(pool.submit(detect_plasmids, genome_path, reference_plasmids, index))
 
-    for genome_index, plasmid_summary in genomes_summary:
+    for future in futures:
+        genome_index, plasmid_summary = future.result()
         for plasmid in plasmid_summary:
             reference_id = plasmid['reference']
             if(reference_id not in plasmids_detected):
