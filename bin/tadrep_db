@@ -1,6 +1,0 @@
-#!/bin/bash
-
-SCRIPT_DIR=$(dirname $(realpath $0))
-TADREP_PATH=$(realpath "${SCRIPT_DIR}/..")
-export PYTHONPATH="${TADREP_PATH}:${PYTHONPATH}"
-python3 -m database.main "$@"
