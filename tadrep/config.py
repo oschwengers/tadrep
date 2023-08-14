@@ -100,9 +100,9 @@ def setup(args):
             sys.exit(f'ERROR: dedicated temp dir ({tmp_path}) does not exist!')
         else:
             log.info('use dedicated temp dir: path=%s', tmp_path)
-            tmp_path = Path(tempfile.mkdtemp(dir=str(tmp_path)))
+            tmp_path = Path(tempfile.mkdtemp(dir=str(tmp_path))).resolve()
     else:
-        tmp_path = Path(tempfile.mkdtemp())
+        tmp_path = Path(tempfile.mkdtemp()).resolve()
     log.info('tmp-path=%s', tmp_path)
 
     if(args.prefix):
