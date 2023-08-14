@@ -72,7 +72,7 @@ def parse_arguments():
     
     arg_group_parameters = clustering_parser.add_argument_group('Parameter')
     arg_group_parameters.add_argument('--min-sequence-identity', action='store', type=int, default=90, choices=range(1, 101), metavar='[1-100]', dest='min_sequence_identity', help='Minimal plasmid sequence identity (default = 90%%)')
-    arg_group_parameters.add_argument('--min-sequence-length-difference', action='store', type=int, default=1000, choices=range(1, 1_000_001), metavar='[1-1000000]', dest='min_sequence_length_difference', help='Maximal plasmid sequence length difference in basepairs (default = 1000)')
+    arg_group_parameters.add_argument('--max-sequence-length-difference', action='store', type=int, default=1000, choices=range(1, 1_000_001), metavar='[1-1000000]', dest='max_sequence_length_difference', help='Maximal plasmid sequence length difference in basepairs (default = 1000)')
     arg_group_parameters.add_argument('--skip', '-s', action='store_true', help='Skips clustering, one group for each plasmid')
 
     # detection parser

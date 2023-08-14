@@ -173,7 +173,7 @@ def setup_cluster(args):
     cluster_sequence_identity_threshold = args.min_sequence_identity / 100
     log.info('cluster-sequence-identity-threshold=%0.3f', cluster_sequence_identity_threshold)
 
-    cluster_length_threshold = args.min_sequence_length_difference
+    cluster_length_threshold = args.max_sequence_length_difference
     log.info('cluster-length-threshold=%d', cluster_length_threshold)
 
     if(args.skip):
