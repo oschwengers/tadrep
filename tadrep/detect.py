@@ -1,6 +1,6 @@
 import logging
 import sys
-import multiprocessing as mp
+import multiprocessing.dummy as mp
 import numpy as np
 
 import tadrep.config as cfg
