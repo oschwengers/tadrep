@@ -7,7 +7,7 @@
 
 # TaDReP: Targeted Detection and Reconstruction of Plasmids
 
-TaDReP is a tool for the rapid and targeted detection and reconstruction of plasmids within bacterial draft assemblies.
+TaDReP is a tool for the rapid targeted detection and reconstruction of plasmids within bacterial draft genomes.
 
 - [Description](#description)
 - [Installation](#installation)
@@ -25,9 +25,9 @@ TaDReP is a tool for the rapid and targeted detection and reconstruction of plas
 
 ## Description
 
-TaDReP facilitates the rapid screening of target plasmids within single draft genomes or entire cohorts thereof.
+TaDReP facilitates the rapid screening for target plasmids within single or cohorts of draft genomes.
 
-It detects and reconstructs reference plasmids within bacterial draft assemblies via Blast+ contig alignments. Contig alignments are rigourously filtered regarding coverage and sequence identity thresholds. Finally, reference plasmids are detected and reconstructed upon strict thresholds regarding plasmid-wise coverage and sequence identity.
+It detects and reconstructs reference plasmids within bacterial draft assemblies via Blast+ alignments of draft genome contigs that are rigourously filtered for coverage and sequence identity thresholds. Finally, reference plasmids are detected and reconstructed if strict thresholds regarding plasmid-wise coverage and sequence identity are met.
 
 ## Installation
 
@@ -49,11 +49,11 @@ $ python3 -m pip install --user tadrep
 
 ### Input
 
-TaDReP accepts bacterial draft genome assemblies in (zipped) fasta format. Complete reference plasmid sequences are either extracted from (semi-)closed genomes or plasmid sequence collections of plasmid sequences (Fasta), or created from public plasmid databases (RefSeq / PLSDB). For information how to extract plasmid sequences, please read the [extract](#extract) section below.
+TaDReP accepts bacterial draft genome assemblies in (zipped) fasta format. Complete reference plasmid sequences are either extracted from (semi-)closed genomes or plasmid sequence collections, or created from public plasmid databases (RefSeq / PLSDB). For further information how to extract plasmid sequences, please read the [extract](#extract) section below.
 
 ### Output
 
-For each draft genome TaDReP writes a TSV summary file providing all detected reference plasmids and aligned genome contigs. For each reference plasmid that was detected in a draft assembly, ordered and rearranged contigs are exported as `N`-merged scaffolds, as well as mere contigs. Furthermore, for each reconstructed plasmid, the reference plasmid backbone and all contig alignments are visualized in a `PDF` figure.
+For each draft genome TaDReP writes a TSV summary file providing all detected reference plasmids and aligned genome contigs. For each reference plasmid that was detected in a draft assembly, ordered and rearranged contigs are exported as `N`-merged scaffolds, as well as mere contigs. Furthermore, for each reconstructed plasmid, the reference plasmid backbone and all contig alignments are visualized (PDF).
 
 - `<genome>-summary.tsv`: detailed per contig alignment summary
 - `<genome>-<plasmid>-contigs.fna`: ordered and rearranged contigs of the reconstructed plasmid
@@ -111,7 +111,7 @@ GitHub https://github.com/oschwengers/tadrep
 
 ## Setup
 
-The setup module downloads external databases, *e.g.* PlasmidFinders incompatibility groups that are required to characterize plasmids.
+The `setup` module downloads external databases, *e.g.* PlasmidFinders incompatibility groups that are required to characterize plasmids.
 
 ### Example
 
@@ -123,7 +123,7 @@ tadrep -v -o <output-path> setup
 
 ## Database
 
-The TaDReP database module downloads public plasmid databases (PLSDB / RefSeq) into a reference plasmid file. This creates a subdirectory in a user specified output directory.
+The `database` module downloads public plasmid databases (PLSDB / RefSeq) into a reference plasmid file. This creates a subdirectory in a user specified output directory.
 
 If you downloaded a database, you can skip the extract step and start with the [characterization](#characterize).
 
@@ -161,7 +161,7 @@ tadrep -v -o <output-path> database --type refseq -f
 
 ## Extract
 
-Extracts reference plasmid sequences from complete genomes, (semi-)draft genomes or plasmid files.
+The `extract` module Extracts reference plasmid sequences from complete genomes, (semi-)draft genomes or plasmid files.
 
 ```bash
 usage: TaDReP extract [-h] [--type {genome,plasmid,draft}] [--header HEADER] [--files FILES [FILES ...]] [--discard-longest DISCARD_LONGEST] [--max-length MAX_LENGTH]
@@ -217,12 +217,12 @@ tadrep -v --type plasmid --files plasmids.fna
 
 ## Characterize
 
-All reference plasmids are characterized by following features:
+The `characterize` module characterizes all reference plasmids by the following features:
 
 - Length
 - GC content
 - Incompatibility types
-- Coding sequences
+- Number of coding sequences
 
 If you downloaded a reference database this is the step to start with.
 
@@ -260,7 +260,7 @@ tadrep -v -o <output-path> characterize --db databases/plsdb/plsdb.json --inc-ty
 
 ## Cluster
 
-The cluster step/module groups plasmids with similar sequences and features.
+The `cluster` module groups plasmids with similar sequences and features.
 
 ```bash
 usage: TaDReP cluster [-h] [--min-sequence-identity [1-100]] [--max-sequence-length-difference [1-1000000]] [--skip]
@@ -284,7 +284,7 @@ tadrep -v cluster
 
 ## Detect
 
-The detection aligns contigs of bacterial draft genomes to reference plasmids using BLAST+. Each match is evaluated by coverage and sequence identity of the aligned plasmid section and can be individualy adjusted by using `--min-plasmid-identity` and `--min-plasmid-coverage`. If various contigs match a plasmid and the combined coverage and identity exceed a certain threshold, the combination of aligned contigs is saved.
+The `detect` module aligns contigs of bacterial draft genomes to reference plasmids using BLAST+. Each match is evaluated by coverage and sequence identity of the aligned plasmid section and can be individualy adjusted by using `--min-plasmid-identity` and `--min-plasmid-coverage`. If various contigs match a plasmid and the combined coverage and identity exceed a certain threshold, the combination of aligned contigs is saved.
 
 Each detected plasmid is reconstructed as a pseudo sequence, where matching contigs are linked by a sequence of `N`. Information on detected & reconstructed plasmids and in which draft genomes they were found in provided in a summary and a presence-absence table.
 
@@ -344,7 +344,7 @@ Note: `--min-contig-coverage` / `--min-plasmid-identity` and `--min-contig-ident
 
 ## Visualize
 
-Visualizes matching contigs from draft genomes for each detected plasmid.
+The `visualize` module visualizes matching contigs from draft genomes for each detected plasmid.
 
 By default, contigs are represented by boxes, either on top or bottom of the plasmid center line. The position of the boxes represents a match on either forward or backward strand respectively. A colour gradient is used to indicate the identity between contig and plasmid section, a brighter colorization implies smaller sequence identity. The start of this gradient, where it is the brightest, can be individually set with the `--interval-start` parameter.
 
