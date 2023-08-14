@@ -7,7 +7,7 @@
 
 # TaDReP: Targeted Detection and Reconstruction of Plasmids
 
-TaDReP is a tool for the rapid and targeted detection and reconstruction of plasmids within bacterial draft assemblies via contig alignments.
+TaDReP is a tool for the rapid and targeted detection and reconstruction of plasmids within bacterial draft assemblies.
 
 - [Description](#description)
 - [Installation](#installation)
@@ -25,9 +25,9 @@ TaDReP is a tool for the rapid and targeted detection and reconstruction of plas
 
 ## Description
 
-TaDReP facilitates the rapid screening of target plasmids within single genomes or genome cohorts.
+TaDReP facilitates the rapid screening of target plasmids within single draft genomes or entire cohorts thereof.
 
-It detects and reconstructs reference plasmids within bacterial draft assemblies via contig alignments. Therefore, contigs from draft assemblies are aligned against reference plasmid sequences via BLAST+ and rigourously filtered for contig-wise coverage and identity thresholds. Reference plasmids are finally detected and reconstructed upon strict plasmid-wise coverage and identity thresholds.
+It detects and reconstructs reference plasmids within bacterial draft assemblies via Blast+ contig alignments. Contig alignments are rigourously filtered regarding coverage and sequence identity thresholds. Finally, reference plasmids are detected and reconstructed upon strict thresholds regarding plasmid-wise coverage and sequence identity.
 
 ## Installation
 
@@ -36,7 +36,7 @@ TaDRep can be installed via Conda and Pip. However, we encourage to use [Conda](
 ### Conda
 
 ```bash
-$ conda env create --prefix ~/tmp/conda-envs/tadrep/ --file environment.yml
+conda install -c conda-forge -c bioconda tadrep
 ```
 
 ### Pip
@@ -45,26 +45,22 @@ $ conda env create --prefix ~/tmp/conda-envs/tadrep/ --file environment.yml
 $ python3 -m pip install --user tadrep
 ```
 
-TaDRep requires [Blast+](https://blast.ncbi.nlm.nih.gov) which must be installed & executable.
-
 ## Input and Output
 
 ### Input
 
-TaDReP accepts bacterial draft genome assemblies in (zipped) fasta format. Complete reference plasmid sequences are created either by downloading a public plasmid database (RefSeq / PLSDB) or extracting them from local files. For the latter, please read the [extract](#extract) section below.
+TaDReP accepts bacterial draft genome assemblies in (zipped) fasta format. Complete reference plasmid sequences are either extracted from (semi-)closed genomes or plasmid sequence collections of plasmid sequences (Fasta), or created from public plasmid databases (RefSeq / PLSDB). For information how to extract plasmid sequences, please read the [extract](#extract) section below.
 
 ### Output
 
-For each draft genome TaDReP writes a TSV summary file providing all detected reference plasmids and aligned genome contigs. For each reference plasmid that was detected in a draft assembly, ordered and rearranged contigs are exported as mere contigs and as a single pseudomolecule sequence combining contigs separated by multiple `N`.
-Furthermore, for each reconstructed plasmid, the reference plasmid backbone and all contig alignments are visualized as `PDF`.
+For each draft genome TaDReP writes a TSV summary file providing all detected reference plasmids and aligned genome contigs. For each reference plasmid that was detected in a draft assembly, ordered and rearranged contigs are exported as `N`-merged scaffolds, as well as mere contigs. Furthermore, for each reconstructed plasmid, the reference plasmid backbone and all contig alignments are visualized in a `PDF` figure.
 
 - `<genome>-summary.tsv`: detailed per contig alignment summary
 - `<genome>-<plasmid>-contigs.fna`: ordered and rearranged contigs of the reconstructed plasmid
 - `<genome>-<plasmid>-pseudo.fna`: pseudomolecule sequence of the reconstructed plasmid
 - `<genome>-<plasmid>.pdf`: visualization of aligned contigs against the detected reference plasmid
 
-If multiple genomes were provided, TaDReP also provides a presence/absence matrix of all detected plasmids for convenient cohort analyses.
-A short summary of plasmids and which genomes were matched is also provided.
+If multiple genomes are provided, TaDReP also provides a presence/absence matrix of all detected plasmids as a cohort analyses, as well as a short summary of plasmids and which contigs were matched in each genome.
 
 - `plasmids.info`: plasmid characterization summary
 - `plasmids.tsv`: presence/absence table of detected plasmids
@@ -77,7 +73,7 @@ A short summary of plasmids and which genomes were matched is also provided.
 
 ## Usage
 
-TaDReP is split up into seven different submodules to provide easier usage.
+TaDReP's workflow comprises seven steps implement in CLI submodules to ease semi-automated multi-step analyses.
 
 ```
 usage: TaDReP [--help] [--verbose] [--threads THREADS] [--tmp-dir TMP_DIR] [--version] [--output OUTPUT] [--prefix PREFIX]  ...
@@ -108,27 +104,26 @@ Submodules:
     visualize           Visualize plasmid coverage of contigs
 
 Citation:
-Schwengers et al. (2022)
+Schwengers et al. (2023)
 TaDReP: Targeted Detection and Reconstruction of Plasmids.
 GitHub https://github.com/oschwengers/tadrep
 ```
 
 ## Setup
 
-The setup module ist currently used to download and modify plasmid incompatibility groups, required to characterize plasmids.
+The setup module downloads external databases, *e.g.* PlasmidFinders incompatibility groups that are required to characterize plasmids.
 
 ### Example
 
-Verbosely download and write inc-types into folder 'inc-types':
+Verbosely download inc-types:
 
 ```bash
-tadrep -v -o inc-types setup
+tadrep -v -o <output-path> setup
 ```
 
 ## Database
 
-TaDReP provides an easy way to download and transform public plasmid databases (PLSDB / RefSeq) into a reference plasmid file.
-This creates a subdirectory in user specified output directory with a json reference.
+The TaDReP database module downloads public plasmid databases (PLSDB / RefSeq) into a reference plasmid file. This creates a subdirectory in a user specified output directory.
 
 If you downloaded a database, you can skip the extract step and start with the [characterization](#characterize).
 
@@ -146,43 +141,27 @@ Input / Output:
 
 ### Examples
 
-Create refseq database in directory databases:
+Create refseq database:
 
 ```bash
-tadrep -v -o databases database --type refseq
+tadrep -v -o <output-path> database --type refseq
 ```
 
-Create PLSDB database in directory databases:
+Create PLSDB database:
 
 ```bash
-tadrep -v -o databases database --type plsdb
+tadrep -v -o <output-path> database --type plsdb
 ```
 
 Overwrite existing refseq files with newly downloaded data.
 
 ```bash
-tadrep -v -o databases database --type refseq -f
-```
-
-Using these examples in succession creates following folder structure:
-
-```
-└── databases
-   ├── plsdb
-   └── refseq
+tadrep -v -o <output-path> database --type refseq -f
 ```
 
 ## Extract
 
-Extract reference plasmid sequences from complete genomes, draft genomes or plasmid files in fasta format.
-
-Type 'genome' extracts all but the longest sequence, which can be adjusted by setting '--discard-longest'.
-
-Type 'draft' in combination with '--header' provides a possibility to extract only sequences with specific header contents.
-
-Type 'plasmid' extracts all sequences from a given file without any filtering.
-
-If you extracted references, you can skip the database step and start with the [characterization](#characterize).
+Extracts reference plasmid sequences from complete genomes, (semi-)draft genomes or plasmid files.
 
 ```bash
 usage: TaDReP extract [-h] [--type {genome,plasmid,draft}] [--header HEADER] [--files FILES [FILES ...]] [--discard-longest DISCARD_LONGEST] [--max-length MAX_LENGTH]
@@ -201,6 +180,14 @@ Input:
   --max-length MAX_LENGTH, -m MAX_LENGTH
                         Max sequence length (default = 1000000 bp)
 ```
+
+For different input types specified via `--type`:
+
+- `genome`: extract all but the longest sequence. This can be adjusted via `--discard-longest`.
+- `draft`: extracts only sequences with specific headers. Headers can be specified via `--header`.
+- `plasmid`: extracts all sequences from a given file without any filtering.
+
+If you extracted references, you can skip the database step and start with the [characterization](#characterize).
 
 ### Examples
 
@@ -230,14 +217,12 @@ tadrep -v --type plasmid --files plasmids.fna
 
 ## Characterize
 
-All plasmids are characterized by following features:
+All reference plasmids are characterized by following features:
 
 - Length
-- GC - content
+- GC content
 - Incompatibility types
 - Coding sequences
-
-This module provides means to copy reference databases from different folders and to import incompatibility types downloaded by [tadrep setup](#setup).
 
 If you downloaded a reference database this is the step to start with.
 
@@ -255,27 +240,27 @@ Input:
 
 ### Examples
 
-Characterize plasmids in working directory `showcase` and import inc-types from `inc-types` folder:
+Characterize plasmids in working directory `<output-path>` and import inc-types from `inc-types` folder:
 
 ```bash
-tadrep -v -o showcase characterize --inc-types inc-types/inc-types.fasta
+tadrep -v -o <output-path> characterize --inc-types inc-types/inc-types.fasta
 ```
 
 If inc-types is already present inside the working directory, the parameter `--inc-types` can be omitted:
 
 ```bash
-tadrep -v -o showcase characterize
+tadrep -v -o <output-path> characterize
 ```
 
-If you downloaded a database you can import it into the working directory `showcase` with the `--db` parameter:
+If you downloaded a database you can import it into the working directory `<output-path>` with the `--db` parameter:
 
 ```bash
-tadrep -v -o showcase characterize --db databases/plsdb/plsdb.json --inc-types inc-types/inc-types.fasta
+tadrep -v -o <output-path> characterize --db databases/plsdb/plsdb.json --inc-types inc-types/inc-types.fasta
 ```
 
 ## Cluster
 
-This module aims to group plasmids with similar features. This is planned for a future release, currently the only option is to skip clustering, where each plasmid is separated in its own individual group.
+The cluster step/module groups plasmids with similar sequences and features.
 
 ```bash
 usage: TaDReP cluster [-h] [--skip]
@@ -284,20 +269,20 @@ optional arguments:
   -h, --help  show this help message and exit
 
 Parameter:
-  --skip, -s  Skips clustering, one group for each plasmid
+  --skip, -s Skips clustering, one group for each plasmid
 ```
 
 ### Example
 
 ```bash
-tadrep -v -o showcase cluster --skip
+tadrep -v cluster
 ```
 
 ## Detect
 
-The detection maps contigs of bacterial draft genomes onto the reference plasmid using BLAST+. Each match is evaluated by coverage and identity of mapped plasmid section and can be individualy adjusted by using `--min-contig-identity` and `--min-contig-coverage`. If multiple contigs match a plasmid and the combined coverage and identity exceed a certain threshold, the combination of contigs is saved.
+The detection aligns contigs of bacterial draft genomes to reference plasmids using BLAST+. Each match is evaluated by coverage and sequence identity of the aligned plasmid section and can be individualy adjusted by using `--min-plasmid-identity` and `--min-plasmid-coverage`. If various contigs match a plasmid and the combined coverage and identity exceed a certain threshold, the combination of aligned contigs is saved.
 
-Each detected plasmid is reconstructed as a pseudo sequence, where matching contigs are linked by a sequence of multiple 'N'. Information about reconstructed plasmids and which draft genome they were found in is combined in a summary and a presence-absence table.
+Each detected plasmid is reconstructed as a pseudo sequence, where matching contigs are linked by a sequence of `N`. Information on detected & reconstructed plasmids and in which draft genomes they were found in provided in a summary and a presence-absence table.
 
 ```bash
 usage: TaDReP detect [-h] [--genome GENOME [GENOME ...]] [--min-contig-coverage [1-100]] [--min-contig-identity [1-100]] [--min-plasmid-coverage [1-100]] [--min-plasmid-identity [1-100]]
@@ -325,37 +310,37 @@ Annotation:
 
 ### Examples
 
-Detect reference plasmids from directory `showcase` in file `draft.fna` with default settings:
+Detect reference plasmids from directory `<output-path>` in file `draft.fna` with default settings:
 
 ```bash
-tadrep -v -o showcase detect --genome draft.fna
+tadrep -v -o <output-path> detect --genome draft.fna
 ```
 
-Detect reference plasmids from directory `showcase` in file `draft.fna`;
+Detect reference plasmids from directory `<output-path>` in file `draft.fna`;
 
 `75%` of `contig length` has to be covered by a match;
 
  `Combined contig matches` have to cover at least `95%` of `reference plasmid` length:
 
 ```bash
-tadrep -v -o showcase detect --genome draft.fna --min-contig-coverage 75 --min-plasmid-coverage 95
+tadrep -v -o <output-path> detect --genome draft.fna --min-contig-coverage 75 --min-plasmid-coverage 95
 ```
 
-Detect reference plasmids from directory `showcase` in file `draft.fna`;
+Detect reference plasmids from directory `<output-path>` in file `draft.fna`;
 
 `Contig sequence` of a match has to be at least `80%` identical to reference plasmid;
 
 `Combined contig matches` have to sum up to at least `95%` identity of `reference plasmid` sequence:
 
 ```bash
-tadrep -v -o showcase detect --genome draft.fna --min-contig-identity 80 --min-plasmid-identity 95
+tadrep -v -o <output-path> detect --genome draft.fna --min-contig-identity 80 --min-plasmid-identity 95
 ```
 
 Note: `--min-contig-coverage` / `--min-plasmid-identity` and `--min-contig-identity` / `--min-plasmid-coverage` can be combined as well.
 
 ## Visualize
 
-Visualize matching contigs from draft genomes for each detected plasmid.
+Visualizes matching contigs from draft genomes for each detected plasmid.
 
 By default, contigs are represented by boxes, either on top or bottom of the plasmid center line. The position of the boxes represents a match on either forward or backward strand respectively. A colour gradient is used to indicate the identity between contig and plasmid section, a brighter colorization implies smaller sequence identity. The start of this gradient, where it is the brightest, can be individually set with the `--interval-start` parameter.
 
@@ -401,20 +386,20 @@ Omit:
 
 ### Examples
 
-Visualize results from detection in directory `showcase` with default settings:
+Visualize results from detection in directory `<output-path>` with default settings:
 
 ```bash
-tadrep -v -o showcase visualize
+tadrep -v -o <output-path> visualize
 ```
 
-Visualize results from detection in directory `showcase`;
+Visualize results from detection in directory `sho<output-path>wcase`;
 
 `Brightest colour` of gradient starts at `95.5%` sequence identity (darkest colour is always 100% identity);
 
 `Surround` contig blocks with `1px` line:
 
 ```bash
-tadrep -v -o showcase visualize --interval-start 95.5 --linewidth 1
+tadrep -v -o <output-path> visualize --interval-start 95.5 --linewidth 1
 ```
 
 ## Issues & Feature Requests
