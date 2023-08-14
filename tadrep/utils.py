@@ -14,7 +14,7 @@ log = logging.getLogger('UTILS')
 
 DB_FILES = ['db.tsv', 'db.ndb', 'db.not', 'db.ntf', 'db.nto']
 
-CITATION = 'Schwengers et al. (2022)\nTaDReP: Targeted Detection and Reconstruction of Plasmids.\nGitHub https://github.com/oschwengers/tadrep'
+CITATION = 'Schwengers et al. (2023)\nTaDReP: Targeted Detection and Reconstruction of Plasmids.\nGitHub https://github.com/oschwengers/tadrep'
 
 
 def parse_arguments():
