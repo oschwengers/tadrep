@@ -263,13 +263,17 @@ tadrep -v -o <output-path> characterize --db databases/plsdb/plsdb.json --inc-ty
 The cluster step/module groups plasmids with similar sequences and features.
 
 ```bash
-usage: TaDReP cluster [-h] [--skip]
+usage: TaDReP cluster [-h] [--min-sequence-identity [1-100]] [--max-sequence-length-difference [1-1000000]] [--skip]
 
-optional arguments:
-  -h, --help  show this help message and exit
+options:
+  -h, --help            show this help message and exit
 
 Parameter:
-  --skip, -s Skips clustering, one group for each plasmid
+  --min-sequence-identity [1-100]
+                        Minimal plasmid sequence identity (default = 90%)
+  --max-sequence-length-difference [1-1000000]
+                        Maximal plasmid sequence length difference in basepairs (default = 1000)
+  --skip, -s            Skips clustering, one group for each plasmid
 ```
 
 ### Example
