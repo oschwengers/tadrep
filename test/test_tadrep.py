@@ -8,11 +8,11 @@ import pytest
 from .conftest import FILES
 
 def test_full(tmpdir):
-    tmpdir_path = Path(tmpdir)
+    tmpdir_path = Path(tmpdir).resolve()
     sh.copyfile(Path('test/data/db.json'), tmpdir_path.joinpath('db.json'))
     
     # all parameter OK
-    proc = run(['bin/tadrep', '--output', tmpdir, 'detect', '--genome', 'test/data/draft.fna'])
+    proc = run(['bin/tadrep', '--output', tmpdir_path, 'detect', '--genome', 'test/data/draft.fna'])
     assert proc.returncode == 0
     
     for file in FILES:  # all files in place and not empty
