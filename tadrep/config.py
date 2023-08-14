@@ -39,6 +39,8 @@ header = None
 db_local_path = None
 
 # cluster setup
+cluster_sequence_identity_threshold = None
+cluster_length_threshold= None
 skip_cluster = False
 
 # detection setup
@@ -166,7 +168,13 @@ def setup_characterize(args):
 
 
 def setup_cluster(args):
-    global skip_cluster
+    global skip_cluster, cluster_sequence_identity_threshold, cluster_length_threshold
+
+    cluster_sequence_identity_threshold = args.min_sequence_identity / 100
+    log.info('cluster-sequence-identity-threshold=%0.3f', cluster_sequence_identity_threshold)
+
+    cluster_length_threshold = args.min_sequence_length_difference
+    log.info('cluster-length-threshold=%d', cluster_length_threshold)
 
     if(args.skip):
         skip_cluster = True

@@ -21,9 +21,16 @@ def cluster_plasmids():
         'cd-hit-est',
         '-i', str(fasta_path),
         '-o', str(cfg.tmp_path.joinpath('plasmids.clustered')),
-        '-c', '0.8',
-        '-S', '1000',
-        '-g', '1'
+        '-G', '1',  # use global sequence identity
+        '-c', str(cfg.cluster_sequence_identity_threshold),  # sequence identity threshold
+        '-S', str(cfg.cluster_sequence_identity_threshold),  # sequence length threshold in bps
+        '-AL', str(cfg.cluster_sequence_identity_threshold),  # aligntment length threshold in bps
+        '-g', '1',  # cluster to the most similar cluster (slower but more accurate)
+        '-r', '1',  # do +/+ and +/- alignments
+        '-mask', 'NX',  # mask N and X letters
+        '-d', '0',  # provide entire Fasta identifier in cluster description file
+        '-M', '0',  # allow unlimited memory consumption
+        '-T', str(cfg.threads)
     ]
     log.debug('cmd=%s', cmd_cdhitest)
     tu.run_cmd(cmd_cdhitest, cfg.tmp_path)
