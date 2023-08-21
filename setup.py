@@ -28,7 +28,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'biopython >= 1.78',
-        'xopen >= 1.1.0',
+        'xopen >= 1.5.0',
         'pyrodigal >= 2.1.0',
         'matplotlib >= 1.4',
         'pygenomeviz >= 0.3.2'
