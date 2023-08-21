@@ -30,7 +30,7 @@ setup(
         'biopython >= 1.78',
         'xopen >= 1.5.0',
         'pyrodigal >= 2.1.0',
-        'matplotlib >= 1.4',
+        'matplotlib >= 3.7',
         'pygenomeviz >= 0.3.2'
     ],
     entry_points={
