@@ -22,13 +22,16 @@ setup(
     author='Oliver Schwengers',
     author_email='oliver.schwengers@computational.bio.uni-giessen.de',
     url='https://github.com/oschwengers/tadrep',
-    packages=find_packages(include=['tadrep', 'tadrep.*', 'database', 'database.*']),
+    packages=find_packages(include=['tadrep', 'tadrep.*']),
     python_requires='>=3.8',
     include_package_data=False,
     zip_safe=False,
     install_requires=[
         'biopython >= 1.78',
-        'xopen >= 1.1.0'
+        'xopen >= 1.1.0',
+        'pyrodigal >= 2.1.0',
+        'matplotlib >= 1.4',
+        'pygenomeviz >= 0.3.2'
     ],
     entry_points={
         'console_scripts': [

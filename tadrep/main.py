@@ -13,7 +13,7 @@ import tadrep.cluster as tcl
 import tadrep.characterize as tc
 import tadrep.detect as td
 import tadrep.visualize as tv
-import database.main as dm
+import tadrep.database.main as dm
 
 
 def main():

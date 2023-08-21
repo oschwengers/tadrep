@@ -4,8 +4,8 @@ import sys
 
 import tadrep.io as tio
 import tadrep.config as cfg
-import database.refseq as dr
-import database.plsdb as dp
+import tadrep.database.refseq as dr
+import tadrep.database.plsdb as dp
 
 
 log = logging.getLogger('DATABASE')
