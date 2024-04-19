@@ -25,8 +25,8 @@ def cluster_plasmids():
         '-o', str(cfg.tmp_path.joinpath('plasmids.clustered')),
         '-G', '1',  # use global sequence identity
         '-c', str(cfg.cluster_sequence_identity_threshold),  # sequence identity threshold
-        '-S', str(cfg.cluster_sequence_identity_threshold),  # sequence length threshold in bps
-        '-AL', str(cfg.cluster_sequence_identity_threshold),  # aligntment length threshold in bps
+        '-S', str(cfg.cluster_length_threshold),  # sequence length threshold in bps
+        '-AL', str(cfg.cluster_length_threshold),  # aligntment length threshold in bps
         '-g', '1',  # cluster to the most similar cluster (slower but more accurate)
         '-r', '1',  # do +/+ and +/- alignments
         '-mask', 'NX',  # mask N and X letters
